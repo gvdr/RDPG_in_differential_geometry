@@ -1,7 +1,7 @@
-PWD /home/stirling/thesis/Conference Submission
+PWD /home/stirling/Documents/thesis/Conference Submission
 INPUT /usr/share/texmf-dist/web2c/texmf.cnf
 INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
-INPUT /home/stirling/thesis/Conference Submission/DraftDoc.tex
+INPUT /home/stirling/Documents/thesis/Conference Submission/DraftDoc.tex
 OUTPUT DraftDoc.log
 INPUT /usr/share/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/share/texmf-dist/tex/latex/base/article.cls

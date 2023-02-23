@@ -24,6 +24,14 @@
         inner sep=0pt,
         minimum size=0.45pt,
         font=\small},
+    targetcircle/.style={
+        circle,
+        draw=red,
+        fill=red,
+        fill opacity = 1,
+        inner sep=0pt,
+        minimum size=5pt,
+        font=\small},
     myarrow/.style={-},
     dottedarrow/.style={-,dashed},
     thiccarrow/.style={-,line width=0.9pt},
@@ -64,7 +72,7 @@
         (2) edge [color=black] (4)
         (3) edge [color=black] (4);
 
-    \node[mycircle] (x) at (-1.4, 1.7) {};
+    \node[targetcircle] (x) at (-1.4, 1.7) {};
 
     \path[every node/.style={font=\sffamily\small}]
         (x) edge [color=black] (0)

@@ -24,12 +24,19 @@
         inner sep=0pt,
         minimum size=0.45pt,
         font=\small},
+    targetcircle/.style={
+        circle,
+        draw=red,
+        fill=red,
+        fill opacity = 1,
+        inner sep=0pt,
+        minimum size=5pt,
+        font=\small},
     myarrow/.style={-},
     dottedarrow/.style={-,dashed},
     thiccarrow/.style={-,line width=0.9pt},
     node distance=1.2cm and 1.5cm
 ]
-
 \begin{scope}
     \begin{scope}[rotate=90]
         \foreach \x/\y in {0/0,72/1,144/2, 216/3, 288/4}{ % color in outer layer
@@ -62,7 +69,7 @@
         (c) edge [color=black] (d)
         (d) edge [color=black] (e);
 
-    \node[mycircle] (x) at (2.85, -0.6) {};
+    \node[targetcircle] (x) at (2.85, -0.6) {};
 
     \path[every node/.style={font=\sffamily\small}]
         (x) edge [color=black] (b);

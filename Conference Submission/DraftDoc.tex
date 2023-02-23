@@ -98,9 +98,10 @@ As it is completely general, we believe that the framework we are introducing ca
 \end{section}
 
 \begin{section}{Data}
-    In this paper we explore this process using three synthetic networks, one which consists of the node we are interested in modelling, the target node, transitioning from one large group to another large group. In the other network the target node slowly moves along a long chain of connected nodes.
 
-    In the 2 community network the communities are of size 40 and 50 and are each fully connected. The target node is initially fully connected to the 50 node community; at each time step one edge is removed between the target node and the 50 node community and replaced with an edge between the target node and the 40 node community \ref{2community train series}. This temporal network has 40 time steps in total, we use the first 20 to train the neural network and the last 20 to test it.
+    In this paper we simulate three temporal sequences of graphs. For each sequence we will be modelling the node in red, we will refer to this as the target node. For each sequence we train the model on the first 20 timesteps and compare the predictions for the next 15 timesteps. For clarity, each diagram \ref{2community train series} \ref{longTail train series} \ref{3community train series} has been simplified and illustrates the movement of the target node in each sequence.\\
+    
+    The 2 community network has communities of size 40 and 50, each of which are fully connected. The target node is initially fully connected to the 50 node community. In our simplified diagram \ref{2community train series}\subref{2community train series, a} that is represented by the five node community. At each time step one edge is removed between the target node and the larger community and replaced with an edge between the target node and the smaller community \ref{2community train series}\subref{2community train series, b}. This process is then continued \ref{2community train series}\subref{2community train series, c} for thirty five timesteps to generate our training and test data.
 
     Figures obtained from \cite{Emma2023}.
     \begin{figure}[H]
@@ -110,6 +111,7 @@ As it is completely general, we believe that the framework we are introducing ca
             \centering
             \resizebox{.6\width}{!}{\input{SynthDataDiagrams/2community1.tex}}
             \caption{Simplification of the 2 Community network at $t=1$.}
+            \label{2community train series, a}
         \end{subfigure}
         \hfill
         \centering
@@ -117,6 +119,7 @@ As it is completely general, we believe that the framework we are introducing ca
             \centering
             \resizebox{.6\width}{!}{\input{SynthDataDiagrams/2community2.tex}}
             \caption{Simplification of the 2 Community network at $t=2$.}
+            \label{2community train series, b}
         \end{subfigure}
         \hfill
         \centering
@@ -124,6 +127,7 @@ As it is completely general, we believe that the framework we are introducing ca
             \centering
             \resizebox{.6\width}{!}{\input{SynthDataDiagrams/2community3.tex}}
             \caption{Simplification of the 2 Community network at $t=3$.}
+            \label{2community train series, c}
         \end{subfigure}
         \caption{First 3 time steps of synthetic 2 community network.}
         \label{2community train series}
@@ -152,6 +156,7 @@ As it is completely general, we believe that the framework we are introducing ca
             \caption{Simplification of the long tail network at $t=3$.}
         \end{subfigure}\\
         \caption{First 3 time steps of synthetic long tail network.}
+        \label{longTail train series}
     \end{figure}    
 
 
