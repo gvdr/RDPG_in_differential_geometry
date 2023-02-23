@@ -99,7 +99,7 @@ As it is completely general, we believe that the framework we are introducing ca
 
 \begin{section}{Data}
 
-    In this paper we simulate three temporal sequences of graphs. For each sequence we will be modelling the node in red, we will refer to this as the target node. For each sequence we train the model on the first 20 timesteps and compare the predictions for the next 15 timesteps. For clarity, each diagram \ref{2community train series} \ref{longTail train series} \ref{3community train series} has been simplified and illustrates the movement of the target node in each sequence.\\
+    In this paper we simulate three temporal sequences of undirected graphs. For each sequence we will be modelling the node in red, we will refer to this as the target node. For each sequence we train the model on the first 20 timesteps and compare the predictions for the next 15 timesteps. For clarity, each diagram \ref{2community train series} \ref{longTail train series} \ref{3community train series} has been simplified and illustrates the movement of the target node in each sequence.\\
     
     The 2 community network has communities of size 40 and 50, each of which are fully connected. The target node is initially fully connected to the 50 node community. In our simplified diagram \ref{2community train series}\subref{2community train series, a} that is represented by the five node community. At each time step one edge is removed between the target node and the larger community and replaced with an edge between the target node and the smaller community \ref{2community train series}\subref{2community train series, b}. This process is then continued \ref{2community train series}\subref{2community train series, c} for thirty five timesteps to generate our training and test data.
 
@@ -133,13 +133,14 @@ As it is completely general, we believe that the framework we are introducing ca
         \label{2community train series}
     \end{figure}
 
-    For the long tail network we have a large (50 nodes) fully connected component at one end. This is used to orient the embedding and model. The target node starts attatched to the node that is attatched to this large componet. At each time step the target node move one node further down the tail.
+    In the long tail network \ref{longTail train series}, we have a long chain with fifty nodes and a fully connected component with forty nodes at one end of the chain. This is used to orient the embedding and model. The target node starts attatched to the node that is attatched to this large componet\ref{longTail train series, a}. At each time step the target node move one node further down the tail\ref{longTail train series, b}. Again, this is repeated to generate the training and test data \ref{longTail train series, c}.
     \begin{figure}[H]
         \centering
         \begin{subfigure}[c]{0.3\textwidth}
             \centering
             \resizebox{.6\width}{!}{\input{SynthDataDiagrams/longTail1.tex}}
             \caption{Simplification of the long tail network at $t=1$.}
+            \label{longTail train series, a}
         \end{subfigure}
         \hfill
         \centering
@@ -147,6 +148,7 @@ As it is completely general, we believe that the framework we are introducing ca
             \centering
             \resizebox{.6\width}{!}{\input{SynthDataDiagrams/longTail2.tex}}
             \caption{Simplification of the long tail network at $t=2$.}
+            \label{longTail train series, b}
         \end{subfigure}
         \hfill
         \centering
@@ -154,6 +156,7 @@ As it is completely general, we believe that the framework we are introducing ca
             \centering
             \resizebox{.6\width}{!}{\input{SynthDataDiagrams/longTail3.tex}}
             \caption{Simplification of the long tail network at $t=3$.}
+            \label{longTail train series, c}
         \end{subfigure}\\
         \caption{First 3 time steps of synthetic long tail network.}
         \label{longTail train series}
