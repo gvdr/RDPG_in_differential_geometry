@@ -51,6 +51,40 @@
       \field{pages}{134\bibrangedash 151}
       \range{pages}{18}
     \endentry
+    \entry{lehoucq1996deflation}{article}{}
+      \name{author}{2}{}{%
+        {{hash=212708c4a7882b6627153e24763f1cb2}{%
+           family={Lehoucq},
+           familyi={L\bibinitperiod},
+           given={Richard\bibnamedelima B},
+           giveni={R\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+        {{hash=4a66769137720e49f4960b536ca70e8a}{%
+           family={Sorensen},
+           familyi={S\bibinitperiod},
+           given={Danny\bibnamedelima C},
+           giveni={D\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {SIAM}%
+      }
+      \strng{namehash}{df9eea451981ad5fc31f71facca4ec79}
+      \strng{fullhash}{df9eea451981ad5fc31f71facca4ec79}
+      \strng{bibnamehash}{df9eea451981ad5fc31f71facca4ec79}
+      \strng{authorbibnamehash}{df9eea451981ad5fc31f71facca4ec79}
+      \strng{authornamehash}{df9eea451981ad5fc31f71facca4ec79}
+      \strng{authorfullhash}{df9eea451981ad5fc31f71facca4ec79}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{SIAM Journal on Matrix Analysis and Applications}
+      \field{number}{4}
+      \field{title}{Deflation techniques for an implicitly restarted Arnoldi iteration}
+      \field{volume}{17}
+      \field{year}{1996}
+      \field{pages}{789\bibrangedash 821}
+      \range{pages}{33}
+    \endentry
     \entry{newman2001clustering}{article}{}
       \name{author}{1}{}{%
         {{hash=214f45e2823b5430ca6f11c0fb3b6552}{%

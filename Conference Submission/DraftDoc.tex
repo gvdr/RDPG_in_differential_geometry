@@ -18,6 +18,23 @@ sorting=ynt
 \usepackage{pgffor}
 \usepackage{mathtools}
 \addbibresource{bibliography.bib}
+\usepackage{hyperref,thmtools}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{remark*}[theorem]{Remark}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{sublemma}{}[theorem]
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+% Override ugly default link
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ugly boxes
+  urlcolor     = blue, %Colour for external hyperlinks
+  linkcolor    = blue, %Colour of internal links
+  citecolor   = blue    %Colour of citations
+}
 
 \begin{document}
 
@@ -44,36 +61,117 @@ As it is completely general, we believe that the framework we are introducing ca
 \end{section}
 
 \begin{section}{Methodology}
+    We are given a sequence of graphs, and our goal is to predict the next graph in the sequence. To do this we read each graph as a Random Dot Product Graph (RDPG); a visual representation of this can be seen in \autoref{framework illustration}. To obtain the RDPG, we take each network observation \autoref{method nets} and represent them in the form of an adjacency matrix \autoref{method adjacency}. We then use a truncated singular value decomposition to reduce the dimensionality of our adjacency matrices[ref]. The rows of the output of the SVD can then be viewed as vector points in a d-dimensional space[ref], where d is the number of singular values we take for our SVD. In this space nodes that are similar, ie, nodes have many common neighbours, will be mapped to similar points in the space.
+    \begin{figure}
+    \centering
+    \begin{subfigure}[c]{1\textwidth}
+        \begin{tabular}{llll}
+        \begin{subfigure}[c]{0.25\textwidth}
+            \centering
+            \resizebox{.6\width}{!}{\input{SynthDataDiagrams/methodology1.tex}}
+            \label{method net, a}
+        \end{subfigure}
+        &
+        \centering
+        \begin{subfigure}[c]{0.25\textwidth}
+            \centering
+            \resizebox{.6\width}{!}{\input{SynthDataDiagrams/methodology2.tex}}
+            \label{method net, b}
+        \end{subfigure}
+        &
+        $\cdots$
+        &
+        \centering
+        \begin{subfigure}[c]{0.25\textwidth}
+            \centering
+            \resizebox{.6\width}{!}{\input{SynthDataDiagrams/methodology3.tex}}
+            \label{method net, c}
+        \end{subfigure}
+        
+        \end{tabular}
+        \caption{Example sequence of networks.}
+        \label{method nets}
+        
+    \end{subfigure}
+    \begin{subfigure}[c]{1\textwidth}
+        \begin{tabular}{llll}
+            $\begin{bmatrix}
+                \cdot & 1 & 1 & 1 & \cdot & \cdot & \cdot & \cdot\\
+                1 & \cdot & 1 & \cdot & \cdot & \cdot & \cdot & \cdot\\
+                1 & 1 & \cdot & 1 & 1 & \cdot & \cdot & \cdot\\
+                1 & \cdot & 1 & \cdot & \cdot & \cdot & \cdot & \cdot\\
+                \cdot & \cdot & 1 & \cdot & \cdot & 1 & 1 & \cdot\\
+                \cdot & \cdot & \cdot & \cdot & 1 & \cdot & \cdot & \cdot\\
+                \cdot & \cdot & \cdot & \cdot & 1 & \cdot & \cdot & 1\\
+                \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & 1 & \cdot
+            \end{bmatrix}$
+            &
+            $\begin{bmatrix}
+                \cdot & 1 & 1 & 1 & \cdot & \cdot & \cdot & \cdot\\
+                1 & \cdot & 1 & 1 & \cdot & \cdot & \cdot & \cdot\\
+                1 & 1 & \cdot & 1 & 1 & \cdot & \cdot & \cdot\\
+                1 & 1 & 1 & \cdot & \cdot & \cdot & \cdot & \cdot\\
+                \cdot & \cdot & 1 & \cdot & \cdot & 1 & 1 & \cdot\\
+                \cdot & \cdot & \cdot & \cdot & 1 & \cdot & \cdot & 1\\
+                \cdot & \cdot & \cdot & \cdot & 1 & \cdot & \cdot & 1\\
+                \cdot & \cdot & \cdot & \cdot & \cdot & 1 & 1 & \cdot
+            \end{bmatrix}$
+            &
+            $\cdots$
+            &
+            $\begin{bmatrix}
+                \cdot & 1 & 1 & 1 & \cdot & \cdot & \cdot & \cdot\\
+                1 & \cdot & 1 & 1 & \cdot & \cdot & \cdot & \cdot\\
+                1 & 1 & \cdot & 1 & \cdot & \cdot & \cdot & \cdot\\
+                1 & 1 & 1 & \cdot & \cdot & \cdot & \cdot & \cdot\\
+                \cdot & \cdot & \cdot & \cdot & \cdot & 1 & 1 & \cdot\\
+                \cdot & \cdot & \cdot & \cdot & 1 & \cdot & 1 & 1\\
+                \cdot & \cdot & \cdot & \cdot & 1 & 1 & \cdot & 1\\
+                \cdot & \cdot & \cdot & \cdot & \cdot & 1 & 1 & \cdot
+            \end{bmatrix}$
+            
+        \end{tabular}
+        \caption{Sequence of sparce adjacency matrices associated with the networks in \autoref{method nets}.}
+        \label{method adjacency}
+    \end{subfigure}
 
-    XXX A couple of rows about RDPG XXX
+        \begin{tabular}{llll}
 
-    XXX what are these matrix XXX
+        \end{tabular}
 
-    We used a Singular Value Decomposition of each matrix to embed our network in a low dimensional space.\
-        \[
-        A = U\Sigma V'
-        \]
-    XXX Let's not explain SVD, at most give a ref XXX
-    This can be truncated at an arbitrary number of eigenpairs to form a low dimentional approximation to $A$.
-        \[
-        A \approx \hat U \hat \Sigma \hat V'
-        \]\\
-    Where $\hat U, \hat \Sigma, \hat V$ are the first $d$ columns of $U, \Sigma, V$ \cite{golub1971singular}. $\hat U \sqrt{\hat \Sigma}$ is still associated with the in edges of our nodes, and $\sqrt{\hat \Sigma} \hat V' $ is still associated with the out edges of our nodes, but now we have simplified our system whilst keeping as much information as possible due to our descending order of singular values. These two matrices form our $d$ dimensional embedding.\\
-
-    The approximation given by this formula can be interpreted as a graph where the entry $(i,j)$ of the matrix are the probability that an edge exists from $i \rightarrow j$.This approach creates a random dot product graph\cite{athreya2017statistical}, a class of Latent Position Models \cite{hoff2002latent}. Finding the embedding is not trivial; we need to find the eigenpairs of each of $AA'$ and $A'A$. Because of the computational complexity we use the SVD function in Arpack.jl to approximate each matrix. This then changes the problem of discovering edge formation and destruction into learning a dynamical system.\\
-    It is important to note that the SVD is not unique. The distances between points will be the same for every embedding, but the orientation may be different, and so, if the SVD of each time step is not alligned, learning will be effectively impossible [<- show this]. Since our approximation method is an iterative approach, to align each SVD, we can simply pick the same initial vector guess for each [probably worth getting a reference].  
+        \caption{Visual illustration of the proposed framework.}
+        \label{framework illustration}
+    \end{figure}
     
-    Once we have this embedding of points, we look to model the trajectories of each point. That is, with some input data, point location, distance to neighbours, etc, we want to model the ODE of each point. To do this we make use of the SciML ecosystem of packages in the Julia programming language \cite{SciML_C_Rak}. To explore which architectures perform best for this system we then test various types. ~~~~~~~~~~~~~~~~~~~~~~~~\\
+    We used a Singular Value Decomposition of each adjacency matrix to embed our network in a low dimensional space. To execute the SVD\cite{golub1971singular} we use the Julia package [cite]. This package uses implicitly restarted Lanczos iterations\cite{lehoucq1996deflation} to approximate the eigen vectors and singular values of each of our adjacency matrices. From the "svds" function, we obtain two matrices, $L$ and $R$ where:\\
+    \begin{align}
+        L&=\hat L \sqrt{\hat \Sigma }\\
+        R &= \hat R \sqrt{\hat \Sigma }\\
+        A &\approx \hat L \hat \Sigma \hat R'\\
+        &\approx LR'
+    \end{align}
+    $L,\hat L, R, \hat R$ are each real valued $n\times d$ matrices, where the columns of $\hat L$ and $\hat R$ are the first $d$ eigenvectors of $AA'$ and $A'A$ respectively ordered by the size of their associated singular values. $\hat \Sigma$ is a $d\times d$ diagonal matrix whose entries are the singular values associated with each eigenvector. \\
+    It is important to note that the SVD is not unique. The distances between points will be the same for every embedding, but the orientation may be different, and so, if the SVD of each time step is not alligned, learning will be effectively impossible [<- show this]. Since our approximation method is an iterative approach, to align each SVD, we can simply pick the same initial vector guess for each [probably worth getting a reference]; this will cause the outputs of the Arpack function to each be aligned with eachother XXX with some requirements of the matrix/initial vec?XXX. Altenatively we can use Procrustes alignmet[cite package] to align the matrices after they have been generated.\\
+    The approximation  given by this formula can be interpreted as a graph where the entry $(i,j)$ of the matrix are the probability that an edge exists from $i \rightarrow j$.This approach creates a Random Dot Product Graph\cite{athreya2017statistical}, a class of Latent Position Models \cite{hoff2002latent}. Once we have this embedding of points, we look to model the trajectories of each point. That is, with some input data, point location, distance to neighbours, etc, we want to model the ODE of each point. To do this we make use of the SciML ecosystem of packages in the Julia programming language \cite{SciML_C_Rak}.\\
+
+    % IN THE THESIS MAYBE
+    % This can be truncated at an arbitrary number of eigenpairs to form a low dimentional approximation to $A$.
+    %     \[
+    %     A \approx \hat U \hat \Sigma \hat V'
+    %     \]\\
+    % Where $\hat U, \hat \Sigma, \hat V$ are the first $d$ columns of $U, \Sigma, V$ \cite{golub1971singular}. $\hat U \sqrt{\hat \Sigma}$ is still associated with the in edges of our nodes, and $\sqrt{\hat \Sigma} \hat V' $ is still associated with the out edges of our nodes, but now we have simplified our system whilst keeping as much information as possible due to our descending order of singular values. These two matrices form our $d$ dimensional embedding.\\
+
+
+     
+    
     
     % KNN Explaination
     As a way of limiting the complexity of our model, we limit the input of the neural network to the euclidean distances between the target node and its $k$ nearest neighbours. The target node is the node that we are looking to model the movement of and stays the same throughout each of the temporal networks. 
-    \begin{equation}
-        \begin{aligned}
-            %\centering
-            \mathbb{P}(i\rightarrow j)&\coloneqq L_i \cdot R_j\\
-            \mathbb{P}(\hat{i}\rightarrow j)&\coloneqq L_{\hat{i}} \cdot R_j
-        \end{aligned}
-    \end{equation}
+    \begin{align}
+        %\centering
+        \mathbb{P}(i\rightarrow j)&\coloneqq L_i \cdot R_j\\
+        \mathbb{P}(\hat{i}\rightarrow j)&\coloneqq L_{\hat{i}} \cdot R_j
+    \end{align}
     Where $(i,j)$ are nodes in the network and $\hat{i}$ is another node at the same timestep to $i$. This implies that the distance between these two nodes with respect to node $j$ is given by
     \begin{equation}
         \begin{gathered}
@@ -93,15 +191,14 @@ As it is completely general, we believe that the framework we are introducing ca
     Where $k$ is the number of neighbours we chose for the neural network input. Because the distance between points is discribed by the euclidean distance, we use this as our loss metric.
 
     % Symbolic Regression Explaination
-    !!expand on sym reg!! 
     With our trained NODE, we have a black box that approximates the system that governs the movement of Twitter users. To make this more interpretable we then look to approximate this black box into a combination of known functions using symbolic regression[citation (use the one from symreg package)]. For this process we need to define a set of functions which the algorithm will use to generate a tree of functions to find the best approximation to our NODE with. When using this method we usually are required to make two assumptions: that we have paired observations of $y(t), \frac{dy}{dt}$, and that the tree of expressions we will need is shallow. We will train the symbolic regression on the predictions of the neural network. By doing this, we can remove these assumptions\cite{kidger2022neural}.
 \end{section}
 
 \begin{section}{Data}
 
-    In this paper we simulate three temporal sequences of undirected graphs. For each sequence we will be modelling the node in red, we will refer to this as the target node. For each sequence we train the model on the first 20 timesteps and compare the predictions for the next 15 timesteps. For clarity, each diagram \ref{2community train series} \ref{longTail train series} \ref{3community train series} has been simplified and illustrates the movement of the target node in each sequence.\\
+    In this paper we simulate three temporal sequences of undirected graphs. For each sequence we will be modelling the node in red, we will refer to this as the target node. For each sequence we train the model on the first 20 timesteps and compare the predictions for the next 15 timesteps. For clarity, each diagram \autoref{2community train series} \autoref{longTail train series} \autoref{3community train series} has been simplified and illustrates the movement of the target node in each sequence.\\
     
-    The 2 community network has communities of size 40 and 50, each of which are fully connected. The target node is initially fully connected to the 50 node community. In our simplified diagram \ref{2community train series}\subref{2community train series, a} that is represented by the five node community. At each time step one edge is removed between the target node and the larger community and replaced with an edge between the target node and the smaller community \ref{2community train series}\subref{2community train series, b}. This process is then continued \ref{2community train series}\subref{2community train series, c} for thirty five timesteps to generate our training and test data.
+    The 2 community network has communities of size 40 and 50, each of which are fully connected. The target node is initially fully connected to the 50 node community. In our simplified diagram \autoref{2community train series, a} that is represented by the five node community. At each time step one edge is removed between the target node and the larger community and replaced with an edge between the target node and the smaller community \autoref{2community train series, b}. This process is then continued \autoref{2community train series, c} for thirty five timesteps to generate our training and test data.
 
     Figures obtained from \cite{Emma2023}.
     \begin{figure}[H]
@@ -133,7 +230,7 @@ As it is completely general, we believe that the framework we are introducing ca
         \label{2community train series}
     \end{figure}
 
-    In the long tail network \ref{longTail train series}, we have a long chain with fifty nodes and a fully connected component with forty nodes at one end of the chain. This is used to orient the embedding and model. The target node starts attatched to the node that is attatched to this large componet\ref{longTail train series, a}. At each time step the target node move one node further down the tail\ref{longTail train series, b}. Again, this is repeated to generate the training and test data \ref{longTail train series, c}.
+    In the long tail network \autoref{longTail train series}, we have a long chain with fifty nodes and a fully connected component with forty nodes at one end of the chain. This is used to orient the embedding and model. The target node starts attatched to the node that is attatched to this large componet \autoref{longTail train series, a}. At each time step the target node move one node further down the tail \autoref{longTail train series, b}. Again, this is repeated to generate the training and test data \autoref{longTail train series, c}.
     \begin{figure}[H]
         \centering
         \begin{subfigure}[c]{0.3\textwidth}
@@ -163,7 +260,7 @@ As it is completely general, we believe that the framework we are introducing ca
     \end{figure}    
 
 
-    We also create a set of three communities. The target node starts connected to all of these communities with each community having a different number of edges. The community with the fewest edges between the target node will have one edge removed at each timestep. The communities have sizes 40, 35, 30 and have 25, 24, and 23 edges to the target node respectively. 
+    We also simulate a sequence with three communities. The communities have sizes 40, 35, 30 and have 25, 24, and 23 edges to the target node respectively. In \autoref{3community train series} the communities have been simplified to have sizes of five, four, and 3. The target node starts connected to all of these communities with each community having a different number of edges \autoref{3community train series, a}. The community with the fewest edges between the target node will have one edge removed at each timestep \autoref{3community train series, b}, and this process is repeated to create the required number of timesteps \autoref{3community train series, c}.  
     \begin{figure}[H]
         \centering
         \centering
@@ -171,6 +268,7 @@ As it is completely general, we believe that the framework we are introducing ca
             \centering
             \resizebox{.6\width}{!}{\input{SynthDataDiagrams/3community1.tex}}
             \caption{Simplification of the 3 Community network at $t=1$.}
+            \label{3community train series, a}
         \end{subfigure}
         \hfill
         \centering
@@ -178,6 +276,7 @@ As it is completely general, we believe that the framework we are introducing ca
             \centering
             \resizebox{.6\width}{!}{\input{SynthDataDiagrams/3community2.tex}}
             \caption{Simplification of the 3 Community network at $t=2$.}
+            \label{3community train series, b}            
         \end{subfigure}
         \hfill
         \centering
@@ -185,6 +284,7 @@ As it is completely general, we believe that the framework we are introducing ca
             \centering
             \resizebox{.6\width}{!}{\input{SynthDataDiagrams/3community3.tex}}
             \caption{Simplification of the 3 Community network at $t=3$.}
+            \label{3community train series, c}
         \end{subfigure}
         \caption{First 3 time steps of synthetic 3 community network.}
         \label{3community train series}
@@ -192,9 +292,10 @@ As it is completely general, we believe that the framework we are introducing ca
     The 2 community temporal network was selected to illustrate that this process can be used to model a node changing communities in ideal conditions, and the long tail network was selected because we wanted to present these models with a range of problems. The two community problem is difficult for the neural network to learn because the same set of distances as input need to result in different outputs. The long tail problem is difficult for the embedding because a large portion of the network is along the off diagonals; meaning that, to get an accurate embedding, the dimension of the embedding would need to be close to the length of the tail. The three community problem should be the easiest to solve because it has been dileberately constructed to avoid the problems the other two models face.
 
 \end{section}
-\begin{section}{Results}
-    For each of theses systems, we took embedded the temporal network in two dimensions at each time step. The temporal embeddings were then divided into a training set of 20 and a testing set of 15. The output of the trained neural networks was then used to train a symbolic regression model that could use a simple set of addition, subtraction, division, and multiplication. 
 
+\begin{section}{Results and Discussion}
+    For each of theses systems, we took embedded the temporal network in two dimensions at each time step. The temporal embeddings were then divided into a training set of 20 and a testing set of 15. The output of the trained neural networks was then used to train a symbolic regression model that could use a simple set of addition, subtraction, division, and multiplication. \\
+    In fig \autoref{2community series}, \autoref{longtail series},\autoref{3community series} the green points are the embedded coordinates of the node in each of the communities. Each cluster is one separate community. The orange point is the true coordinate of the embedded target node at each time step. The blue point is our model prediction from the true target node at the first time step. As the time progresses, we see the true node move from one community cluster to the other. This is expected from the embedding; the target node starts as very similar to the first community (as it has many connections with nodes in that community) and as time progresses, it gradually becomes less and less similar to the first community and more similar to the second (as the edges between the target node and the first community are replaced with edges to the second community). As such, we see the target node move towards the second community.
     \begin{subsection}{2 Community}
         \begin{figure}
             \foreach \i in {1,...,15} {%
@@ -206,9 +307,11 @@ As it is completely general, we believe that the framework we are introducing ca
             \caption{2 Community test series. This series shows the comparison of the neural network model, the symbolic regression model trained on the neural network model, and the true solution of the two community system.}
             \label{2community series}
         \end{figure}
-        In fig \ref{2community series} the green points are the embedded coordinates of the node in each of the communities. Each cluster is one separate community. The orange point is the true coordinate of the embedded target node at each time step. The blue point is our model prediction from the true target node at the first time step. As the time progresses, we see the true node move from one community cluster to the other. This is expected from the embedding; the target node starts as very similar to the first community (as it has many connections with nodes in that community) and as time progresses, it gradually becomes less and less similar to the first community and more similar to the second (as the edges between the target node and the first community are replaced with edges to the second community). As such, we see the target node move towards the second community.
+        
 
-        In this case we see the symbolic regression overshoot the location of the target node and move far ahead of its location by the end of the training data. In contrast, the neural network moves away from the target node at first, then maintain that distance throughout the training data. This system was set up and trained multiple times, and each time we saw the symbolic regression model behave more erratically than the neural network model predictions.
+        In this case we see the symbolic regression overshoot the location of the target node and move far ahead of its location by the end of the training data. In contrast, the neural network moves away from the target node at first, then maintain that distance throughout the training data. This system was set up and trained multiple times, and each time we saw the symbolic regression model behave more erratically than the neural network model predictions.\\
+
+        It is interesting to see the symbolic regression model perform so much more poorly than the neural network model in this system. When we view the training section of the data, we see that there is a downward curve in the neural network predictions towards the end of the training data. It seems that the symbolic regression model picked this up and continued the downward trajectory throughout the test data. This downward curve may be because the problem that we are trying to solve is symmetrical. That is the same set of distances as input into the neural network, the target node needs to move away from its nearest neighbours in the first half, then move towards its nearest neighbours in the second half. Potential ways of breaking this symmetry may be to include information of the previous timestep, or to include the absolute position of the target node as input into the neural network.
     \end{subsection}
 
     \begin{subsection}{Long Tail}
@@ -222,9 +325,11 @@ As it is completely general, we believe that the framework we are introducing ca
             \caption{3 Community test series. This series shows the comparison of the neural network model, the symbolic regression model trained on the neural network model, and the true solution of the long tail system.}
             \label{longtail series}
         \end{figure}
-        In fig \ref{longtail series} we see the true embedding of the target node jump from one arm to the other at each timestep. It is clear that neither the the symbolic regression model nor the neural network model capture this movement, but the symbolic regression model does not move away from the data as quickly as the neural network model does.
+        In fig \autoref{longtail series} we see the true embedding of the target node jump from one arm to the other at each timestep. It is clear that neither the the symbolic regression model nor the neural network model capture this movement, but the symbolic regression model does not move away from the data as quickly as the neural network model does.
 
-        In contrast to this, the symbolic regression model remains close to the true target node throughout the test data.       
+        In contrast to this, the symbolic regression model remains close to the true target node throughout the test data.
+        
+        We see that neither the neural network model capture the movement of the target node to any real extent. One reason for this may again be an issue of symmetrical input. The distances from the k nearest neighbours to the target node do not seem to change much as the target node jumps from one arm to the other, but the neural network somehow needs to learn to jump left then right at alternating timesteps. The solutions to this would be the same as for the two community system.
     \end{subsection}
 
     \begin{subsection}{Three Community (Please Review)}
@@ -238,41 +343,24 @@ As it is completely general, we believe that the framework we are introducing ca
             \caption{Long tail test series. This series shows the comparison of the neural network model, the symbolic regression model trained on the neural network model, and the true solution of the 3 community system.}
             \label{3community series}
         \end{figure}
-        In fig \ref{3community series} we again, as the edges between the community with the fewest edges are removed, we see the target node move away from it in the embedding and towards the other two clusters of points (communities).
+        In fig \autoref{3community series} we again, as the edges between the community with the fewest edges are removed, we see the target node move away from it in the embedding and towards the other two clusters of points (communities).
 
         In the neural network only model, we see the prediction follow the true target node very closely at first. We then see the node drift further and further from the true target node. In contrast, the symbolic regression model remains much closer to the true position of the target node as the test data progresses. We see the symbolic regression move slightly ahead of the true location at first, but this distance remains relatively constant thereafter.
-    \end{subsection}
 
-\end{section}
-
-\begin{section}{Discussion}
-    \begin{subsection}{Two Community}
-        It is interesting to see the symbolic regression model perform so much more poorly than the neural network model in this system. When we view the training section of the data, we see that there is a downward curve in the neural network predictions towards the end of the training data. It seems that the symbolic regression model picked this up and continued the downward trajectory throughout the test data. This downward curve may be because the problem that we are trying to solve is symmetrical. That is the same set of distances as input into the neural network, the target node needs to move away from its nearest neighbours in the first half, then move towards its nearest neighbours in the second half. Potential ways of breaking this symmetry may be to include information of the previous timestep, or to include the absolute position of the target node as input into the neural network. 
-
-    \end{subsection}
-
-    \begin{subsection}{Long Tail}
-        We see that neither the neural network model capture the movement of the target node to any real extent. One reason for this may again be an issue of symmetrical input. The distances from the k nearest neighbours to the target node do not seem to change much as the target node jumps from one arm to the other, but the neural network somehow needs to learn to jump left then right at alternating timesteps. The solutions to this would be the same as for the two community system.
-    \end{subsection}
-    \begin{subsection}{Three Community}
         This was by far the largest improvement between the neural network and the symbolic regression. This could be because this system had the least difference between the training predictions and the true position of the target node. At the end of the test data we see the true target node move towards the origin. This is because it now only has edges to one community and so at each timestep it removes one of these. If this had continued, the target node would have no edges. Nodes with no edges are mapped to the origin. When this happened, the symbolic regression model prediction began to move further from the true node.
 
         We see a large difference in the training predictions between the 2 and 3 community systems. In the 2 community system, even in the training period, the predictions tended to wander and be less accurate. Whereas the 3 community training predictions remained very close to the true target node. The movement of the target node in the embedding was very similar between the two systems, and so the difference seems to be that the 2 community has symmetrical inputs.
     \end{subsection}
-    Using symbolic regression to approximate the neural network output seems to increase the stability of the extrapolation. This is most pronounced 
+
+\end{section}
 
 \begin{section}{Conclusion}
-    Not sure what to write for this
-\end{section}
+    Not sure what to write for this\\
+    Using symbolic regression to approximate the neural network output seems to increase the stability of the extrapolation. This is most pronounced 
 \end{section}
 
 
-% \begin{section}{What Next?}
-%     - optimisation\\
-%     - Scale up\\
-%     - Include more structural knowledge with underlying\\
-%     - Find and use real world data to test against
-% \end{section}
+
 \printbibliography
 
 \end{document}

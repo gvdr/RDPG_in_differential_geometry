@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.11.23)  23 FEB 2023 14:42
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.11.23)  27 FEB 2023 10:28
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**"/home/stirling/Documents/thesis/Conference Submission/SynthDataDiagrams/2community1.tex"
-(/home/stirling/Documents/thesis/Conference Submission/SynthDataDiagrams/2community1.tex
+**"/home/stirling/Documents/thesis/Conference Submission/SynthDataDiagrams/methodology3.tex"
+(/home/stirling/Documents/thesis/Conference Submission/SynthDataDiagrams/methodology3.tex
 LaTeX2e <2021-11-15> patch level 1
 L3 programming layer <2022-04-10> (/usr/share/texmf-dist/tex/latex/standalone/standalone.cls
 Document Class: standalone 2018/03/26 v1.3a Class to compile TeX sub-files standalone
@@ -382,8 +382,8 @@ File: pgflibraryarrows.meta.code.tex 2021/05/15 v3.1.9a (3.1.9a)
 File: l3backend-pdftex.def 2022-04-14 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count296
 \l__pdf_internal_box=\box85
-) (./2community1.aux)
-\openout1 = `2community1.aux'.
+) (./methodology3.aux)
+\openout1 = `methodology3.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 9.
 LaTeX Font Info:    ... okay on input line 9.
@@ -419,17 +419,17 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 48
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 )) [1
 
-] (./2community1.aux) ) 
+] (./methodology3.aux) ) 
 Here is how much of TeX's memory you used:
- 15619 strings out of 478238
- 333649 string characters out of 5850455
- 595534 words of memory out of 5000000
- 33601 multiletter control sequences out of 15000+600000
+ 15569 strings out of 478238
+ 332733 string characters out of 5850455
+ 592536 words of memory out of 5000000
+ 33551 multiletter control sequences out of 15000+600000
  469558 words of font info for 29 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 100i,7n,104p,503b,845s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 100i,7n,104p,504b,832s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on 2community1.pdf (1 page, 2400 bytes).
+Output written on methodology3.pdf (1 page, 1904 bytes).
 PDF statistics:
  11 PDF objects out of 1000 (max. 8388607)
  7 compressed objects within 1 object stream

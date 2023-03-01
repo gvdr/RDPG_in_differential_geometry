@@ -1,8 +1,8 @@
 PWD /home/stirling/Documents/thesis/Conference Submission/SynthDataDiagrams
 INPUT /usr/share/texmf-dist/web2c/texmf.cnf
 INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
-INPUT /home/stirling/Documents/thesis/Conference Submission/SynthDataDiagrams/2community1.tex
-OUTPUT 2community1.log
+INPUT /home/stirling/Documents/thesis/Conference Submission/SynthDataDiagrams/methodology1.tex
+OUTPUT methodology1.log
 INPUT /usr/share/texmf-dist/tex/latex/standalone/standalone.cls
 INPUT /usr/share/texmf-dist/tex/latex/standalone/standalone.cls
 INPUT /usr/share/texmf-dist/tex/latex/standalone/standalone.cls
@@ -475,10 +475,10 @@ INPUT /usr/share/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 INPUT /usr/share/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 INPUT /usr/share/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 INPUT /usr/share/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
-INPUT ./2community1.aux
-INPUT 2community1.aux
-INPUT 2community1.aux
-OUTPUT 2community1.aux
+INPUT ./methodology1.aux
+INPUT methodology1.aux
+INPUT methodology1.aux
+OUTPUT methodology1.aux
 INPUT /usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 INPUT /usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 INPUT /usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
@@ -500,5 +500,5 @@ INPUT /usr/share/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 INPUT /usr/share/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 INPUT /usr/share/texmf-dist/fonts/map/fontname/texfonts.map
 INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmr9.tfm
-OUTPUT 2community1.pdf
-INPUT 2community1.aux
+OUTPUT methodology1.pdf
+INPUT methodology1.aux
