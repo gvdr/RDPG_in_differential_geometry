@@ -1,7 +1,11 @@
 using PlotlyJS
 using ColorSchemes
-include("../_Modular Functions/pca.jl")
 include("../_Modular Functions/loadGlobalConstants.jl")
+
+include("../_Modular Functions/pca.jl")
+include("../Symbolic Regression/symreg.jl")
+
+
 
 
 function get_embedding(B, pred)
@@ -18,10 +22,10 @@ end
 using DelimitedFiles
 
 
-sltn = readdlm("/home/connor/Thesis/Code/Solutions/$net_name test only.csv", ',')
+sltn = readdlm("./Code/Solutions/$net_name test only.csv", ',')
 
 for i in 1:datasize
-    pts = t_data[i+datasize]#get_embedding([sltn_sym_reg[:,i]'; t_data[i+datasize]], sltn[:,i])
+    pts = t_data[i+datasize]'#get_embedding([sltn_sym_reg[:,i]'; t_data[i+datasize]], sltn[:,i])
     mid = convert(Int, dims[1]/2)
     traces0 = PlotlyJS.scatter(x=[sltn[1,i]], y=[sltn[2,i]], mode="markers", name="Neural Network Pred", marker_size=12)
     traces1 = PlotlyJS.scatter(x=[sltn_sym_reg[1,i]], y=[sltn_sym_reg[2,i]], mode="markers", name="Symbolic Regression Pred", marker_size=12)
@@ -29,7 +33,7 @@ for i in 1:datasize
     
     traces3 = PlotlyJS.scatter(x=pts[2:mid,1], y=pts[1:mid,2], mode="markers", name="Data")
     display(PlotlyJS.plot([traces0,traces1,traces2, traces3]))
-    savefig(PlotlyJS.plot([traces0, traces1, traces2, traces3]), "/home/connor/Thesis/Code/Plots/Test Only/$net_name/$net_name $i.png")
+    savefig(PlotlyJS.plot([traces0, traces1, traces2, traces3]), "./Code/Plots/Test Only/$net_name/$net_name $i.png")
 
 end
 

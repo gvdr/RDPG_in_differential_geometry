@@ -3,29 +3,26 @@ using DelimitedFiles
 include("../_Modular Functions/helperFunctions.jl")
 include("../_Modular Functions/loadGlobalConstants.jl")
 
-sltn = readdlm("/home/connor/Thesis/Code/Solutions/$net_name.csv", ',')
-sltnt = readdlm("/home/connor/Thesis/Code/Solutions/$net_name test only.csv", ',')
+sltn = readdlm("./Code/Solutions/$net_name.csv", ',')
+sltnt = readdlm("./Code/Solutions/$net_name test only.csv", ',')
 grad_sltn = sltn[:,2:end].-sltn[:,1:end-1]
 
-trace = scatter(x=sltn[1,1:datasize*100],y=sltn[2,1:datasize*100], mode="markers")
-trace2 =  scatter(x=[t_data[i][1,1] for i in 1:40],y=[t_data[i][1,2] for i in 1:40], mode="markers")
-trace3 =  scatter(x=sltnt[1,1:end],y=sltnt[2,1:end], mode="markers")
+# trace = scatter(x=sltn[1,1:datasize*100],y=sltn[2,1:datasize*100], mode="markers", name="sltn from start")
+# trace2 =  scatter(x=[t_data[i][1,1] for i in 1:40],y=[t_data[i][1,2] for i in 1:datasize], mode="markers", name="train")
+# trace3 =  scatter(x=[t_data[i+datasize][1,1] for i in 1:datasize],y=[t_data[i+datasize][1,2] for i in 1:datasize], mode="markers", name="test")
+# trace4 =  scatter(x=sltnt[1,1:end],y=sltnt[2,1:end], mode="markers", name="sltn from test")
 
-plot([trace, trace2, trace3])
+# plot([trace, trace2, trace3, trace4])
 
 train_data = withoutNode(t_data,1)
 
 function dists(u,t)
-    M = reshape(train_data.A[:,Int(floor(t))],(train_data.n,train_data.d))
-        
-    cosine_distances = zeros(Float64, train_data.n)
+    M = train_data[t]
 
-    for i::Int in eachindex(cosine_distances)
-        distance = sqrt(sum(abs2, M[i,:].-u)) #euclidean dist(target, node from data)
-        @inbounds cosine_distances[i] = isnan(distance) ? zero(distance) : distance
-
-    end
-    return cosine_distances
+    subtract_func(m) = m-u
+    direction_vecs = [subtract_func(m) for m in eachcol(M)]
+  
+    û = vcat(partialsort(direction_vecs,1:k, by=x->sum(abs2, x))...)
 end
 
 iter_grad_sltn = [grad_sltn[:,i] for i in 1:size(grad_sltn)[2]]
@@ -55,7 +52,7 @@ dominating1 = calculate_pareto_frontier(Float64.(data), grad_sltn[1,:], hall_of_
 
 dominating2 = calculate_pareto_frontier(Float64.(data), grad_sltn[2,:], hall_of_fame2, options)
 
-#dominating3 = calculate_pareto_frontier(Float64.(train_data.A), grad_sltn[3,:], hall_of_fame3, options)
+# dominating3 = calculate_pareto_frontier(Float64.(train_data.A), grad_sltn[3,:], hall_of_fame3, options)
 
 
 # eqn1 = node_to_symbolic(dominating1[end].tree, options)
@@ -64,18 +61,17 @@ dominating2 = calculate_pareto_frontier(Float64.(data), grad_sltn[2,:], hall_of_
 
 # eqn3 = node_to_symbolic(dominating3[end].tree, options)
 
-sltn1 = [dominating1[end].tree(data)'; dominating2[end].tree(data)']#; dominating3[end].tree(train_data.A)']
+sltn1 = [dominating1[end].tree(data)'; dominating2[end].tree(data)']# ; dominating3[end].tree(train_data.A)']
 
-sltn1 = [sum([sltn1[:,j]' for j in 100*(i-1)+1:100*i]) for i in 1:2*datasize-1]
+sltn1 = vcat([sum([sltn1[:,j]' for j in 100*(i-1)+1:100*i]) for i in 1:2*datasize-1]...)'
 
 
 
 sltn_sym_reg = sltn1[:, datasize+1:2*datasize-1]
 
-collect
 
 temp = zeros(Float64, (dims[2],datasize))
-global u0 = targetNode(t_data,1)[1+datasize]'
+global u0 = targetNode(t_data,1)[1+datasize]
 temp[:,1].=u0
 
 for i in 2:datasize

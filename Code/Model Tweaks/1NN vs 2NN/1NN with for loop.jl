@@ -1,4 +1,6 @@
-using CSV, DataFrames, LinearAlgebra, Revise
+using CSV, DataFrames, LinearAlgebra, Revise, CUDA
+using DifferentialEquations, Lux, SciMLSensitivity, ComponentArrays
+# CUDA.allowscalar(false)
 # User needs to provide:
 #   u0
 #   datasize
@@ -18,9 +20,46 @@ include("../../_Modular Functions/reconstructRDPG.jl")
 
 #u1::Array{Float32, 1} = Array{Float32, 1}(undef, output_data_length)
 
-prob_neuralode, p, st, nn = constructNN();
 
-optprob = NODEproblem();
+rng = Random.default_rng()
+nn = Lux.Chain(x -> x,
+      Lux.Dense(input_data_length, 16, tanh),
+      Lux.Dense(16, 8),
+      Lux.Dense(8, 4),
+      Lux.Dense(4, output_data_length))
+
+p, st = Lux.setup(rng, nn)
+
+p = p |> ComponentArray #|> Lux.gpu
+# st = st |> Lux.gpu
+
+
+function dudt_pred(u,p,t) 
+
+  M = train_data[t]
+
+  subtract_func(m) = m-u
+  direction_vecs = [subtract_func(m) for m in eachcol(M)]
+
+  û = vcat(partialsort(direction_vecs,1:k, by=x->sum(abs2, x))...)
+  nn(û, p, st)
+end
+
+dudt_pred_(u,p,t) = dudt_pred(u,p,t)[1]
+
+prob_neuralode = ODEProblem{false}(dudt_pred_, u0, tspan, p)
+
+# prob_neuralode, p, st, nn = constructNN();
+
+
+
+# optprob = NODEproblem();
+  # use Optimization.jl to solve the problem
+adtype = Optimization.AutoForwardDiff()
+
+
+optf = Optimization.OptimizationFunction((x,p)->loss_neuralode(x), adtype)
+optprob = Optimization.OptimizationProblem(optf, p)
 res = [] # Used to store models at various training times
 result::AbstractVector = []
 mid = convert(Int, dims[1]/2)
@@ -31,7 +70,7 @@ TNode_data = targetNode(t_data[1:datasize],1)
 
 #prob_neuralode = remake(prob_neuralode, u0=u0)
 result = Optimization.solve(optprob,
-                            ADAM(0.001),
+                            ADAM(0.01),
                             callback = callback,
                             maxiters = 300)
 optprob = remake(optprob, u0=result.u)
@@ -55,30 +94,30 @@ global train_data = withoutNode(t_data,1)
 tsteps = range(1.0, Float64(length(t_data)), length = length(t_data))
 prob_neuralode = remake(prob_neuralode, tspan=(1.0,Float64(length(t_data))))
 function predict_neuralode(θ)
-    Array(solve(prob_neuralode, Tsit5(), saveat = 0.01, p = θ))
+  Array(solve(prob_neuralode, Tsit5(), saveat = 1.0:0.01:Float64(length(train_data)), p=θ))#|>Lux.gpu
 end
 # prob_neuralode, p, st, nn = constructNN();
 # optprob = NODEproblem();
-sol = predict_neuralode(result.u)[:,1,:]
+sol = predict_neuralode(result.u)
 
 using DelimitedFiles
-
-writedlm("/home/connor/Thesis/Code/Solutions/$net_name.csv", sol, ",")
+ 
+writedlm("./Code/Solutions/$net_name.csv", sol, ",")
 
 function predict_neuralode(θ)
-    Array(solve(prob_neuralode, Tsit5(), saveat = tsteps, p = θ))
-  end
+  Array(solve(prob_neuralode, Tsit5(), saveat = tsteps, p=θ))#|>Lux.gpu
+end
   
 global train_data = withoutNode(t_data[1+datasize:end],1)
-global u0 = targetNode(t_data,1)[1+datasize]'
-global tspan = (1.0, 10.0)
+global u0 = vec(targetNode(t_data,1)[1+datasize])
+global tspan = (1.0, Float64(datasize))
 global tsteps = range(tspan[1], tspan[2], length = datasize)
-prob_neuralode, p, st, nn = constructNN();
+prob_neuralode = ODEProblem{false}(dudt_pred_, u0, tspan, p)
 optprob = NODEproblem();
-sol = predict_neuralode(result.u)[:,1,:]
+sol = predict_neuralode(result.u)
 
 using DelimitedFiles
 
-writedlm("/home/connor/Thesis/Code/Solutions/$net_name test only.csv", sol, ",")
+writedlm("./Code/Solutions/$net_name test only.csv", sol, ",")
 
 

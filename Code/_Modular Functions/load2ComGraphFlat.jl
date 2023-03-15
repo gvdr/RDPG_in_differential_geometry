@@ -13,7 +13,7 @@ function load2ComGraphFlat(dims)
         push!(time_graphs, Matrix(temp[:,:]))
     end
 
-    true_data = zeros(Float32, d*n, length(names))
+    true_data = zeros(Float32, (d,n), length(names))
 
     
     tempL, tempR = do_the_rdpg(time_graphs[1], convert(Int, d))
@@ -35,7 +35,7 @@ end
 
 function loadManualAligned()
     println("Procrustes Alignment")
-    path = "./Thesis/Code/Graph Series/$net_name"
+    path = "./Code/Graph Series/$net_name"
     names = readdir(path)
 
     n, d = dims
@@ -46,7 +46,7 @@ function loadManualAligned()
         push!(time_graphs, Matrix(temp[:,:]))
     end
 
-    true_data = zeros(Float32, d*n, length(names))
+    true_data = zeros(Float32, d,n, length(names))
 
     tempL, tempR = do_the_rdpg(time_graphs[1], convert(Int, d))
     for i in 1:length(names)
@@ -61,7 +61,7 @@ function loadManualAligned()
         else
             L, R = do_the_rdpg(time_graphs[i], convert(Int, d))
         end
-        true_data[:,i] = reshape([L; R], d*n)
+        true_data[:,:,i] = [L; R]'
 
     end
     return true_data, time_graphs
@@ -80,11 +80,11 @@ function loadRegAligned()
         push!(time_graphs, Matrix(temp[:,:]))
     end
 
-    true_data = zeros(Float32, d*n, length(names))
+    true_data = zeros(Float32, d,n, length(names))
 
     for i in 1:length(names)
         L, R = do_the_rdpg(time_graphs[i], convert(Int, d))
-        true_data[:,i] = reshape([L; R], d*n)
+        true_data[:,i] = [L; R]'
 
     end
     return true_data, time_graphs

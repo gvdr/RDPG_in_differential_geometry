@@ -1,24 +1,26 @@
 using Revise
-global dims=(182,2)   
-global net_name = "2communities"
+global dims=(182,2) #|> Lux.gpu
+global net_name = "longTail"
 include("load2ComGraphFlat.jl")
 include("../structs/TemporalEmbedding.jl")
 global true_data, time_graphs = load2ComGraphFlat(true);
 Base.IndexStyle(true_data)=IndexLinear()
-t_data = TemporalNetworkEmbedding(round.(true_data, digits=10),dims[1],dims[2])
+
+t_data = TemporalNetworkEmbedding(true_data,dims[1],dims[2])
 
 
 global datasize = 20
-global train_data = withoutNode(t_data[1:datasize],1)
+global train_data = withoutNode(t_data[1:datasize],1) #|> Lux.gpu
 global test_data = withoutNode(t_data[1+datasize:end],1)
-global tspan = (1.0, 10.0)
-global tsteps = range(tspan[1], tspan[2], length = datasize)
+global tspan = (1.0, 10.0)#|> Lux.gpu
+global tsteps = range(tspan[1], tspan[2], length = datasize)#|> Lux.gpu
 global k = 15
 
-global input_data_length = k
+global input_data_length = k*dims[2]
 global output_data_length = dims[2]
+global u0 = vec(targetNode(t_data,1)[1])#|> Lux.gpu
 
-global u0 = targetNode(t_data,1)[1]'
+
 #targetNode(t_data,1)[1]
 # TNode_data = targetNode(t_data,1)
 # train_data = withoutNode(t_data,1)
