@@ -7,21 +7,13 @@ sltn = readdlm("./Code/Solutions/$net_name.csv", ',')
 sltnt = readdlm("./Code/Solutions/$net_name test only.csv", ',')
 grad_sltn = sltn[:,2:end].-sltn[:,1:end-1]
 
-<<<<<<< HEAD
+
 trace = scatter(x=sltn[1,1:datasize*100],y=sltn[2,1:datasize*100], mode="markers", name="sltn from start")
 trace2 =  scatter(x=[t_data[i][1,1] for i in 1:40],y=[t_data[i][2,1] for i in 1:datasize], mode="markers", name="train")
 trace3 =  scatter(x=[t_data[i+datasize][1,1] for i in 1:datasize],y=[t_data[i+datasize][2,1] for i in 1:datasize], mode="markers", name="test")
 trace4 =  scatter(x=sltnt[1,1:end],y=sltnt[2,1:end], mode="markers", name="sltn from test")
 
 plot([trace, trace2, trace3, trace4])
-=======
-# trace = scatter(x=sltn[1,1:datasize*100],y=sltn[2,1:datasize*100], mode="markers", name="sltn from start")
-# trace2 =  scatter(x=[t_data[i][1,1] for i in 1:40],y=[t_data[i][1,2] for i in 1:datasize], mode="markers", name="train")
-# trace3 =  scatter(x=[t_data[i+datasize][1,1] for i in 1:datasize],y=[t_data[i+datasize][1,2] for i in 1:datasize], mode="markers", name="test")
-# trace4 =  scatter(x=sltnt[1,1:end],y=sltnt[2,1:end], mode="markers", name="sltn from test")
-
-# plot([trace, trace2, trace3, trace4])
->>>>>>> master
 
 train_data = withoutNode(t_data,1)
 
@@ -59,7 +51,7 @@ halls = [
 #     parallelism=:multithreading
 # )
 
-<<<<<<< HEAD
+
 # hall_of_fame3 = EquationSearch(
 #     data[:,1:datasize*100], grad_sltn[3,1:datasize*100], niterations=40, options=options,
 #     parallelism=:multithreading
@@ -76,10 +68,6 @@ dominatings = [
 # dominating2 = calculate_pareto_frontier(Float64.(data), grad_sltn[2,:], hall_of_fame2, options)
 
 # dominating3 = calculate_pareto_frontier(Float64.(data), grad_sltn[3,:], hall_of_fame3, options)
-=======
-# dominating3 = calculate_pareto_frontier(Float64.(train_data.A), grad_sltn[3,:], hall_of_fame3, options)
->>>>>>> master
-
 
 # eqn1 = node_to_symbolic(dominating1[end].tree, options)
 
@@ -87,15 +75,11 @@ dominatings = [
 
 # eqn3 = node_to_symbolic(dominating3[end].tree, options)
 
-<<<<<<< HEAD
 # sltn1 = [dominating1[end].tree(data)'; dominating2[end].tree(data)'; dominating3[end].tree(data)']
 
 sltn1 = vcat([dominatings[i][end].tree(data)' for i in 1:dims[2]]...)
 
-=======
-sltn1 = [dominating1[end].tree(data)'; dominating2[end].tree(data)']# ; dominating3[end].tree(train_data.A)']
 
->>>>>>> master
 sltn1 = vcat([sum([sltn1[:,j]' for j in 100*(i-1)+1:100*i]) for i in 1:2*datasize-1]...)'
 
 
