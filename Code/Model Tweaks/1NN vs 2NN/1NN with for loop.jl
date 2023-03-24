@@ -23,8 +23,8 @@ include("../../_Modular Functions/reconstructRDPG.jl")
 
 rng = Random.default_rng()
 nn = Lux.Chain(x -> x,
-      Lux.Dense(input_data_length, 16, tanh),
-      Lux.Dense(16, 8),
+      Lux.Dense(input_data_length, 32, tanh),
+      Lux.Dense(32, 8),
       Lux.Dense(8, 4),
       Lux.Dense(4, output_data_length))
 
@@ -60,24 +60,25 @@ adtype = Optimization.AutoForwardDiff()
 
 optf = Optimization.OptimizationFunction((x,p)->loss_neuralode(x), adtype)
 optprob = Optimization.OptimizationProblem(optf, p)
+optprob = remake(optprob, u0=result.u)
 res = [] # Used to store models at various training times
-result::AbstractVector = []
+#result::AbstractVector = []
 mid = convert(Int, dims[1]/2)
 
 TNode_data = targetNode(t_data[1:datasize],1)
 
 
-
 #prob_neuralode = remake(prob_neuralode, u0=u0)
 result = Optimization.solve(optprob,
-                            ADAM(0.01),
+                            ADAM(0.005),
                             callback = callback,
-                            maxiters = 300)
+                            maxiters = 600)
 optprob = remake(optprob, u0=result.u)
+
 result = Optimization.solve(optprob,
-                            Optim.BFGS(initial_stepnorm=0.01),
+                            Optim.BFGS(initial_stepnorm=0.001),
                             callback = callback,
-                            maxiters = 100)
+                            maxiters = 200)
 optprob = remake(optprob, u0=result.u)
 # println("Part 2")
 # result = Optimization.solve(optprob,
@@ -88,18 +89,20 @@ optprob = remake(optprob, u0=result.u)
 println("Done")
                             
 
-include("../../_Modular Functions/createFullSltn.jl")
+#include("../../_Modular Functions/createFullSltn.jl")
 
 global train_data = withoutNode(t_data,1)
-tsteps = range(1.0, Float64(length(t_data)), length = length(t_data))
+global tsteps = range(1.0, Float64(length(t_data)), length = 100*length(t_data))
+prob_neuralode = ODEProblem{false}(dudt_pred_, u0, tspan, p)
 prob_neuralode = remake(prob_neuralode, tspan=(1.0,Float64(length(t_data))))
 function predict_neuralode(θ)
-  Array(solve(prob_neuralode, Tsit5(), saveat = 1.0:0.01:Float64(length(train_data)), p=θ))#|>Lux.gpu
+  Array(solve(prob_neuralode, Tsit5(), saveat = tsteps, p=θ))#|>Lux.gpu
 end
 # prob_neuralode, p, st, nn = constructNN();
 # optprob = NODEproblem();
 sol = predict_neuralode(result.u)
 
+# loss_neuralode(result.u)
 using DelimitedFiles
 
 writedlm("./Code/Solutions/$net_name.csv", sol, ",")
@@ -110,8 +113,8 @@ end
   
 global train_data = withoutNode(t_data[1+datasize:end],1)
 global u0 = vec(targetNode(t_data,1)[1+datasize])
-global tspan = (1.0, Float64(datasize))
-global tsteps = range(tspan[1], tspan[2], length = datasize)
+global tspan = (1.0, Float64(length(t_data[1+datasize:end])))
+global tsteps = range(tspan[1], tspan[2], length = length(train_data))
 prob_neuralode = ODEProblem{false}(dudt_pred_, u0, tspan, p)
 optprob = NODEproblem();
 sol = predict_neuralode(result.u)

@@ -11,10 +11,10 @@ Base.IndexStyle(true_data)=IndexLinear()
 t_data = TemporalNetworkEmbedding(true_data,dims[1],dims[2])
 
 
-global datasize = 20
+global datasize = 25
 global train_data = withoutNode(t_data[1:datasize],1) #|> Lux.gpu
 global test_data = withoutNode(t_data[1+datasize:end],1)
-global tspan = (1.0, 10.0)#|> Lux.gpu
+global tspan = (1.0, Float64(datasize))#|> Lux.gpu
 global tsteps = range(tspan[1], tspan[2], length = datasize)#|> Lux.gpu
 global k = 15
 
