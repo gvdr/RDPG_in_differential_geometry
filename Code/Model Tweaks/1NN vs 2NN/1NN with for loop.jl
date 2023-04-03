@@ -23,10 +23,8 @@ include("../../_Modular Functions/reconstructRDPG.jl")
 
 rng = Random.default_rng()
 nn = Lux.Chain(x -> x,
-      Lux.Dense(input_data_length, 32, tanh),
-      Lux.Dense(32, 8),
-      Lux.Dense(8, 4),
-      Lux.Dense(4, output_data_length))
+      Lux.Dense(input_data_length, 64, tanh),
+      Lux.Dense(64, output_data_length))
 
 p, st = Lux.setup(rng, nn)
 
@@ -70,16 +68,35 @@ TNode_data = targetNode(t_data[1:datasize],1)
 
 #prob_neuralode = remake(prob_neuralode, u0=u0)
 result = Optimization.solve(optprob,
-                            ADAM(0.005),
+                            Optim.SimulatedAnnealing(),
                             callback = callback,
-                            maxiters = 600)
+                            maxiters = 10^4, 
+                            maxtime=5*10^2)
 optprob = remake(optprob, u0=result.u)
+println("ping")
 
+predict_neuralode(result.u)
+
+result = Optimization.solve(optprob,
+                            Optim.SimulatedAnnealing(),
+                            callback = callback,
+                            maxiters = 10^4, 
+                            maxtime=10^4)
+optprob = remake(optprob, u0=result.u)
+println("ping")
+loss_neuralode(result.u)
 result = Optimization.solve(optprob,
                             Optim.BFGS(initial_stepnorm=0.001),
                             callback = callback,
-                            maxiters = 200)
-optprob = remake(optprob, u0=result.u)
+                            maxiters = 500)
+
+# result = Optimization.solve(optprob,
+# ADAM(0.001),
+# callback = callback,
+# maxiters = 100)
+# optprob = remake(optprob, u0=result.u)
+
+
 # println("Part 2")
 # result = Optimization.solve(optprob,
 #                             BFGS(),
@@ -91,8 +108,10 @@ println("Done")
 
 #include("../../_Modular Functions/createFullSltn.jl")
 
+collect(1.0:0.01:datasize)
+
 global train_data = withoutNode(t_data,1)
-global tsteps = range(1.0, Float64(length(t_data)), length = 100*length(t_data))
+global tsteps = tspan[1]:0.01:tspan[2]
 prob_neuralode = ODEProblem{false}(dudt_pred_, u0, tspan, p)
 prob_neuralode = remake(prob_neuralode, tspan=(1.0,Float64(length(t_data))))
 function predict_neuralode(θ)

@@ -24,7 +24,7 @@ using DelimitedFiles
 
 sltn = readdlm("./Code/Solutions/$net_name test only.csv", ',')
 
-for i in 1:datasize
+for i in 1:length(t_data)-datasize
     pts = t_data[i+datasize]'#get_embedding([sltn_sym_reg[:,i]'; t_data[i+datasize]], sltn[:,i])
     mid = convert(Int, dims[1]/2)
     traces0 = PlotlyJS.scatter(x=[sltn[1,i]], y=[sltn[2,i]], mode="markers", name="Neural Network Pred", marker_size=12)
