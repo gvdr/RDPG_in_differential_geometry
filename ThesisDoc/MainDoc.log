@@ -1,15 +1,15 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.11.23)  23 NOV 2022 13:31
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022/Arch Linux) (preloaded format=pdflatex 2022.11.23)  6 APR 2023 13:25
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**/home/stirling/thesis/ThesisDoc/MainDoc.tex
-(/home/stirling/thesis/ThesisDoc/MainDoc.tex
+**/home/stirling/Documents/thesis/ThesisDoc/MainDoc.tex
+(/home/stirling/Documents/thesis/ThesisDoc/MainDoc.tex
 LaTeX2e <2021-11-15> patch level 1
 L3 programming layer <2022-04-10> (/usr/share/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
-(/usr/share/texmf-dist/tex/latex/base/size10.clo
-File: size10.clo 2021/10/04 v1.4n Standard LaTeX file (size option)
+(/usr/share/texmf-dist/tex/latex/base/size12.clo
+File: size12.clo 2021/10/04 v1.4n Standard LaTeX file (size option)
 )
 \c@part=\count185
 \c@section=\count186
@@ -577,12 +577,12 @@ Package caption Info: End \AtBeginDocument code.
 * \topmargin=-37.0pt
 * \headheight=12.0pt
 * \headsep=25.0pt
-* \topskip=10.0pt
+* \topskip=12.0pt
 * \footskip=30.0pt
-* \marginparwidth=65.0pt
-* \marginparsep=11.0pt
+* \marginparwidth=44.0pt
+* \marginparsep=10.0pt
 * \columnsep=10.0pt
-* \skip\footins=9.0pt plus 4.0pt minus 2.0pt
+* \skip\footins=10.8pt plus 4.0pt minus 2.0pt
 * \hoffset=0.0pt
 * \voffset=0.0pt
 * \mag=1000
@@ -614,49 +614,54 @@ Underfull \hbox (badness 10000) in paragraph at lines 44--50
 
  []
 
-
+[1]
 Underfull \hbox (badness 10000) in paragraph at lines 52--53
 
  []
 
-[1]
-Underfull \hbox (badness 10000) in paragraph at lines 75--77
+[2]
+Underfull \hbox (badness 10000) in paragraph at lines 87--89
 
  []
 
-[2]
+[3]
 
 LaTeX Warning: No positions in optional float specifier.
-               Default added (so using `tbp') on input line 110.
+               Default added (so using `tbp') on input line 122.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 128--129
+Underfull \hbox (badness 10000) in paragraph at lines 140--141
 
  []
 
-[3] [4]
-Overfull \hbox (31.34352pt too wide) in paragraph at lines 188--188
-[]\OT1/cmr/m/n/10 Rackauckas, C. \OT1/cmr/m/it/10 et al. \OT1/cmr/m/n/10 Uni-ver-sal Dif-fer-en-tial Equa-tions for Sci-en-tific Ma-chine Learn-ing. \OT1/cmr/m/it/10 CoRR \OT1/cmr/bx/n/10 abs/2001.04385.
+[4] [5] [6]
+Overfull \hbox (20.43794pt too wide) in paragraph at lines 200--200
+[]\OT1/cmr/m/n/12 Poli, M. \OT1/cmr/m/it/12 et al. \OT1/cmr/m/n/12 Graph neu-ral or-di-nary dif-fer-en-tial equa-tions. \OT1/cmr/m/it/12 arXiv preprint arXiv:1911.07532
  []
 
-[5] (./MainDoc.aux)
+
+Overfull \hbox (86.76627pt too wide) in paragraph at lines 200--200
+\OT1/cmr/m/n/12 17442. $\OT1/cmtt/m/n/12 https : / / proceedings . neurips . cc / paper / 2020 / file / c9f2f917078bd2db12f23c3b413d9cba -[]
+ []
+
+[7] [8] (./MainDoc.aux)
 Package logreq Info: Writing requests to 'MainDoc.run.xml'.
 \openout1 = `MainDoc.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 14702 strings out of 478238
- 283383 string characters out of 5850455
- 1019250 words of memory out of 5000000
- 32758 multiletter control sequences out of 15000+600000
- 472393 words of font info for 39 fonts, out of 8000000 for 9000
+ 14727 strings out of 478238
+ 284051 string characters out of 5850455
+ 1017578 words of memory out of 5000000
+ 32776 multiletter control sequences out of 15000+600000
+ 475351 words of font info for 49 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 94i,9n,92p,3884b,1250s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
-Output written on MainDoc.pdf (6 pages, 188519 bytes).
+ 94i,9n,92p,3894b,1250s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb>
+Output written on MainDoc.pdf (9 pages, 152793 bytes).
 PDF statistics:
- 91 PDF objects out of 1000 (max. 8388607)
- 56 compressed objects within 1 object stream
+ 92 PDF objects out of 1000 (max. 8388607)
+ 58 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  13 words of extra memory for PDF output out of 10000 (max. 10000000)
 

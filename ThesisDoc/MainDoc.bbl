@@ -90,6 +90,40 @@
       \field{pages}{1090\bibrangedash 1098}
       \range{pages}{9}
     \endentry
+    \entry{bongard2007automated}{article}{}
+      \name{author}{2}{}{%
+        {{hash=0b666071b3487ff44859a1a9814badd9}{%
+           family={Bongard},
+           familyi={B\bibinitperiod},
+           given={Josh},
+           giveni={J\bibinitperiod}}}%
+        {{hash=475bdf26aafc86ddd3f62a8ff9267f8a}{%
+           family={Lipson},
+           familyi={L\bibinitperiod},
+           given={Hod},
+           giveni={H\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {National Acad Sciences}%
+      }
+      \strng{namehash}{72be297871d2160b72c7118cb80acf91}
+      \strng{fullhash}{72be297871d2160b72c7118cb80acf91}
+      \strng{bibnamehash}{72be297871d2160b72c7118cb80acf91}
+      \strng{authorbibnamehash}{72be297871d2160b72c7118cb80acf91}
+      \strng{authornamehash}{72be297871d2160b72c7118cb80acf91}
+      \strng{authorfullhash}{72be297871d2160b72c7118cb80acf91}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Proceedings of the National Academy of Sciences}
+      \field{number}{24}
+      \field{title}{Automated reverse engineering of nonlinear dynamical systems}
+      \field{volume}{104}
+      \field{year}{2007}
+      \field{pages}{9943\bibrangedash 9948}
+      \range{pages}{6}
+    \endentry
     \entry{garg2009evolution}{inproceedings}{}
       \name{author}{4}{}{%
         {{hash=7980afc5106b8ca8125c6588709c1820}{%
@@ -128,6 +162,40 @@
       \field{year}{2009}
       \field{pages}{315\bibrangedash 321}
       \range{pages}{7}
+    \endentry
+    \entry{schmidt2009distilling}{article}{}
+      \name{author}{2}{}{%
+        {{hash=7047d212f80975d90e11f6931e965e13}{%
+           family={Schmidt},
+           familyi={S\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=475bdf26aafc86ddd3f62a8ff9267f8a}{%
+           family={Lipson},
+           familyi={L\bibinitperiod},
+           given={Hod},
+           giveni={H\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {American Association for the Advancement of Science}%
+      }
+      \strng{namehash}{0aa99564fb3a9c17033d7d720330bdda}
+      \strng{fullhash}{0aa99564fb3a9c17033d7d720330bdda}
+      \strng{bibnamehash}{0aa99564fb3a9c17033d7d720330bdda}
+      \strng{authorbibnamehash}{0aa99564fb3a9c17033d7d720330bdda}
+      \strng{authornamehash}{0aa99564fb3a9c17033d7d720330bdda}
+      \strng{authorfullhash}{0aa99564fb3a9c17033d7d720330bdda}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{science}
+      \field{number}{5923}
+      \field{title}{Distilling free-form natural laws from experimental data}
+      \field{volume}{324}
+      \field{year}{2009}
+      \field{pages}{81\bibrangedash 85}
+      \range{pages}{5}
     \endentry
     \entry{zhao2012multi}{inproceedings}{}
       \name{author}{7}{}{%
@@ -728,6 +796,28 @@
       \field{year}{2021}
       \field{pages}{179\bibrangedash 198}
       \range{pages}{20}
+    \endentry
+    \entry{kidger2022neural}{article}{}
+      \name{author}{1}{}{%
+        {{hash=051731aab4dfad9f49233270e9e83536}{%
+           family={Kidger},
+           familyi={K\bibinitperiod},
+           given={Patrick},
+           giveni={P\bibinitperiod}}}%
+      }
+      \strng{namehash}{051731aab4dfad9f49233270e9e83536}
+      \strng{fullhash}{051731aab4dfad9f49233270e9e83536}
+      \strng{bibnamehash}{051731aab4dfad9f49233270e9e83536}
+      \strng{authorbibnamehash}{051731aab4dfad9f49233270e9e83536}
+      \strng{authornamehash}{051731aab4dfad9f49233270e9e83536}
+      \strng{authorfullhash}{051731aab4dfad9f49233270e9e83536}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{arXiv preprint arXiv:2202.02435}
+      \field{title}{On neural differential equations}
+      \field{year}{2022}
     \endentry
     \entry{nguyen2022physics}{article}{}
       \name{author}{4}{}{%
