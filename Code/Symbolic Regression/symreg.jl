@@ -3,8 +3,8 @@ using SymbolicUtils
 using DelimitedFiles
 include("../_Modular Functions/helperFunctions.jl")
 
-sltn = readdlm("./Code/Solutions/$net_name.csv", ',')
-sltnt = readdlm("./Code/Solutions/$net_name test only.csv", ',')
+sltn = readdlm("./Code/Solutions/$net_name big net.csv", ',')
+sltnt = readdlm("./Code/Solutions/$net_name big net test only.csv", ',')
 grad_sltn = sltn[:,2:end].-sltn[:,1:end-1]
 
 test_range = eachindex(1.0:0.01:Float64(datasize))
@@ -53,7 +53,7 @@ dominatings = [
 ]
 
 eqns = [
-    dominatings[i][end].tree
+    dominatings[i][end-2].tree
     for i in 1:dims[2]
 ]
 
@@ -70,7 +70,7 @@ sltn1 = zeros(Float64, (dims[2],length(1.0:0.01:size(sltnt)[2])))
 global u0 = targetNode(t_data,1)[1+datasize]
 sltn1[:,1] = u0
 iter_eq(d) = vcat([eqns[i](d) for i in 1:dims[2]]...)
-for t in 2:size(sltn1)[2]-1
+for t in 2:size(sltn1)[2]
     sltn1[:,t] = next_step(sltn1[:,t-1], 1+(t-1)*0.01, iter_eq)
 end
 

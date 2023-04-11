@@ -50,12 +50,7 @@ dudt_pred_(u,p,t) = dudt_pred(u,p,t)[1]
 
 prob_neuralode = ODEProblem{false}(dudt_pred_, u0, tspan, p)
 
-# prob_neuralode, p, st, nn = constructNN();
 
-
-
-# optprob = NODEproblem();
-  # use Optimization.jl to solve the problem
 adtype = Optimization.AutoForwardDiff()
 
 
@@ -63,58 +58,37 @@ optf = Optimization.OptimizationFunction((x,p)->loss_neuralode(x), adtype)
 optprob = Optimization.OptimizationProblem(optf, p)
 # optprob = remake(optprob, u0=result.u)
 res = [] # Used to store models at various training times
-#result::AbstractVector = []
+
 mid = convert(Int, dims[1]/2)
 
 TNode_data = targetNode(t_data[1:datasize],1)
 
-
-#prob_neuralode = remake(prob_neuralode, u0=u0)
-temp_res = p
 result = Optimization.solve(optprob,
                             ADAM(0.005),
                             callback = callback,
-                            maxiters = 10^3)
+                            maxiters = 500)
 optprob = remake(optprob, u0=result.u)
 println("ping")
 
-result = Optimization.solve(optprob,
-                            Optim.BFGS(initial_stepnorm=0.001),
-                            callback = callback,
-                            maxiters = 10^4, 
-                            maxtime=10^4)
-optprob = remake(optprob, u0=result.u)
-println("ping")
-loss_neuralode(result.u)
 result = Optimization.solve(optprob,
                             Optim.BFGS(initial_stepnorm=0.001),
                             callback = callback,
                             maxiters = 500)
-
-# result = Optimization.solve(optprob,
-# ADAM(0.001),
-# callback = callback,
-# maxiters = 100)
-# optprob = remake(optprob, u0=result.u)
+optprob = remake(optprob, u0=result.u)
+println("ping")
+loss_neuralode(temp_res)
 
 
-# println("Part 2")
-# result = Optimization.solve(optprob,
-#                             BFGS(),
-#                             callback = callback,
-#                             maxiters = 25)
-# optprob = remake(optprob, u0=result.u)
 println("Done")
                             
 
-#include("../../_Modular Functions/createFullSltn.jl")
 
 collect(1.0:0.01:datasize)
 
-global train_data = withoutNode(t_data,1)
+# global train_data = withoutNode(t_data,1)
 global tsteps = tspan[1]:0.01:tspan[2]
 prob_neuralode = ODEProblem{false}(dudt_pred_, u0, tspan, p)
-prob_neuralode = remake(prob_neuralode, tspan=(1.0,Float64(length(t_data))))
+
 function predict_neuralode(θ)
   Array(solve(prob_neuralode, Tsit5(), saveat = tsteps, p=θ))#|>Lux.gpu
 end

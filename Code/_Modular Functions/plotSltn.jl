@@ -22,7 +22,7 @@ end
 using DelimitedFiles
 
 
-sltn = readdlm("./Code/Solutions/$net_name test only.csv", ',')
+sltn = readdlm("./Code/Solutions/$net_name big net test only.csv", ',')
 
 for i in 1:length(t_data)-datasize
     pts = t_data[i+datasize]'#get_embedding([sltn_sym_reg[:,i]'; t_data[i+datasize]], sltn[:,i])
