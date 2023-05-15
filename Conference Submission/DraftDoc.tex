@@ -278,9 +278,10 @@ sorting=ynt
             \caption{First 3 time steps of the simplified, synthetic 2 community network. The red node represents the target node that we are aiming to model. The 4 node and 5 node fully connected components represent the 40 and 50 node communities of the sequence respectively. At each time step, an edge from the target node to the larger community is replaced with and edge from the target node to the smaller community.}
             \label{2community train series}
         \end{figure}
+        The 2 community temporal network was selected to test whether this framework can be used to model a node changing communities in systems where there are no other processes occurring. Notably, the movement in the two community system is difficult for the neural network to learn because opposite sets of inputs need to result in the same output. In a simplified version of this system with only the nearest node as input, the input for the model begins as the position of the larger community at roughly $(0,-1)$ \autoref{2community series 1}. This input needs to move the target towards the top left. However, as the sequence progresses, the nearest neighbours will be the small community at roughly $(-1,0)$, which also needs to move the target node towards the top left. 
 
     \subsection{Long Tail System}
-        In the long tail network \autoref{longTail train series}, we have a long chain with 50 nodes and a fully connected component with forty nodes at one end of the chain. This is used to orient the embedding and model. The SVD does not take into account the ID of the individual node; it only distinguishes based on their distance to each other. Because of this a chain of nodes, even when aligned, could be flipped when it is embedded. That is, between one time step and the next the first node in the chain could be aligned with the last node. With a large, connected group at one end however, that group will always be aligned with itself and so the rest of the chain will also be aligned properly. The target node starts attached to the node that is attached to this large component \autoref{longTail train series, a}. At each time step the target node move one node further down the tail \autoref{longTail train series, b}. Again, this is repeated to generate the training and test data \autoref{longTail train series, c}.
+        In the long tail network \autoref{longTail train series}, we have a long chain with 50 nodes and a fully connected component with forty nodes at one end of the chain. This is used to orient the embedding and model. The SVD does not take into account the index of the individual node in the adjacency matrix; it only distinguishes based on their distance to each other. Because of this a chain of nodes, even when aligned, could be flipped when it is embedded. That is, between one time step and the next the first node in the chain could be aligned with the last node. With a large, connected group at one end however, that group will always be aligned with itself and so the rest of the chain will also be aligned properly. The target node starts attached to the node that is attached to this large component \autoref{longTail train series, a}. At each time step the target node move one node further down the tail \autoref{longTail train series, b}. Again, this is repeated to generate the training and test data \autoref{longTail train series, c}.
         \begin{figure}[H]
             \centering
             \begin{subfigure}[c]{0.3\textwidth}
@@ -309,7 +310,7 @@ sorting=ynt
             \label{longTail train series}
         \end{figure}    
 
-        The long tail network was selected because the SVD performs poorly on highly diagonal matrices, matrices with long chains. As such we wish to see how the framework performs when it is presented with a system that the SVD cannot capture. The long tail problem is difficult for the embedding because a large portion of the network is along the off diagonals; meaning that, to get an accurate embedding, the dimension of the embedding would need to be close to the length of the tail. 
+        The long tail network was selected because the SVD performs poorly on highly diagonal matrices; that is matrices with long chains.  The long tail problem is difficult for the embedding because a large portion of the network is along the off diagonals; meaning that, to get an accurate embedding, the dimension of the embedding would need to be close to the length of the tail. As such we wish to see how the framework performs when it is presented with a system that the SVD cannot capture.
 
     \subsection{Three community System}
     We also simulate a sequence with three communities. The communities have sizes 40, 35, 30 and have 25, 24, and 23 edges to the target node respectively. In \autoref{3community train series} the communities have been simplified to have sizes of 5, 4, and 3. The target node starts connected to all of these communities with each community having a different number of edges \autoref{3community train series, a}. The community with the fewest edges between the target node will have one edge removed at each time step \autoref{3community train series, b}, and this process is repeated to create the required number of time steps \autoref{3community train series, c}.  
@@ -338,26 +339,63 @@ sorting=ynt
             \caption{$t=3$}
             \label{3community train series, c}
         \end{subfigure}
-        \caption{First 3 time steps of synthetic 3 community networks. XXXX Fill in XXXX}
+        \caption{First 3 time steps of the simplified, synthetic 3 community networks. The red node represents the target node which we aim to model. The 3, 4, and 5 node components represent the 30, 35, and 40 node communities respectively. At each time step the one edge is removed between the target node and the community it has the fewest connections with.}
         \label{3community train series}
     \end{figure}
-    The 2 community temporal network was selected to test whether this framework can be used to model a node changing communities in systems where there are no other processes occurring. Notably, the movement in the two community system is difficult for the neural network to learn because the same set of opposite sets of inputs need to result in the same output. In this system, the input for the model begins as the position of the larger community . 
-    
-
      
-     The three community problem should be the easiest to solve because it has been deliberately constructed to avoid the problems the other two models face.
+    The three community was chosen as a best case scenario system to model. It has been constructed to avoid the challenges that are posed by the 2 community and long tail systems. That is, because in this system the target node is moving away from its least similar community, not moving from one community to another, it is not required to overcome the issue of symmetrical input. And because there are no long tails in this system, the SVD is able to capture a lot of the system with a low dimensional.
 
 \end{section}
 
 \begin{section}{Results and Discussion}
+    \subsection{Network Prediction}
+    To compare our models, we look at the loss of the predictions. This includes the loss from the SVD.
+    
+    To find the approximation of the edges of node $i$, $_tA_{i,\cdot}$. We use: 
+    \begin{align}
+        _tA_{i,\cdot} &\approxeq (\bar p) _t\hat A
+    \end{align}
+    Where $\bar p$ is the location of the node $i$ in the embedding at time $t$.
+
+    To find calculate the loss of our prediction at time $t$, we use:
+    \begin{align}
+        L = ||_tA_{i,\cdot} - (\bar p) _t\hat A||_1
+    \end{align}
+    
+    When we do this for the SVD, NN, and symbolic regression, we get \autoref{loss_table}.
+    \begin{figure}
+        \begin{center}
+            \begin{tabular}{| m{0.17\textwidth} | m{0.25\textwidth} | m{0.25\textwidth} | m{0.25\textwidth} |}
+                \hline
+                Sequence & Embedding Loss & Neural Network Prediction Loss & Symbolic Regression Prediction Loss\\ 
+                \hline
+                \hline
+                2 Community & 41.67 & 47.91 & 35.11\\ 
+                \hline 
+                Long Tail & 2.408 & 1.193 & 2.524 \\ 
+                \hline 
+                3 Community & 35.43 & 35.50 & 35.57 \\ 
+                \hline 
+            \end{tabular}
+            \end{center}
+            \caption{A summary of the mean loss of each prediction at the fifth time step. The embedding loss comes from the true target node and loss is only introduced by the SVD. The neural network and symbolic prediction loss comes from the RDPG being reconstructed but with the position of the target node replaced with the location of the respective prediction. Loss is calculated as the total number of incorrectly predicted edges. That is an edge not being present when it should as well as the reverse.}
+            \label{loss_table}
+    \end{figure}
+
+    The loss of one system should not be compared with another. That is the 2 community losses should not be compared to the long tail. This is because the long tail system will only ever have one edge to predict, whereas the 2 community will have 50 edges that need to be predicted.
+
+    Instead, we may compare predictions within the same system. However, we do not see much difference between these predictions, and so we plot our predictions at each time step to further understand the behavior of our framework.
+
     For each of these systems, we took embedded the temporal network in two dimensions at each time step. The temporal embeddings were then divided into a training set of 20 and a testing set of 15. The output of the trained neural networks was then used to train a symbolic regression model that could use a simple set of addition, subtraction, division, and multiplication. \\
     In fig \autoref{2community series}, \autoref{longtail series},\autoref{3community series} the green points are the embedded coordinates of the node in each of the communities. Each cluster is one separate community. The orange point is the true coordinate of the embedded target node at each time step. The blue point is our model prediction from the true target node at the first time step. As the time progresses, we see the true node move from one community cluster to the other. This is expected from the embedding; the target node starts as very similar to the first community (as it has many connections with nodes in that community) and as time progresses, it gradually becomes less and less similar to the first community and more similar to the second (as the edges between the target node and the first community are replaced with edges to the second community). As such, we see the target node move towards the second community.
+
     \begin{subsection}{2 Community}
         \begin{figure}
             \foreach \i in {1,...,15} {%
                 \begin{subfigure}[p]{0.3\textwidth}
-                    \includegraphics[width=\linewidth]{./Plots/Test Only/2communities/2communities \i.png}
+                    \includegraphics[width=\linewidth]{../Code/Plots/Test Only/2communities/2communities \i.png}
                     \caption{t=\i}
+                    \label{2community series \i}
                 \end{subfigure}\quad
             }
             \caption{2 Community test series. This series shows the comparison of the neural network model, the symbolic regression model trained on the neural network model, and the true solution of the two community system.}
@@ -378,8 +416,9 @@ sorting=ynt
         \begin{figure} 
             \foreach \i in {1,...,15} {%
                 \begin{subfigure}[p]{0.3\textwidth}
-                    \includegraphics[width=\linewidth]{./Plots/Test Only/longTail/longTail \i.png}
+                    \includegraphics[width=\linewidth]{../Code/Plots/Test Only/longTail/longTail \i.png}
                     \caption{t=\i}
+                    \label{longtail series \i}
                 \end{subfigure}\quad
             }
             \caption{Long Tail test series. This series shows the comparison of the neural network model, the symbolic regression model trained on the neural network model, and the true solution of the long tail system.}
@@ -394,8 +433,9 @@ sorting=ynt
         \begin{figure}
             \foreach \i in {1,...,15} {%
                 \begin{subfigure}[p]{0.3\textwidth}
-                    \includegraphics[width=\linewidth]{./Plots/Test Only/3community/3community \i.png}
+                    \includegraphics[width=\linewidth]{../Code/Plots/Test Only/3community/3community \i.png}
                     \caption{t=\i}
+                    \label{3community series \i}
                 \end{subfigure}\quad
             }
             \caption{3 community test series. This series shows the comparison of the neural network model, the symbolic regression model trained on the neural network model, and the true solution of the 3 community system.}
@@ -414,24 +454,7 @@ sorting=ynt
 
         % This was by far the largest improvement between the neural network and the symbolic regression. This could be because this system had the least difference between the training predictions and the true position of the target node. At the end of the test data we see the true target node move towards the origin. This is because it now only has edges to one community and so at each timestep it removes one of these. If this had continued, the target node would have no edges. Nodes with no edges are mapped to the origin. When this happened, the symbolic regression model prediction began to move further from the true node.
 
-        \subsection{Network Prediction}
-        \begin{figure}
-            \begin{center}
-                \begin{tabular}{| m{0.25\textwidth} | m{0.25\textwidth} | m{0.25\textwidth} | m{0.25\textwidth} |}
-                 \hline
-                 Sequence & Embedding Loss & Neural Network Prediction Loss & Symbolic Regression Prediction Loss\\ 
-                 \hline
-                 \hline
-                 2 Community & cell5 & cell6 & c\\ 
-                 \hline 
-                 Long tail & cell8 & cell9 & c \\ 
-                 \hline 
-                 3 Community & cell8 & cell9 & c \\ 
-                 \hline 
-                \end{tabular}
-                \end{center}
-                \caption{A summary of the mean loss of each prediction at the fifth time step. The embedding loss comes from the true target node and loss is only introduced by the SVD. The neural network and symbolic prediction loss comes from the RDPG being reconstructed but with the position of the target node replaced with the location of the respective prediction. Loss is calculated as the total number of incorrectly predicted edges. That is an edge not being present when it should as well as the reverse.}
-        \end{figure}
+        
         \subsection{Summary}
         We see a large difference in the training predictions between the 2 and 3 community systems. In the 2 community system, even in the training period, the predictions tended to wander and be less accurate. Whereas the 3 community training predictions remained very close to the true target node. The movement of the target node in the embedding was very similar between the two systems, and so the difference seems to be that the 2 community has symmetrical inputs.
 
@@ -443,7 +466,6 @@ sorting=ynt
 \begin{section}{Conclusion}
     In this paper, we proposed a novel framework for modelling temporal networks. We then tested this framework on three types of small, synthetic network sequences. Throughout these tests the neural network performed generally more poorly than the symbolic regression model, with the large three community sequence being especially notable due to th symbolic regression remaining so close to the target node throughout the test period. 
 \end{section} 
-
 
 
 \printbibliography
