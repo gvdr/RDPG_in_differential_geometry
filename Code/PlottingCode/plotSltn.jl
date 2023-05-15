@@ -3,7 +3,7 @@ using ColorSchemes
 include("../_Modular Functions/loadGlobalConstants.jl")
 
 include("../_Modular Functions/pca.jl")
-global_consts("longTail", (182,2))
+global_consts("3community", (212,2))
 
 include("symreg.jl")
 
@@ -27,6 +27,7 @@ using DelimitedFiles
 
 
 sltn = readdlm("./Code/Solutions/$net_name big net test only.csv", ',')
+mid = convert(Int, dims[1]/2)
 
 for i in 1:length(t_data)-datasize
     pts = t_data[i+datasize]'#get_embedding([sltn_sym_reg[:,i]'; t_data[i+datasize]], sltn[:,i])
@@ -53,22 +54,22 @@ function net_pred_loss(pt, tstep)
     R = t_data[tstep][:,mid+2:end]
 
     
-    pred = round.(pt'*R)
+    pred = pt'*R
     # 
-    return sum(abs, pred.-true_struct'),pred
+    return sum(abs, pred.-true_struct'),pred,true_struct
 end
 
-tstep = datasize+15
+tstep = datasize+5
 sltn_sym = sltn_sym_reg[:,tstep-datasize]
 sltn_nn = sltn[:,tstep-datasize]
 sltn_true = t_data[datasize+1][:,1]
 
-tests = [sltn_sym, sltn_nn, sltn_true]
+tests = [sltn_true, sltn_nn, sltn_sym]
 p  = net_pred_loss.(tests,tstep)
 
 L = t_data[tstep][:,1:mid]
 R = t_data[tstep][:,mid+1:end]
 
 L'*R
-
-printall(p[1][2])
+(p[1][1], p[2][1], p[3][1])
+printall(p[1][3])
