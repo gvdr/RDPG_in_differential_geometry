@@ -2,28 +2,29 @@ using Revise
 include("load2ComGraphFlat.jl")
 include("../structs/TemporalEmbedding.jl")
 
-function global_consts(n, d)
+function global_consts(n, d; device=Lux.cpu)
     global dims=d #|> Lux.gpu
     global net_name = n
 
 
     global true_data, time_graphs = load2ComGraphFlat(true);
-
-    global t_data = TemporalNetworkEmbedding(true_data,dims[1],dims[2])
+    t_graphs = [Float32.(t) for t in time_graphs]
+    global t_data = TemporalNetworkEmbedding(t_graphs,dims[2])
 
 
     global datasize = 25
-    global train_data = withoutNode(t_data[1:datasize],1) #|> Lux.gpu
+    global train_data = withoutNode(t_data[1:datasize],1) |> device
     global test_data = withoutNode(t_data[1+datasize:end],1)
-    global tspan = (1.0, Float64(datasize))#|> Lux.gpu
-    global tsteps = range(tspan[1], tspan[2], length = datasize)#|> Lux.gpu 
+    global tspan = (Float32(1.0), Float32(datasize))|> device
+    global tsteps = range(tspan[1], tspan[2], length = datasize)|> device
     global k = 15
 
     global input_data_length = k*dims[2]
     global output_data_length = dims[2]
-    global u0 = vec(targetNode(t_data,1)[1])#|> Lux.gpu
+    global u0 = vec(targetNode(t_data,1)[1][:AL])|> device
     return nothing
 end
+
 
 #targetNode(t_data,1)[1]
 # TNode_data = targetNode(t_data,1)

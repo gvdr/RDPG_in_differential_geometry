@@ -1,6 +1,5 @@
 using Lux, Random
 
-include("convertToDistances.jl")
 include("helperFunctions.jl")
 
 

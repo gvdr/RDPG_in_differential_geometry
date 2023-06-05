@@ -9,13 +9,14 @@ using Lux, DiffEqFlux, DifferentialEquations, Optimization, OptimizationOptimJL,
 #   output_data_length
 
 
-function predict_neuralode(θ)
-  Array(solve(prob_neuralode, Tsit5(), saveat = tsteps, p=θ))#|>Lux.gpu
+function predict_neuralode(θ)  
+  solve(prob_neuralode, Tsit5(), saveat = tsteps, p=θ)|>device
 end
 
 function loss_neuralode(θ)
     pred = predict_neuralode(θ)
-    loss = sum((pred-TNode_data.A[:,1,:]).^2)
+    
+    loss = sum((pred-TNode_data.AL[1,:,:]).^2)
     return loss
 end
 
@@ -24,7 +25,7 @@ callback = function(θ, l)
   #t = t+1
   #M = reshape(ode_data[:,t], (dims[1],dims[2]))
   display(l)
-  global temp_res = θ
+  # global temp_res = θ
   return false
 end
 

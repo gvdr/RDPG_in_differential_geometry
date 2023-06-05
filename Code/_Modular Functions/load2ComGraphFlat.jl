@@ -40,7 +40,7 @@ function loadManualAligned()
 
     n, d = dims
 
-    time_graphs = []
+    time_graphs = Vector{Matrix}(undef, 0)
     for i in 1:length(names)
         temp = CSV.read(string(path, "/step", i, ".csv"), DataFrame, header=false)
         push!(time_graphs, Matrix(temp[:,:]))
