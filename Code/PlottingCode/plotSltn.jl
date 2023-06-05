@@ -4,7 +4,7 @@ using Lux
 include("../_Modular Functions/loadGlobalConstants.jl")
 
 include("../_Modular Functions/pca.jl")
-global_consts("2communities", (182,2))
+global_consts("longTail", (182,2))
 
 include("symreg.jl")
 p1, p2 = (1,2)
