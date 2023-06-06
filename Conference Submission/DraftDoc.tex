@@ -465,6 +465,8 @@ sorting=ynt
 \begin{section}{Data}
     In this paper we simulate three temporal sequences of undirected graphs. For each sequence we will be modelling the node in red, we will refer to this as the target node. For each sequence we train the model on the first 25 time steps and compare the predictions for the next 15 time steps. For clarity, each diagram \autoref{2community train series} \autoref{longTail train series} \autoref{3community train series} has been simplified and illustrates the movement of the target node in each sequence.
 
+    Each model was trained on a neural network with 4 hidden layers (64,8,8,8).
+
     \subsection{Two Community System}
         The 2 community network has communities of size 40 and 50, each of which are fully connected. The target node is initially fully connected to the 50 node community. In our simplified diagram \autoref{2community train series, a} the 50 node community is represented by the 5 fully connected nodes, while the 40 node community is represented by the 4 node component. At each time step one edge is removed between the target node and the larger community and replaced with an edge between the target node and the smaller community \autoref{2community train series, b}. This process is then continued \autoref{2community train series, c} for thirty-five time steps to generate our training and test data. Once we have this data in the form of a sequence of adjacency matrices, we find the singular value decomposition using the framework described in \autoref{svd}.
 
@@ -497,9 +499,10 @@ sorting=ynt
             \caption{First 3 time steps of the simplified, synthetic 2 community network. The red node represents the target node that we are aiming to model. The 4 node and 5 node fully connected components represent the 40 and 50 node communities of the sequence respectively. At each time step, an edge from the target node to the larger community is replaced with and edge from the target node to the smaller community.}
             \label{2community train series}
         \end{figure}
-        The 2 community temporal network was selected to test whether this framework can be used to model a node changing communities in systems where there are no other processes occurring. Notably, the movement in the two community system is difficult for the neural network to learn because opposite sets of inputs need to result in the same output. In a simplified version of this system with only the nearest node as input, the input for the model begins as the position of the larger community at roughly $(0,-1)$ \autoref{2community series 1}. This input needs to move the target towards the top left. However, as the sequence progresses, the nearest neighbours will be the small community at roughly $(-1,0)$, which also needs to move the target node towards the top left. 
+        The 2 community temporal network was selected to test whether this framework can be used to model a node changing communities in systems where there are no other processes occurring. Notably, the movement in the two community system is difficult for the neural network to learn because opposite sets of inputs need to result in the same output. In a simplified version of this system with only the nearest node as input, the input for the model begins as the position of the larger community at roughly $(0,-1)$ \autoref{2community series 3}. This input needs to move the target towards the top left. However, as the sequence progresses, the nearest neighbours will be the small community at roughly $(-1,0)$, which also needs to move the target node towards the top left. 
 
     \subsection{Long Tail System}
+        \label{longtaildata}
         In the long tail network \autoref{longTail train series}, we have a long chain with 50 nodes and a fully connected component with forty nodes at one end of the chain. This is used to orient the embedding and model. The SVD does not take into account the index of the individual node in the adjacency matrix; it only distinguishes based on their distance to each other. Because of this a chain of nodes, even when aligned, could be flipped when it is embedded. That is, between one time step and the next the first node in the chain could be aligned with the last node. With a large, connected group at one end however, that group will always be aligned with itself and so the rest of the chain will also be aligned properly. The target node starts attached to the node that is attached to this large component \autoref{longTail train series, a}. At each time step the target node move one node further down the tail \autoref{longTail train series, b}. Again, this is repeated to generate the training and test data \autoref{longTail train series, c}.
         \begin{figure}[H]
             \centering
@@ -568,7 +571,7 @@ sorting=ynt
 
 \begin{section}{Results and Discussion}
     \subsection{Embedding Prediction}
-        For each of these systems, we took embedded the temporal network in two dimensions at each time step. The temporal embeddings were then divided into a training set of 20 and a testing set of 15. The output of the trained neural networks was then used to train a symbolic regression model that could use a simple set of addition, subtraction, division, and multiplication. 
+        For each of these systems, we took embedded the temporal network in two dimensions at each time step. The temporal embeddings were then divided into a training set of 20 and a testing set of 15. The output of the trained neural networks was then used to train a symbolic regression model that could use a simple set of addition, subtraction, and multiplication. 
 
         We predicted the evolution of the 2 community, long tail, and 3 community systems for 15 time steps after the training period using both a NNDE model and a symbolic regression model.
 
@@ -595,11 +598,11 @@ sorting=ynt
                     Sequence & Neural Network Prediction Loss & Symbolic Regression Prediction Loss\\ 
                     \hline
                     \hline
-                    2 Community & 5.784 & 10.16\\ 
+                    2 Community & 0.224 & 0.145 \\ 
                     \hline 
-                    Long Tail  & 3.858 & 0.057 \\ 
+                    Long Tail  & 0.093 & 0.331 \\ 
                     \hline 
-                    3 Community & 6.597 & 2.047 \\ 
+                    3 Community & 43.064 & 2.768 \\ 
                     \hline 
                 \end{tabular}
                 \end{center}
@@ -607,11 +610,11 @@ sorting=ynt
                 \label{loss_table}
         \end{figure}
 
-        As can be seen in \autoref{loss_table}, the symbolic regression model performed better for both the long tail system and the 3 community system. However, for the 2 community system the symbolic regression model performed notably worse. 
+        As can be seen in \autoref{loss_table}, the symbolic regression model performed better for both the 2 and 3 community system. However, for the long tail system the symbolic regression model performed notably worse. 
 
         The loss of one system should not be compared with another. That is the 2 community losses should not be compared to the long tail. This is because the long tail system will only ever have one edge to predict, whereas the 2 community will have 50 edges that need to be predicted.
 
-        Instead, we may compare predictions within the same system. However, we do not see much difference between these predictions, and so we plot our predictions at each time step to further understand the behavior of our framework.
+        Instead, we may compare predictions within the same system. However, we do not necessarily get a good understanding of the behaviour of our models with just this summary. We plot our predictions at every third time step to further understand the behavior of the models generated by our framework.
 
     \subsection{Further Exploration}
         In fig \autoref{2community series}, \autoref{longtail series},\autoref{3community series} the purple points are the embedded coordinates of the node in each of the communities. Each cluster is one separate community. The green point is the true coordinate of the embedded target node at each time step. The blue point is our neural network model prediction at each time step. The orange point is the symbolic regression prediction. 
@@ -632,13 +635,11 @@ sorting=ynt
                 \caption{2 Community test series. This series shows the comparison of the neural network model, the symbolic regression model trained on the neural network model, and the true solution of the two community system.}
                 \label{2community series}
             \end{figure}
-            We see the neural network model quickly jumps to around $(-0.5,-0.5)$ where it sits for the entire simulation. This happened across many training periods; either a few time steps after the training period or right at the end of it, the neural network model moved towards a stable point where it remained for the test period.
+            We see both the neural network model and the symbolic regression models follow quite closely to the target node throughout the test process. As we saw in \autoref{loss_table}, the NN model performs slightly worse than the symbolic regression model. This improvement of symbolic regression was present throughout the test period.
 
-            Similarly, the symbolic regression prediction remains close to the neural network prediction at the beginning of the test period, but towards the end of the test period begin to drift away. 
+            In spite of the simple movement of the target node, these close predictions were unexpected. When creating this system, we were looking to test how the model would perform with symmetrical input data. We hypothesised that this may be difficult for the NN model to learn, as it would need to learn to give the same output with opposite input.
             
-            The poor predictive behaviour of the models may be attributed to this being a symmetrical problem. That is, with the same set of distances as input into the model, the target node needs to move away from its nearest neighbours in the first half, then move towards its nearest neighbours in the second half. 
-            
-            Potential ways of breaking this symmetry may be to include information of the previous time step, or to include the absolute position of the target node as input into the neural network.
+            In this case however, it seems that predicting the movement of the target node was not affected by this symmetry.
 
         \subsubsection{Long Tail}
             \begin{figure} 
@@ -652,15 +653,15 @@ sorting=ynt
                 \caption{Long Tail test series. This series shows the comparison of the neural network model, the symbolic regression model trained on the neural network model, and the true solution of the long tail system.}
                 \label{longtail series}
             \end{figure}
-            In fig \autoref{longtail series} we see the true embedding of the target node jump from one arm to the other at each time step. It is clear that neither the symbolic regression model nor the neural network model capture this movement. 
+            In fig \autoref{longtail series} we see the true embedding of the target node move from one arm to the other between the time steps 9 and 12. It is clear that neither the symbolic regression model nor the neural network model capture this movement. 
             
-            However, the symbolic regression model maintains an appropriate distance from the origin oven if it does not follow the movement of the target node.
+            From \autoref{loss_table}, we see that the NN model had a higher accuracy than the symbolic regression. However, the NN model does not follow the true node; instead it stays in relatively the same spot, as opposed to the symbolic regression model, which does move. 
 
             We see that neither the neural network model capture the movement of the target node to any real extent. One reason for this may be that by the time the system progresses to the test section the number of nearest neighbours (k=15) means that the input for the model no longer includes the large community used to orient the system. Because of this, the model will essentially be given the same input at every time step, but will have to somehow produce the alternating behaviour of the target node. This again is an issue of symmetry. 
+
+            The solutions to this symmetry in this problem would be to break the symmetry by including the absolute position of the target node as input for the model, or to have multiple time steps as input. 
             
-            The solutions to symmetry in this problem would be the same as for the two community system. That is, to break the symmetry by including the absolute position of the target node as input for the model, or to have multiple time steps as input. 
-            
-            Another potential solution we might consider in this instance, could be increasing the number of nearest neighbours so that the model always has a reference point. That is, the model would have the position of the large community as input. This solution would not generalise well however, as, in general, we may not know how long a tail could be, and therefore how many nearest neighbours to include.
+            Another potential reason for the poor behavior could be that the embedding of the temporal network does not contain enough information to train a NNDE model. This is discussed in \autoref{longtaildata}.
 
 
         \subsubsection{Three Community}
@@ -675,30 +676,46 @@ sorting=ynt
                 \caption{3 community test series. This series shows the comparison of the neural network model, the symbolic regression model trained on the neural network model, and the true solution of the 3 community system.}
                 \label{3community series}
             \end{figure}
-            In fig \autoref{3community series} we see both models move roughly in the same direction as the target node. The neural network however moves quickly ahead of the target node and, as it does, away from the precise direction of the target node. 
+            In fig \autoref{3community series} we see the symbolic regression model move in roughly the same direction as the target node. The NN model however, moves quickly towards the bottom left, away from the target node. 
             
-            In contrast, the symbolic regression model maintains a very small distance to the target node.
+            In contrast, after the third time step, the symbolic regression model prediction maintains a relatively constant distance to the target node.
 
-            This system was constructed to avoid the symmetrical input of the other two systems. The models built for the 3 community system are by far the most accurate, with the symbolic regression model being particularly impressive. 
+            This system was constructed to avoid the symmetrical input of the other two systems. Because of this, it is interesting to see the poor predictive performance of the NN model. 
             
-            This supports the notion that symbolic regression, when the training data is non-symmetrical, can give more robust predictive models than a NNDE alone.
+            We see that the symbolic regression model significantly improved the predictions, which supports the notion that symbolic regression, can give more robust predictive models than a NNDE alone.
 
-            
-            \subsection{Summary}
-                We see a large difference in the training predictions between the 2 and 3 community systems. In the 2 community system, even in the training period, the predictions tended to wander and be less accurate. Whereas the 3 community training predictions remained very close to the true target node. The movement of the target node in the embedding was very similar between the two systems, and so the difference seems to be that the 2 community has symmetrical inputs.
-
-                These were trained on a relatively small neural network (4 hidden layers (64,8,8,8)).
+        
+    \subsection{Summary}
+      In the 2 and 3 community systems, we see that symbolic regression improved the accuracy of the predictions across all time steps when compared to the NN model. This is especially prominent in the 3 community system. In the long tail system, where the symbolic regression model performed worse than the NN model, neither performed well, with the NN model remaining in relatively the same spot throughout the test period. 
 
 
 \end{section}
 
 \begin{section}{Code}
     \subsection{Summary}
-    The idea of this code is to provide a foundation for a streamline research into temporal network modelling. To that end it is planned to be compatible with popular Julia packages such as Graphs, the SciML ecosystem, and EcologicalNetworks.
+        The idea of this code is to provide a foundation for a streamline research into temporal network modelling. To that end it is planned to be compatible with popular Julia packages such as Graphs, the SciML ecosystem, and EcologicalNetworks.
+
+        The core of the code developed for this project is the TemporalNetworkEmbedding (TNE) structure. This structure was developed not only for me to be able to interface with data quickly and easily, but also so the SciML ecosystem could interface with it during training of the NN. In particular, the ability to index the TNE with a float was essential for the continuous time evolution of the UDEs and NNDEs to function.
+
     \subsection{Statement of Need}
-    
+        Throughout this thesis, we have demonstrated that temporal networks are found in many different areas, that, on small networks, temporal progression of embedded nodes can be modelled with NNDEs, and that there are still problems to be overcome. 
+
+        With this in mind, the code has been developed to:
+
+            1: Allow for interface with popular packages
+
+            2: Allow for further exploration of optimal network structures for deep learning
+
+            3: Provide opportunities for collaboration of experts from other fields
 
     \subsection{Package Methods}
+        In the package \cite{DotProductGraphs}, I created code for constructing:
+        % ADD NOTATION
+        The TemporalNetworkEmbedding structure. This structure stores the temporal network as tensors of the $\hat L, \hat R$ matrices. This structure has many methods for streamlining interactions with the TemporalNetworkEmbedding. These include indexing with integers and floats, where the floats will linearly interpolate between time steps. Other methods include viewing and or removing specific nodes from the network.
+        
+        As well as constructRDPG, which takes a temporal network embedding and optionally the time steps of interest, and outputs the RDPG from the embedding.
+
+        I also added the nearestNeighbours method which takes a vector point in the dimension of the embedding, the time step, a TemporalNetworkEmbedding and the number of nearest neighbours required. The method then outputs the indices of the nearest nodes of the network to the vector in descending order.
  
     \subsection{Comparable Methods and Related Work}
     Teneto Python
