@@ -1,6 +1,4 @@
-using SymbolicRegression
-using SymbolicUtils
-using DelimitedFiles
+
 include("../_Modular Functions/helperFunctions.jl")
 
 sltn = readdlm("./Code/Solutions/$net_name big net.csv", ',')
