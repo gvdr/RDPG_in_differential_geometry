@@ -3,17 +3,17 @@ INPUT /usr/share/texmf-dist/web2c/texmf.cnf
 INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
 INPUT /home/stirling/Documents/thesis/Conference Submission/DraftDoc.tex
 OUTPUT DraftDoc.log
-INPUT /usr/share/texmf-dist/tex/latex/amscls/amsart.cls
-INPUT /usr/share/texmf-dist/tex/latex/amscls/amsart.cls
-INPUT /usr/share/texmf-dist/tex/latex/amscls/amsart.cls
-INPUT /usr/share/texmf-dist/tex/latex/amscls/amsart.cls
-INPUT /usr/share/texmf-dist/tex/latex/amscls/amsart.cls
-INPUT /usr/share/texmf-dist/tex/latex/amscls/amsart.cls
-INPUT /usr/share/texmf-dist/tex/latex/amscls/amsart.cls
-INPUT /usr/share/texmf-dist/tex/latex/amscls/amsart.cls
-INPUT /usr/share/texmf-dist/tex/latex/amscls/amsart.cls
-INPUT /usr/share/texmf-dist/tex/latex/amscls/amsart.cls
-INPUT /usr/share/texmf-dist/tex/latex/amscls/amsart.cls
+INPUT /usr/share/texmf-dist/tex/latex/amscls/amsbook.cls
+INPUT /usr/share/texmf-dist/tex/latex/amscls/amsbook.cls
+INPUT /usr/share/texmf-dist/tex/latex/amscls/amsbook.cls
+INPUT /usr/share/texmf-dist/tex/latex/amscls/amsbook.cls
+INPUT /usr/share/texmf-dist/tex/latex/amscls/amsbook.cls
+INPUT /usr/share/texmf-dist/tex/latex/amscls/amsbook.cls
+INPUT /usr/share/texmf-dist/tex/latex/amscls/amsbook.cls
+INPUT /usr/share/texmf-dist/tex/latex/amscls/amsbook.cls
+INPUT /usr/share/texmf-dist/tex/latex/amscls/amsbook.cls
+INPUT /usr/share/texmf-dist/tex/latex/amscls/amsbook.cls
+INPUT /usr/share/texmf-dist/tex/latex/amscls/amsbook.cls
 INPUT /usr/share/texmf-dist/tex/latex/amsmath/amsmath.sty
 INPUT /usr/share/texmf-dist/tex/latex/amsmath/amsmath.sty
 INPUT /usr/share/texmf-dist/tex/latex/amsmath/amsmath.sty
@@ -1319,6 +1319,17 @@ INPUT /usr/share/texmf-dist/tex/latex/tools/array.sty
 INPUT /usr/share/texmf-dist/tex/latex/tools/array.sty
 INPUT /usr/share/texmf-dist/tex/latex/tools/array.sty
 INPUT /usr/share/texmf-dist/tex/latex/tools/array.sty
+INPUT /usr/share/texmf-dist/tex/latex/cleveref/cleveref.sty
+INPUT /usr/share/texmf-dist/tex/latex/cleveref/cleveref.sty
+INPUT /usr/share/texmf-dist/tex/latex/cleveref/cleveref.sty
+INPUT /usr/share/texmf-dist/tex/latex/cleveref/cleveref.sty
+INPUT /usr/share/texmf-dist/tex/latex/cleveref/cleveref.sty
+INPUT /usr/share/texmf-dist/tex/latex/cleveref/cleveref.sty
+INPUT /usr/share/texmf-dist/tex/latex/cleveref/cleveref.sty
+INPUT /usr/share/texmf-dist/tex/latex/cleveref/cleveref.sty
+INPUT /usr/share/texmf-dist/tex/latex/cleveref/cleveref.sty
+INPUT /usr/share/texmf-dist/tex/latex/cleveref/cleveref.sty
+INPUT /usr/share/texmf-dist/tex/latex/cleveref/cleveref.sty
 INPUT /usr/share/texmf-dist/tex/latex/hyperref/hyperref.sty
 INPUT /usr/share/texmf-dist/tex/latex/thmtools/thmtools.sty
 INPUT /usr/share/texmf-dist/tex/latex/thmtools/thmtools.sty
@@ -1492,11 +1503,10 @@ INPUT ./DraftDoc.out
 INPUT ./DraftDoc.out
 OUTPUT DraftDoc.out
 INPUT /usr/share/texmf-dist/tex/latex/graphics/graphicx.sty
-INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmcsc10.tfm
+INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
+INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
 INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmr9.tfm
 INPUT /var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map
-INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
-INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmti12.tfm
 INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmr8.tfm
 INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmr6.tfm
 INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmmi12.tfm
@@ -1527,6 +1537,7 @@ INPUT ./SynthDataDiagrams/methodology3.tex
 INPUT SynthDataDiagrams/methodology3.tex
 INPUT ./SynthDataDiagrams/methodology3.tex
 INPUT SynthDataDiagrams/methodology3.tex
+INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmcsc10.tfm
 INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmcsc10.tfm
 INPUT ../Code/Plots/examples/plot 1.png
 INPUT ../Code/Plots/examples/plot 1.png
@@ -1564,6 +1575,21 @@ INPUT ./SynthDataDiagrams/2community3.tex
 INPUT SynthDataDiagrams/2community3.tex
 INPUT ./SynthDataDiagrams/2community3.tex
 INPUT SynthDataDiagrams/2community3.tex
+INPUT ../Code/Plots/Test Only/2communities/2communities 1 illustration.png
+INPUT ../Code/Plots/Test Only/2communities/2communities 1 illustration.png
+INPUT ../Code/Plots/Test Only/2communities/2communities 1 illustration.png
+INPUT ../Code/Plots/Test Only/2communities/2communities 1 illustration.png
+INPUT ../Code/Plots/Test Only/2communities/2communities 1 illustration.png
+INPUT ../Code/Plots/Test Only/2communities/2communities 21 illustration.png
+INPUT ../Code/Plots/Test Only/2communities/2communities 21 illustration.png
+INPUT ../Code/Plots/Test Only/2communities/2communities 21 illustration.png
+INPUT ../Code/Plots/Test Only/2communities/2communities 21 illustration.png
+INPUT ../Code/Plots/Test Only/2communities/2communities 21 illustration.png
+INPUT ../Code/Plots/Test Only/2communities/2communities 40 illustration.png
+INPUT ../Code/Plots/Test Only/2communities/2communities 40 illustration.png
+INPUT ../Code/Plots/Test Only/2communities/2communities 40 illustration.png
+INPUT ../Code/Plots/Test Only/2communities/2communities 40 illustration.png
+INPUT ../Code/Plots/Test Only/2communities/2communities 40 illustration.png
 INPUT ./SynthDataDiagrams/longTail1.tex
 INPUT SynthDataDiagrams/longTail1.tex
 INPUT ./SynthDataDiagrams/longTail1.tex
@@ -1663,6 +1689,7 @@ INPUT ../Code/Plots/Test Only/3community/3community 15 small net.png
 INPUT ../Code/Plots/Test Only/3community/3community 15 small net.png
 INPUT ../Code/Plots/Test Only/3community/3community 15 small net.png
 INPUT ../Code/Plots/Test Only/3community/3community 15 small net.png
+INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmti12.tfm
 INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmtt12.tfm
 INPUT DraftDoc.aux
 INPUT ./DraftDoc.out
