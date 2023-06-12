@@ -34,8 +34,8 @@ sltn = readdlm("./Code/Solutions/$net_name big net test only.csv", ',')
 
 t_data[1][:AL]
 
-for i in 1:length(t_data)
-    pts = t_data[i][:AL]#get_embedding([sltn_sym_reg[:,i]'; t_data[i+datasize]], sltn[:,i])
+for i in 1:length(t_data)-datasize
+    pts = t_data[i+datasize][:AL]#get_embedding([sltn_sym_reg[:,i]'; t_data[i+datasize]], sltn[:,i])
     
     #traces0 = PlotlyJS.scatter(x=[sltn[p1,i]], y=[sltn[p2,i]], mode="markers", name="Neural Network Pred", marker_size=12)
     #traces1 = PlotlyJS.scatter(x=[sltn_sym_reg[p1,i]], y=[sltn_sym_reg[p2,i]], mode="markers", name="Symbolic Regression Pred", marker_size=12)
