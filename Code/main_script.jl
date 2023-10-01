@@ -17,10 +17,10 @@ import DiffEqFlux: NeuralODE
 # Things that are important:
 # embedding dim, initial vec for SVD, amount of data
 CUDA.allowscalar(false)
-include("../_Modular Functions/helperFunctions.jl")
-include("../_Modular Functions/loadGlobalConstants.jl")
-include("../_Modular Functions/constructNN.jl")
-include("../_Modular Functions/NODEproblem.jl")
+include("_Modular Functions/helperFunctions.jl")
+include("_Modular Functions/loadGlobalConstants.jl")
+include("_Modular Functions/constructNN.jl")
+include("_Modular Functions/NODEproblem.jl")
 
 global_consts("longTail", (182,2))
 device = Lux.cpu

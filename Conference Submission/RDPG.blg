@@ -1,9 +1,0 @@
-[0] Config.pm:306> INFO - This is Biber 2.18
-[0] Config.pm:309> INFO - Logfile is 'RDPG.blg'
-[150] biber-MSWIN64:340> INFO - === 
-[204] Biber.pm:418> INFO - Reading 'RDPG.bcf'
-[363] Biber.pm:978> INFO - Found 0 citekeys in bib section 0
-[383] bbl.pm:654> INFO - Writing 'RDPG.bbl' with encoding 'UTF-8'
-[384] bbl.pm:757> INFO - Output to RDPG.bbl
-[386] Biber.pm:130> WARN - The file 'RDPG.bcf' does not contain any citations!
-[386] Biber.pm:132> INFO - WARNINGS: 1
