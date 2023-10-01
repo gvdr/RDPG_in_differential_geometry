@@ -1,0 +1,212 @@
+\documentclass[12pt]{amsbook}
+\usepackage[utf8]{inputenc}
+\usepackage[
+backend=biber,
+style=numeric,
+maxbibnames=99,
+sorting=ynt
+]{biblatex}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{tikz}
+\usepackage{standalone}
+\usepackage{svg}
+\usepackage{gensymb}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx, animate}
+\usepackage{caption, subcaption}
+\usepackage{pgffor}
+\usepackage{mathtools}
+\usepackage{array}
+\usepackage{cleveref}
+\addbibresource{bibliography.bib}
+\usepackage{hyperref,thmtools}
+%\usepackage{chngcounter}
+
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{arrows,automata}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows.meta,positioning}
+
+\counterwithin{figure}{chapter}
+\counterwithin{section}{chapter}
+\counterwithin{table}{chapter}
+\counterwithin{subsection}{section}
+
+
+\linespread{1.5}
+\let\cleardoublepage\clearpage
+% Override ugly default link
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ugly boxes
+  urlcolor     = blue, %Colour for external hyperlinks
+  linkcolor    = blue, %Colour of internal links
+  citecolor   = blue    %Colour of citations
+}
+
+
+
+\begin{document}
+
+\begin{figure}[H]
+    \begin{tabular}{llll}
+    \begin{subfigure}[c]{0.3\textwidth}
+        \centering
+        \resizebox{.6\width}{!}{\input{SynthDataDiagrams/methodology1.tex}}
+        \label{method net, a}
+    \end{subfigure}
+    &
+    \centering
+    \begin{subfigure}[c]{0.3\textwidth}
+        \centering
+        \resizebox{.6\width}{!}{\input{SynthDataDiagrams/methodology2.tex}}
+        \label{method net, b}
+    \end{subfigure}
+    &
+    $\cdots$
+    &
+    \centering
+    \begin{subfigure}[c]{0.3\textwidth}
+        \centering
+        \resizebox{.6\width}{!}{\input{SynthDataDiagrams/methodology3.tex}}
+        \label{method net, c}
+    \end{subfigure}
+    
+    \end{tabular}
+    \caption{Example sequence of networks.}
+    \label{method nets}
+    
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+        \begin{tabular}{llll}
+            $\begin{bmatrix}
+                \cdot & 1 & 1 & 1 & \cdot & \cdot & \cdot & \cdot\\
+                1 & \cdot & 1 & \cdot & \cdot & \cdot & \cdot & \cdot\\
+                1 & 1 & \cdot & 1 & 1 & \cdot & \cdot & \cdot\\
+                1 & \cdot & 1 & \cdot & \cdot & \cdot & \cdot & \cdot\\
+                \cdot & \cdot & 1 & \cdot & \cdot & 1 & 1 & \cdot\\
+                \cdot & \cdot & \cdot & \cdot & 1 & \cdot & \cdot & \cdot\\
+                \cdot & \cdot & \cdot & \cdot & 1 & \cdot & \cdot & 1\\
+                \cdot & \cdot & \cdot & \cdot & \cdot & \cdot & 1 & \cdot
+            \end{bmatrix}$
+            &
+            $\begin{bmatrix}
+                \cdot & 1 & 1 & 1 & \cdot & \cdot & \cdot & \cdot\\
+                1 & \cdot & 1 & 1 & \cdot & \cdot & \cdot & \cdot\\
+                1 & 1 & \cdot & 1 & 1 & \cdot & \cdot & \cdot\\
+                1 & 1 & 1 & \cdot & \cdot & \cdot & \cdot & \cdot\\
+                \cdot & \cdot & 1 & \cdot & \cdot & 1 & 1 & \cdot\\
+                \cdot & \cdot & \cdot & \cdot & 1 & \cdot & \cdot & 1\\
+                \cdot & \cdot & \cdot & \cdot & 1 & \cdot & \cdot & 1\\
+                \cdot & \cdot & \cdot & \cdot & \cdot & 1 & 1 & \cdot
+            \end{bmatrix}$
+            &
+            $\cdots$
+            &
+            $\begin{bmatrix}
+                \cdot & 1 & 1 & 1 & \cdot & \cdot & \cdot & \cdot\\
+                1 & \cdot & 1 & 1 & \cdot & \cdot & \cdot & \cdot\\
+                1 & 1 & \cdot & 1 & \cdot & \cdot & \cdot & \cdot\\
+                1 & 1 & 1 & \cdot & \cdot & \cdot & \cdot & \cdot\\
+                \cdot & \cdot & \cdot & \cdot & \cdot & 1 & 1 & \cdot\\
+                \cdot & \cdot & \cdot & \cdot & 1 & \cdot & 1 & 1\\
+                \cdot & \cdot & \cdot & \cdot & 1 & 1 & \cdot & 1\\
+                \cdot & \cdot & \cdot & \cdot & \cdot & 1 & 1 & \cdot
+            \end{bmatrix}$
+            
+        \end{tabular}
+        \caption{Sequence of sparse adjacency matrices associated with the networks in \cref{method nets}.}
+        \label{method adjacency}
+    \end{figure}
+        
+
+
+    \begin{figure}[c]{1\textwidth}
+        \begin{tabular}{m{0.03\textwidth} m{0.3\textwidth} m{0.26\textwidth} m{0.1\textwidth} l}
+        &
+            $\begin{bmatrix}
+                -0.82  & 0.01\\
+                -0.64  & 0.36\\
+                -0.95 & -0.76\\
+                -0.64 &  0.36\\
+                -0.48 &  0.82\\
+                -0.17 & -0.40\\
+                -0.20 & -0.52\\
+                -0.07 &  0.25\\
+            \end{bmatrix}$
+        
+        &
+        
+            $\begin{bmatrix}
+                -0.82  &  0.10\\
+                -0.82  &  0.10\\
+                -0.90 & -0.58\\
+                -0.82  &  0.10\\
+                -0.42 &  0.81\\
+                -0.13  & -0.64\\
+                -0.13  & -0.64\\
+                -0.12 &  0.57\\
+            \end{bmatrix}$
+        
+        &
+        $\cdots$
+        &
+        
+            $\begin{bmatrix}
+                -0.85 &  -0.10\\
+                -0.85 &  -0.10\\
+                -0.85 &  -0.10\\
+                -0.85 &  -0.10\\
+                 0.08 &  -0.69\\
+                 0.11 &  -0.88\\
+                 0.11 &  -0.88\\
+                 0.08 &  -0.69\\
+            \end{bmatrix}$
+        \end{tabular}
+        \caption{Sequence of truncated SVDs associated with the networks in \cref{method nets}.}
+        \label{method embed}
+    \end{figure}
+    
+    \begin{figure}[c]{1\textwidth}
+        \begin{tabular}{llll}
+        \begin{subfigure}[c]{0.31\textwidth}
+            \centering
+            \begin{subfigure}[p]{1\textwidth}
+                \includegraphics[width=\linewidth]{../Code/Plots/examples/plot 1.png}
+                
+            \end{subfigure}
+
+        \end{subfigure}
+        &
+        \centering
+        \begin{subfigure}[c]{0.31\textwidth}
+            \centering
+            \begin{subfigure}[p]{1\textwidth}
+                \includegraphics[width=\linewidth]{../Code/Plots/examples/plot 2.png}
+                
+            \end{subfigure}
+        \end{subfigure}
+        &
+        $\cdots$
+        &
+        \centering
+        \begin{subfigure}[c]{0.31\textwidth}
+            \centering
+            \begin{subfigure}[p]{1\textwidth}
+                \includegraphics[width=\linewidth]{../Code/Plots/examples/plot 3.png}
+               
+            \end{subfigure}
+        \end{subfigure}
+        
+        \end{tabular}
+        \caption{Sequence of embedded points associated with the networks in \cref{method nets}.}
+        \label{method plots}
+        
+    \end{figure}
+
+
+
+\end{document}
