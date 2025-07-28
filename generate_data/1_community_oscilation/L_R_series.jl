@@ -10,9 +10,7 @@ function L_R_series(d, tsteps)
     end
 
     for i in 1:tsteps
-        if i != 1
-            L, R = svd_decompose(series[i], convert(Int, d))
-        end
+        L, R = svd_decompose(series[i], convert(Int, d))
         push!(L_series, L)
         push!(R_series, R)
 
