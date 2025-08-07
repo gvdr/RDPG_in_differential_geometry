@@ -12,8 +12,8 @@ function L_R_series(d, tsteps)
 
     for i in 1:tsteps
         L, R = svd_decompose(series[i], convert(Int, d))
-        push!(L_series, L)
-        push!(R_series, R)
+        push!(L_series, round.(L, digits=10))
+        push!(R_series, round.(R, digits=10))
 
     end
     return L_series, R_series
