@@ -1,0 +1,91 @@
+\documentclass[12pt]{amsbook}
+\usepackage[utf8]{inputenc}
+\usepackage[
+backend=biber,
+style=numeric,
+maxbibnames=99,
+sorting=ynt
+]{biblatex}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{tikz}
+\usepackage{standalone}
+\usepackage{svg}
+\usepackage{gensymb}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx, animate}
+\usepackage{caption, subcaption}
+\usepackage{pgffor}
+\usepackage{mathtools}
+\usepackage{array}
+\usepackage{cleveref}
+\addbibresource{bibliography.bib}
+\usepackage{hyperref,thmtools}
+%\usepackage{chngcounter}
+
+\usetikzlibrary{decorations.markings}
+\usetikzlibrary{arrows,automata}
+\usetikzlibrary{positioning}
+\usetikzlibrary{arrows.meta,positioning}
+
+\counterwithin{figure}{chapter}
+\counterwithin{section}{chapter}
+\counterwithin{table}{chapter}
+\counterwithin{subsection}{section}
+
+
+\linespread{1.5}
+\let\cleardoublepage\clearpage
+% Override ugly default link
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ugly boxes
+  urlcolor     = blue, %Colour for external hyperlinks
+  linkcolor    = blue, %Colour of internal links
+  citecolor   = blue    %Colour of citations
+}
+
+\begin{document}
+\begin{chapter}{Methodology}
+
+        % Goal is to predict next time steps
+        We are given a sequence of graphs, and our goal is to predict the next graph in the sequence. To achieve this, we reinterpret our temporal network as a sequence of points in a latent space; that is, a space in which similar vertices (ones with many of the same neighbours) are mapped to a similar point in space.
+        We then train a Neural Ordinary Differential Equation (NODE) to approximate the rate of change of the points in this latent space. With this numerical equation, we can then use symbolic regression techniques to find a functional equation that matches the numerical equation. Using this process we discover an interpretable function that governs the evolution of a temporal network.
+
+
+
+    \begin{        Initial vector is [1 2 3 4 ... mod 7] (Double check)
+        Initial vector is used to align the vectors but it kind of doesn't work
+section}{Singular Value Decomposition and Random Dot Product Graphs}
+        SVD Calculated with XXX Arpack XXX Julia
+        Each system has 2 singular values
+        L and R are related by [1 0; 0 -1] as the network is not directed (IE the matrix is symetrical) 
+        We only model L and transform it for analysis
+        Reconstruct the RDPG L*(L*transform)'
+    \end{section}   
+
+    \begin{section}{Neural Ordinary Differential Equation}
+        Used Julia SciML ecosystem
+        Basic copy pasted code 
+        Modelling the whole state
+        Loss function is abs2 sum Data-pred + disabove 1 and below 0 (L*(L*transform)' )
+        NN structure 3 layers 256, 128, 128 celu activation function
+    \end{section}
+
+
+    % Symbolic Regression Explaination
+    
+    \begin{section}{Symbolic Regression}
+        ???
+    \end{section}
+
+    \begin{section}{Reconstructing the Temporal Network}
+        $u$ is the first row of the matrix $\hat L$. By taking $u\hat R'$, this is equivalent to finding $\hat A = \hat L \hat R'$ and looking at $\hat A_{1\cdot}$; to recover a final prediction of the edges of $u$, we take:
+        \begin{align}
+            q &= u \hat R'
+        \end{align}
+        This gives a vector $q$ of probabilities of connections between the target node and the rest of the network. As the results can be interpreted as a probability, the most likely graph is given by setting any entry with a value of $0.5$ or higher to one (predict that the edge exists), and setting any entry with a value of less than $0.5$ to zero (predict that an edge does not exist). However, this may not provide the best fit in terms of the accuracy of edges, and techniques to find the best threshold exist (for more information see \Citeauthor{strydomEtAl}\cite{strydomEtAl})
+    \end{section}
+\end{chapter}
+
+\end{document}
