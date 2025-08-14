@@ -54,11 +54,12 @@ sorting=ynt
 
 
 
-    \begin{        Initial vector is [1 2 3 4 ... mod 7] (Double check)
-        Initial vector is used to align the vectors but it kind of doesn't work
-section}{Singular Value Decomposition and Random Dot Product Graphs}
+    \begin{section}{Singular Value Decomposition and Random Dot Product Graphs}
         SVD Calculated with XXX Arpack XXX Julia
         Each system has 2 singular values
+        Aligning The L and R matrices is important (The SVDs can each be fliped)
+        We use an initial vector to ensure that the first eigenvector is oriented the same for each time step
+        Then calculate a transformation for the subsequent eigenvectors, which is used for training loss and prediction.
         L and R are related by [1 0; 0 -1] as the network is not directed (IE the matrix is symetrical) 
         We only model L and transform it for analysis
         Reconstruct the RDPG L*(L*transform)'
@@ -80,6 +81,8 @@ section}{Singular Value Decomposition and Random Dot Product Graphs}
     \end{section}
 
     \begin{section}{Reconstructing the Temporal Network}
+        XXX Is this necessary XXX
+
         $u$ is the first row of the matrix $\hat L$. By taking $u\hat R'$, this is equivalent to finding $\hat A = \hat L \hat R'$ and looking at $\hat A_{1\cdot}$; to recover a final prediction of the edges of $u$, we take:
         \begin{align}
             q &= u \hat R'
