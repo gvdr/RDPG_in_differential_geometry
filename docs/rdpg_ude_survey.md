@@ -33,9 +33,19 @@ Parameterize $N(P)$ such that:
 - Parsimonious (far fewer than $n^2$ parameters)
 - Expressive enough for relevant dynamics
 - Can encode qualitative priors
-- **Preserves the constraint** $X \in \mathcal{X}$ (or at least $(B^d_+)^n$ if gauge-fixed)
 
 **Output dimension:** We're learning $\dot{X} \in \mathbb{R}^{n \times d}$, i.e., $nd$ values—not $n^2$.
+
+**On $B^d_+$ constraints:** The constraint $X \in (B^d_+)^n$ ensures $P_{ij} \in [0,1]$ and is convenient for mathematical analysis. However, it is **not required for numerical learning**. Projecting estimated embeddings to $B^d_+$ can distort geometry and break temporal consistency. For $N(P)X$ dynamics, learning in whatever coordinate system the embedding method naturally produces (e.g., DUASE) works well. Constraint enforcement via barrier losses (Section 9) is optional and only needed if probability bounds are violated.
+
+### 1.4 Gauge-Invariant Scalars
+
+**Key insight:** Scalar parameters in $N(P)$ are gauge-invariant. For example, in message-passing dynamics:
+$$\dot{X}_i = \beta_0 X_i + \beta_1 \sum_j P_{ij}(X_j - X_i)$$
+
+The scalars $\beta_0, \beta_1$ do not depend on the coordinate system because $N$ depends only on $P = XX^\top$, which is rotation-invariant.
+
+**Practical consequence:** Learn parameters from noisy estimates $\hat{X}(t)$, then apply them to true initial conditions $X(0)$ for direct comparison—no Procrustes alignment needed.
 
 ---
 
@@ -384,6 +394,8 @@ The $P_{ij}$ factor ensures sparse regions stay decoupled.
 ---
 
 ## 9. Constraint Preservation
+
+**Practical note:** For well-behaved dynamics learned via $N(P)X$ parameterizations, explicit constraint enforcement is often unnecessary. In experiments (Example 1), parsimonious models trained without barrier losses or projection maintained valid probability bounds throughout. The analysis below is provided for completeness and for cases where constraint violations occur.
 
 There are **two independent types** of constraints on realizable $\dot{P}$:
 

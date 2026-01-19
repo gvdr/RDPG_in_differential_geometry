@@ -220,14 +220,16 @@ This is a scalar (a $1 \times d$ times $d \times d$ times $d \times 1$ product).
 ### 8.1 What Neural ODEs Learn
 
 When we train a Neural ODE on estimated positions $\hat{X}(t)$:
-- We learn some $f$ in a particular gauge (fixed by SVD + Procrustes + $B^d_+$ projection)
+- We learn some $f$ in a particular gauge (determined by the embedding method)
 - The learned $f$ determines $\dot{P}$ correctly
 - A different gauge choice would give $f + XA$—same physics, different parameterization
+
+**On $B^d_+$ projection:** The constraint $X \in (B^d_+)^n$ is convenient for mathematical analysis (ensuring $P_{ij} \in [0,1]$), but is **not required for numerical learning**. In fact, projecting estimated embeddings to $B^d_+$ can distort geometry and break temporal consistency. For dynamics of the form $\dot{X} = N(P)X$, learning in whatever coordinate system the embedding method naturally produces (e.g., DUASE) works well.
 
 ### 8.2 Why Position Loss Works
 
 Position loss $\|\hat{X}_{pred} - \hat{X}_{target}\|^2$ implicitly captures dot product structure because:
-- Procrustes alignment fixes a consistent gauge
+- Temporal embedding methods (DUASE, Omnibus) provide consistent gauges across time
 - In that gauge, position errors translate to probability errors
 - The Neural ODE learns to match positions, which matches $P$
 
@@ -241,9 +243,9 @@ Distance-based objectives are blind to dynamics that change $P$. Since the obser
 
 ### 8.4 Symbolic Regression and Gauge Dependence
 
-Equations learned via symbolic regression are **gauge-dependent**. 
+**Equations expressed in terms of $X$ directly are gauge-dependent.**
 
-**Critical point:** The symbolic form of recovered equations depends on the arbitrary choice of coordinate system (gauge). In a different basis, $\dot{X}_1 = aX_2$ might appear as $\dot{X}_1 = bX_1 + cX_2$. Different researchers using different embedding/alignment procedures may recover **different-looking equations from the same data**—all equally valid.
+**Critical point:** If you write dynamics as $\dot{X}_i = f(X_1, X_2, \ldots)$ with explicit coordinate dependence, the symbolic form depends on the arbitrary choice of coordinate system (gauge). In a different basis, $\dot{X}_1 = aX_2$ might appear as $\dot{X}_1 = bX_1 + cX_2$. Different researchers using different embedding/alignment procedures may recover **different-looking equations from the same data**—all equally valid.
 
 **Example:** Suppose true dynamics are harmonic oscillation. In one gauge:
 $$\dot{X}_1 = \omega X_2, \quad \dot{X}_2 = -\omega X_1$$
@@ -253,18 +255,49 @@ $$\dot{Y}_1 = 0, \quad \dot{Y}_2 = -\omega Y_1 + \omega Y_2 \quad \text{(differe
 
 Both produce **identical** $P(t)$.
 
-**What IS gauge-invariant:**
+**What IS gauge-invariant (for X-based equations):**
 - Eigenvalues of the linearization (frequencies, decay rates)
 - Equilibrium structure (existence, stability type)
 - Qualitative dynamics (oscillatory, stable, chaotic, etc.)
 - Topological properties (number of equilibria, limit cycles)
 
+### 8.5 Gauge-Invariant Scalars in $N(P)X$ Dynamics
+
+**Key insight:** When dynamics are parameterized as $\dot{X} = N(P)X$ with $N$ depending only on $P = XX^\top$, the **scalar parameters in $N$ are gauge-invariant**.
+
+**Example (Message-Passing):**
+$$\dot{X}_i = \beta_0 X_i + \beta_1 \sum_j P_{ij}(X_j - X_i)$$
+
+This is equivalent to $\dot{X} = N(P)X$ where $N = \beta_0 I + \beta_1(P - D)$ with $D = \text{diag}(P\mathbf{1})$.
+
+The scalars $\beta_0, \beta_1$ are **gauge-invariant** because:
+1. $P = XX^\top$ is invariant under $X \mapsto XQ$
+2. $N(P)$ therefore doesn't change under gauge transformation
+3. The scalars $\beta_0, \beta_1$ parameterize $N$, not $X$ directly
+
+**Practical consequence: Learn Anywhere, Apply Everywhere**
+
+Because $\beta_0, \beta_1$ are gauge-invariant:
+1. **Learn** in DUASE space (from noisy spectral estimates $\hat{X}(t)$)
+2. **Apply** the learned $\beta_0, \beta_1$ to TRUE initial conditions $X(0)$
+3. **Compare** recovered trajectories directly to ground truth—no Procrustes alignment needed!
+
+This was verified experimentally (Example 1): parameters learned from DUASE embeddings, when applied to true $X(0)$, produced trajectories with validation error 0.48 (MsgPass) vs 8.24 (black-box NN).
+
+**Contrast with X-based equations:** If we had learned $\dot{X}_1 = aX_1 + bX_2$ directly, the coefficients $a, b$ would be gauge-dependent and could not be transferred between coordinate systems.
+
+### 8.6 The Primary Evaluation Metric: $P(t)$
+
+Since $P = XX^\top$ is rotation-invariant, comparing probability matrices is the honest test of dynamics recovery:
+
+$$\text{P-error}(t) = \|P_{pred}(t) - P_{true}(t)\|$$
+
+**Do NOT compare $X$ positions directly** (gauge-dependent). Even with Procrustes alignment, position comparison conflates dynamics errors with alignment errors.
+
 **For truly gauge-invariant equations:** Regress on $\dot{P}_{ij}$ as functions of $P$:
 $$\dot{P}_{ij} = \phi(P)$$
 
 This directly models observable evolution without coordinate dependence. The tradeoff: higher dimensionality ($\frac{n(n+1)}{2}$ vs $nd$) and must respect tangent space constraints.
-
-**For truly invariant equations:** Regress directly on $\dot{P}_{ij}$ as functions of $P$.
 
 ---
 
@@ -952,12 +985,16 @@ Latent positions X or (L,R) (parameterization, not unique)
 
 ### 13.4 Connection to Practice
 
-The gauge choice ($B^d_+$, Procrustes, etc.) selects a consistent representative from each equivalence class, enabling:
-- Coordinate-based Neural ODE training
-- Position-based loss functions
-- Standard optimization algorithms
+**On gauge choices:** Temporal embedding methods (DUASE, Omnibus, Procrustes chains) select consistent representatives from equivalence classes, enabling coordinate-based Neural ODE training with position-based loss functions.
+
+**On $B^d_+$:** The constraint $X \in (B^d_+)^n$ is convenient for mathematical analysis (ensuring $P_{ij} \in [0,1]$), but is **not required for numerical learning**. Projecting to $B^d_+$ can distort geometry. For $N(P)X$ dynamics, learning in the embedding method's natural coordinate system works well.
+
+**Gauge-invariant scalars:** For dynamics $\dot{X} = N(P)X$, scalar parameters in $N$ (e.g., $\beta_0, \beta_1$ in message-passing) are gauge-invariant. This enables:
+- **Learn anywhere**: Train on estimated embeddings $\hat{X}(t)$
+- **Apply everywhere**: Use learned parameters with true initial conditions $X(0)$
+- **Direct comparison**: No Procrustes alignment needed for evaluation
 
 The theory guarantees that any dynamics learned with symmetric $N$ will:
 - Produce correct predictions of $P(t)$
-- Be gauge-consistent across different choices of representative
+- Have gauge-invariant scalar parameters
 - Cover the full tangent space of achievable $\dot{P}$

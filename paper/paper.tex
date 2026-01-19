@@ -17,7 +17,7 @@
 \usepackage{algpseudocode}
 \usepackage{cleveref}
 
-\addbibresource{../Document and Images/bibliography.bib}
+\addbibresource{bibliography.bib}
 
 \hypersetup{
     colorlinks=true,
@@ -303,6 +303,12 @@ with only $k+1$ learnable scalars.
 The interpretation is intuitive: $\alpha_0 I$ represents intrinsic node dynamics, $\alpha_1 P$ captures direct neighbor influence (one-hop interactions), and $\alpha_2 P^2$ captures two-hop effects through shared neighbors.
 For many network dynamics, degree $k \leq 2$ suffices.
 
+\textbf{Gauge invariance of learned parameters.}
+A key advantage of expressing dynamics in terms of $P$ rather than $X$ directly: the scalar coefficients $\alpha_0, \alpha_1, \ldots$ are \emph{gauge-invariant}.
+Since $P = XX^\top$ is unchanged by orthogonal transformations $X \mapsto XQ$, and $N(P)$ depends only on $P$, the learned $\alpha_k$ values are independent of the coordinate system chosen by SVD and Procrustes alignment.
+This means coefficients learned in \emph{any} gauge (including the DUASE-estimated coordinates) can be applied to \emph{any other} gauge (including the true positions)---the ``learn anywhere, apply everywhere'' principle.
+By contrast, dynamics expressed directly in $X$ coordinates (e.g., $\dot{X}_1 = aX_1 + bX_2$) would have coefficients that depend on the specific basis chosen.
+
 \textbf{Pairwise kernel $N(P)$.} A flexible homogeneous form:
 \begin{equation}
     N_{ij} = \begin{cases} \kappa(P_{ij}) & i \neq j \\ h(P_{ii}) & i = j \end{cases}
@@ -388,6 +394,12 @@ We handle constraints via a barrier loss:
 \end{equation}
 This encourages learned dynamics to remain in the valid region without breaking the ODE structure.
 Unlike projection-based approaches that clamp values, the barrier loss maintains differentiability throughout training.
+
+\textbf{Practical note.}
+While the $B^d_+$ constraint provides a convenient sufficient condition for mathematical analysis, our experiments show that explicit projection onto $B^d_+$ is neither necessary nor beneficial for numerical learning.
+Euclidean ODE solvers with barrier losses maintain valid probabilities while preserving the natural geometry of the embedding space.
+Projecting onto $B^d_+$ can distort the geometry and introduce artifacts that complicate learning.
+The $B^d_+$ framework remains valuable for theoretical analysis of constraint satisfaction, but practitioners should prefer unconstrained optimization with soft penalties.
 
 \subsection{Symbolic Regression}
 \label{sec:symreg}
@@ -549,6 +561,12 @@ Beyond the theoretical gauge freedom, practical challenges include:
 (ii) Procrustes alignment artifacts that can introduce spurious motion or remove real motion resembling global rotation;
 (iii) discrete, noisy observations rather than continuous $P(t)$.
 These factors may explain why some dynamics (e.g., circulation) are harder to learn than others (e.g., attraction/repulsion).
+
+\textbf{Evaluation in $P$-space.}
+The gauge freedom implies that $X$-based metrics (e.g., position RMSE) are coordinate-dependent and potentially misleading.
+The natural evaluation metric is $P(t) = X(t)X(t)^\top$, which is gauge-invariant.
+Comparing predicted $\hat{P}(t)$ to true $P(t)$ directly tests whether the learned dynamics capture observable network structure, independent of coordinate conventions.
+Our experiments confirm that models can achieve low $P$-error even when $X$-trajectories differ substantially due to gauge ambiguity.
 
 \textbf{Parsimonious architectures.}
 The $\dot{X} = N(P)X$ architecture with symmetric $N$ offers two key advantages over generic neural networks: (1) automatic gauge consistency---symmetric $N$ cannot produce invisible dynamics (Theorem~\ref{thm:symmetric}), and (2) dramatic parameter reduction---polynomial $N$ achieves comparable accuracy with $10^3$--$10^4$ fewer parameters.
@@ -969,13 +987,14 @@ From $\dot{P} = NP + PN$:
 
 Since $P_{ij} = X_i \cdot X_j \leq \|X_i\| \|X_j\|$, we have $P_{ij} = 1$ only if $X_i = X_j$ with $\|X_i\| = 1$.
 
-\textbf{Practical enforcement:} Rather than modifying $N$ (which breaks the symmetric structure), use a barrier in the loss function:
+\textbf{Practical enforcement:} Rather than modifying $N$ (which breaks the symmetric structure) or projecting onto $B^d_+$ (which distorts the geometry), use a barrier in the loss function:
 \begin{equation}
     \mathcal{L}_{\text{barrier}} = \gamma \sum_{i,j} \left[\max(0, -P_{ij})^2 + \max(0, P_{ij} - 1)^2\right]
 \end{equation}
-This encourages learned dynamics to stay in the valid region.
+This encourages learned dynamics to stay in the valid region while preserving the natural geometry of the embedding space.
+Our experiments show that projection-based constraint enforcement (e.g., onto $B^d_+$) is unnecessary and can actually impede learning.
 
-\textbf{Summary:} In the interior of the valid configuration space, only the algebraic constraint matters---and it's automatic. Geometric constraints only matter at boundaries.
+\textbf{Summary:} In the interior of the valid configuration space, only the algebraic constraint matters---and it's automatic. Geometric constraints only matter at boundaries. Soft penalties (barrier loss) outperform hard constraints (projection) in practice.
 
 \section{Oscillatory Dynamics with Symmetric $N$}
 \label{app:oscillations}

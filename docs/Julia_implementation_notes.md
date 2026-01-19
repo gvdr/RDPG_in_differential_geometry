@@ -51,6 +51,96 @@ making learning impossible. With proper alignment, the dynamics stay in B^d_+ na
 
 ---
 
+## ⚠️ CRITICAL UPDATE: Gauge-Equivariant Learning (January 2026)
+
+**The B^d_+ projection approach described above has significant drawbacks.** Based on Example 1 experiments, we now recommend a simpler, more principled approach.
+
+### The Problem with B^d_+ Projection
+
+B^d_+ projection (clamping negatives, scaling to unit ball) **distorts geometry**:
+- Changes pairwise distances
+- Breaks temporal consistency
+- Introduces artifacts at boundaries
+
+### The Solution: Gauge-Equivariant Dynamics
+
+**Key insight**: Dynamics of the form **Ẋ = N(P)X** where P = XX' are **gauge-equivariant**. The learned parameters are scalars that work in ANY coordinate system.
+
+This means:
+1. **Learn in DUASE space**: Train on whatever coordinates DUASE naturally produces (no projection!)
+2. **Apply to TRUE initial conditions**: Use learned parameters with true X(0)
+3. **Direct comparison**: Recovered trajectories are directly comparable to ground truth - NO Procrustes needed
+
+### Why This Works
+
+DUASE provides embeddings that are:
+- **Temporally consistent** via shared basis G
+- Related to true positions by unknown orthogonal transformation Q: X̂ = XQ
+
+Since N(P)X dynamics only depend on P = XX' (which is rotation-invariant), the learned parameters (β₀, β₁, etc.) are the same regardless of which coordinate system we use.
+
+**Example**: Message-passing dynamics
+```
+Ẋᵢ = β₀·Xᵢ + β₁·Σⱼ Pᵢⱼ(Xⱼ - Xᵢ)
+```
+The scalars β₀, β₁ are gauge-invariant. Learn them in DUASE space, apply them to true X(0).
+
+### Updated Pipeline
+
+```
+A(t) ~ Bernoulli(XX') → [K samples, average] → DUASE embedding → X̂(t) → Train N(P)X dynamics
+                                                                              ↓
+                                                          Apply learned params to TRUE X(0)
+                                                                              ↓
+                                                              Compare P_recovered vs P_true
+```
+
+### P(t) is the True Test
+
+**Do NOT compare X positions** (gauge-dependent). Compare **P = XX'** (rotation-invariant):
+- P_error = mean(|P_pred - P_true|)
+- This is the honest test of dynamics recovery
+
+### Experimental Validation (Example 1)
+
+| Model | Parameters | Validation Error (vs True) |
+|-------|------------|---------------------------|
+| MsgPass | 2 | 0.48 |
+| Poly P² | 3 | 0.56 |
+| Pure NN | 7832 | 8.24 |
+
+**Parsimonious physics-informed models (2-3 params) vastly outperform black-box NN (7832 params)** on extrapolation. The N(P)X structure provides massive inductive bias.
+
+### Misspecification Robustness (Surprising Finding)
+
+In Example 1, the true dynamics were message-passing form:
+```
+Ẋᵢ = α₀·Xᵢ + α₁·Σⱼ Pᵢⱼ(Xⱼ - Xᵢ)  [equivalent to N = α₀I + α₁(P - D)]
+```
+
+But the Polynomial architecture `Ẋ = (β₀I + β₁P + β₂P²)X` (which does NOT have the degree matrix subtraction) still captured the dynamics well.
+
+**Implication**: N(P)X architectures are flexible enough to approximate related dynamics even when not exactly matched. The polynomial form can absorb some of the "missing" structure through its coefficients. This is encouraging for real applications where the true dynamics form is unknown.
+
+### When to Use B^d_+ Projection
+
+B^d_+ projection may still be useful when:
+- You need strict probability constraints (P_ij ∈ [0,1])
+- You're using dynamics that are NOT gauge-equivariant
+- Visualization requires a canonical coordinate system
+
+But for learning N(P)X dynamics, **skip the projection**.
+
+### DUASE Estimates vs Dynamics Predictions
+
+**Important distinction**:
+- **DUASE**: Estimates X from observed adjacency matrices (can't extrapolate)
+- **Dynamics models**: Predict future X from initial conditions (can extrapolate)
+
+When evaluating extrapolation, only dynamics models are making true predictions. DUASE "extrapolation" would require seeing future data.
+
+---
+
 ## Legacy Warning
 
 **NOTE**: Older example scripts (example1, example2, example4) may train directly
