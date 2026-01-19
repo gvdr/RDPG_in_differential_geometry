@@ -23,7 +23,7 @@ export embed_temporal_network_smoothed
 export sample_adjacency, sample_adjacency_repeated
 export folded_embedding, embed_temporal_with_folding
 export duase_embedding, omni_embedding
-export embed_temporal_duase, embed_temporal_omni
+export embed_temporal_duase, embed_temporal_duase_raw, embed_temporal_omni
 export align_series_to_Bd_plus, find_global_orthogonal_to_Bd_plus, find_global_rotation_to_Bd_plus
 
 """
@@ -1382,6 +1382,75 @@ function embed_temporal_duase(X_series::Vector{<:AbstractMatrix}, d::Int;
         for t in 1:T
             L_aligned[t] = L_aligned[t] * Q_global
         end
+    end
+
+    return L_aligned
+end
+
+"""
+    embed_temporal_duase_raw(X_series::Vector{<:AbstractMatrix}, d::Int;
+                              K::Int=10, window::Union{Nothing, Int}=nothing,
+                              rng=Random.GLOBAL_RNG) -> Vector{Matrix}
+
+DUASE embedding WITHOUT B^d_+ alignment - returns embeddings in their natural space.
+
+The key insight: DUASE's shared basis G already provides temporal consistency.
+We don't need to align to B^d_+ for dynamics learning - we can learn in whatever
+rotated space the embedding gives us.
+
+# Pipeline
+1. For each time t, generate K adjacency samples from X(t) and average
+2. Apply DUASE (optionally with windowing)
+3. Apply consistent sign flips (not full Procrustes or B^d_+ alignment)
+
+# Arguments
+- `X_series`: Vector of true latent position matrices (one per timestep)
+- `d`: Embedding dimension
+- `K`: Number of repeated samples per timestep (default: 10)
+- `window`: Sliding window size for DUASE (default: nothing = use all T)
+- `rng`: Random number generator
+
+# Returns
+- Vector of estimated L matrices, temporally aligned via shared basis
+
+# Notes
+- NO B^d_+ projection (which can distort geometry)
+- Dynamics can be learned in the rotated space since P = XX' is rotation invariant
+"""
+function embed_temporal_duase_raw(X_series::Vector{<:AbstractMatrix}, d::Int;
+                                   K::Int=10, window::Union{Nothing, Int}=nothing,
+                                   rng=Random.GLOBAL_RNG)
+    T = length(X_series)
+    n = size(X_series[1], 1)
+
+    # Step 1: Generate K adjacency samples at each time point and average
+    A_avg_series = Vector{Matrix{Float64}}(undef, T)
+    for t in 1:T
+        A_sum = zeros(n, n)
+        for _ in 1:K
+            A_sum .+= sample_adjacency(X_series[t]; rng=rng)
+        end
+        A_avg_series[t] = A_sum ./ K
+    end
+
+    # Step 2: Apply DUASE - gives embeddings aligned via shared basis G
+    G, X_raw = duase_embedding(A_avg_series, d; window=window)
+
+    # Step 3: Consistent sign flips only (minimal alignment)
+    # Flip signs so that the majority of entries are positive (heuristic)
+    L_aligned = Vector{Matrix{Float64}}(undef, T)
+
+    # Determine sign flips from first timestep
+    sign_flips = ones(d)
+    for j in 1:d
+        if sum(X_raw[1][:, j] .< 0) > n / 2
+            sign_flips[j] = -1.0
+        end
+    end
+
+    # Apply consistent sign flips to all timesteps
+    for t in 1:T
+        L_aligned[t] = X_raw[t] .* sign_flips'
     end
 
     return L_aligned

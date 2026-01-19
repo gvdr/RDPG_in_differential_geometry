@@ -175,6 +175,38 @@ the noise without the structural constraint.
 
 ---
 
+## Example 5: Gauge-Consistent N(P)X Architecture Comparison
+
+**Story**: Compare standard Neural ODE with theoretically-motivated gauge-consistent architectures.
+
+**Motivation**: The RDPG embedding has gauge freedom - X and XQ give identical probabilities P = XX' for any orthogonal Q. Standard NNs can waste capacity learning "invisible" dynamics. The N(P)X form with symmetric N eliminates this ambiguity.
+
+**Architectures compared**:
+1. **Standard NN**: Ẋ = f(X) with generic neural network f
+2. **Polynomial N(P)X**: Ẋ = (α₀I + α₁P + α₂P²)X with learned scalars αₖ
+3. **Kernel N(P)X**: Ẋ = N(P)X where N_ij = κ(P_ij) with learned kernel κ
+
+**Data generation**: Pairwise dynamics Ẋ = (αI + βP)X
+- This exactly matches the polynomial form (degree 1)
+- Tests whether correct inductive bias helps
+
+**Key demonstrations**:
+- Parameter efficiency: Polynomial has 2 parameters vs ~10,000 for standard NN
+- Parameter recovery: Does polynomial recover true α, β?
+- Prediction accuracy: MSE comparison across architectures
+- Probability constraint satisfaction
+
+**Theoretical connection**:
+- Symmetric N cannot produce invisible dynamics (Theorem 1 in paper)
+- Polynomial form is maximally parsimonious
+- Kernel form balances expressivity and structure
+
+**Script**: `scripts/example5_gauge_comparison.jl`
+
+**Dimensions**: d=2, n=30, clean data
+
+---
+
 ## Technical Notes
 
 ### B^d_+ Constraint Strategies

@@ -59,6 +59,7 @@ include("embedding.jl")
 include("types.jl")
 include("constraints.jl")
 include("training.jl")
+include("gauge_ude.jl")  # Gauge-consistent N(P)X architecture
 include("visualization.jl")
 include("symbolic.jl")
 
@@ -77,6 +78,10 @@ export load_rdpg_json
 export plot_phase_portrait, plot_network_snapshots, plot_probability_heatmaps, plot_all_diagnostics
 export plot_single_target_trajectory
 export extract_symbolic_dynamics, predict_symbolic, SymbolicDynamics
+# Gauge-consistent N(P)X architecture
+export PolynomialNConfig, KernelNConfig, SymmetricNConfig
+export build_polynomial_N_ode, build_kernel_N_ode, build_symmetric_nn_ode
+export train_gauge_ude, predict_gauge_trajectory
 
 """
     load_rdpg_json(filepath::String) -> NamedTuple
