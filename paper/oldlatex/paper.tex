@@ -42,11 +42,8 @@
 \title{Learning Interpretable Dynamics of Temporal Networks\\via Neural ODEs and Symbolic Regression}
 
 \author{
-    Connor Smith\textsuperscript{1} \and
-    Miguel Lurgi\textsuperscript{2} \and
-    Giulio V. Dalla Riva\textsuperscript{1}\\[1em]
-    \small\textsuperscript{1}School of Mathematics and Statistics, University of Canterbury, New Zealand\\
-    \small\textsuperscript{2}Department of Biosciences, Swansea University, UK
+    Connor Smith
+    Giulio V. Dalla Riva
 }
 
 \date{}
@@ -56,13 +53,13 @@
 \maketitle
 
 \begin{abstract}
-Temporal networks---networks whose structure changes over time---appear across domains from neuroscience to ecology to social systems.
-While most approaches focus on predicting future network states, they rarely provide interpretable models of the underlying dynamics.
-We present a framework that learns continuous, interpretable differential equations governing the evolution of temporal network structure.
-Our approach embeds networks into a low-dimensional latent space via Random Dot Product Graphs (RDPG), learns the dynamics of this embedding using Neural Ordinary Differential Equations (Neural ODEs), and extracts human-interpretable equations through symbolic regression.
-We develop a gauge-theoretic analysis showing that RDPG embeddings have rotational ambiguity, and derive a gauge-consistent architecture $\dot{X} = N(P)X$ with symmetric $N$ that eliminates this ambiguity while achieving dramatic parameter reduction (from $\sim$10,000 to as few as 2 parameters).
-We demonstrate the framework on synthetic temporal networks, showing that it successfully recovers governing equations and dynamical parameters.
-This work bridges the gap between predictive accuracy and mechanistic understanding in temporal network modeling.
+	Temporal networks---networks whose structure changes over time---appear across domains from neuroscience to ecology to social systems.
+	While most approaches focus on predicting future network states, they rarely provide interpretable models of the underlying dynamics.
+	We present a framework that learns continuous, interpretable differential equations governing the evolution of temporal network structure.
+	Our approach embeds networks into a low-dimensional latent space via Random Dot Product Graphs (RDPG), learns the dynamics of this embedding using Neural Ordinary Differential Equations (Neural ODEs), and extracts human-interpretable equations through symbolic regression.
+	We develop a gauge-theoretic analysis showing that RDPG embeddings have rotational ambiguity, and derive a gauge-consistent architecture $\dot{X} = N(P)X$ with symmetric $N$ that eliminates this ambiguity while achieving dramatic parameter reduction (from $\sim$10,000 to as few as 2 parameters).
+	We demonstrate the framework on synthetic temporal networks, showing that it successfully recovers governing equations and dynamical parameters.
+	This work bridges the gap between predictive accuracy and mechanistic understanding in temporal network modeling.
 \end{abstract}
 
 \section{Introduction}
@@ -93,11 +90,11 @@ These equations are interpretable---they can be analyzed mathematically, checked
 
 \textbf{Contributions.} We introduce:
 \begin{enumerate}
-    \item A complete pipeline from temporal network observations to interpretable differential equations
-    \item A gauge-theoretic analysis of RDPG dynamics, identifying what can and cannot be learned from embedding trajectories
-    \item Parsimonious architectures ($\dot{X} = N(P)X$ with symmetric $N$) that are gauge-consistent by construction and can recover exact dynamical parameters
-    \item Demonstration on synthetic systems with known ground-truth dynamics
-    \item Open-source Julia implementation (\texttt{RDPGDynamics.jl}) for reproducibility
+	\item A complete pipeline from temporal network observations to interpretable differential equations
+	\item A gauge-theoretic analysis of RDPG dynamics, identifying what can and cannot be learned from embedding trajectories
+	\item Parsimonious architectures ($\dot{X} = N(P)X$ with symmetric $N$) that are gauge-consistent by construction and can recover exact dynamical parameters
+	\item Demonstration on synthetic systems with known ground-truth dynamics
+	\item Open-source Julia implementation (\texttt{RDPGDynamics.jl}) for reproducibility
 \end{enumerate}
 
 \section{Methods}
@@ -112,12 +109,12 @@ Given a temporal network represented as a sequence of adjacency matrices $\{A_t\
 
 For an adjacency matrix $A \in \{0,1\}^{n \times n}$, the RDPG embedding computes:
 \begin{equation}
-    A \approx \bL \bR^\top
+	A \approx \bL \bR^\top
 \end{equation}
 where $\bL, \bR \in \R^{n \times d}$ are the left and right embedding matrices and $d \ll n$ is the embedding dimension.
 These are obtained via truncated singular value decomposition (SVD):
 \begin{equation}
-    A = U \Sigma V^\top \implies \bL = U_d \Sigma_d^{1/2}, \quad \bR = V_d \Sigma_d^{1/2}
+	A = U \Sigma V^\top \implies \bL = U_d \Sigma_d^{1/2}, \quad \bR = V_d \Sigma_d^{1/2}
 \end{equation}
 where subscript $d$ denotes truncation to the top $d$ singular values/vectors.
 
@@ -128,7 +125,7 @@ This probabilistic interpretation is central to our approach: while edge events 
 SVD decompositions are unique only up to orthogonal transformations.
 To ensure smooth trajectories across time, we align each embedding to its predecessor using orthogonal Procrustes rotation:
 \begin{equation}
-    \Omega_t = \arg\min_{\Omega^\top\Omega = I} \|\Omega \bL_t - \bL_{t-1}\|_F^2
+	\Omega_t = \arg\min_{\Omega^\top\Omega = I} \|\Omega \bL_t - \bL_{t-1}\|_F^2
 \end{equation}
 with solution $\Omega_t = V U^\top$ where $\bL_t \bL_{t-1}^\top = U \Sigma V^\top$.
 
@@ -138,7 +135,7 @@ with solution $\Omega_t = V U^\top$ where $\bL_t \bL_{t-1}^\top = U \Sigma V^\to
 A fundamental subtlety of RDPG embedding is that the latent positions $X$ are not uniquely determined by the probability matrix $P$.
 For any orthogonal matrix $Q \in O(d)$:
 \begin{equation}
-    (XQ)(XQ)^\top = XQQ^\top X^\top = XX^\top = P
+	(XQ)(XQ)^\top = XQQ^\top X^\top = XX^\top = P
 \end{equation}
 Thus $X$ and $XQ$ represent the \emph{same} observable $P$.
 This is the \textbf{gauge freedom} of RDPG: the equivalence class $[X] = \{XQ : Q \in O(d)\}$ corresponds to a single probability matrix.
@@ -146,21 +143,21 @@ This is the \textbf{gauge freedom} of RDPG: the equivalence class $[X] = \{XQ : 
 This gauge freedom has profound implications for learning dynamics.
 
 \begin{definition}[Observable vs.\ Invisible Dynamics]
-A vector field $f: \R^{n \times d} \to \R^{n \times d}$ produces \emph{observable dynamics} if $\dot{P} \neq 0$, where $\dot{P} = f(X)X^\top + Xf(X)^\top$.
-Otherwise, the dynamics are \emph{invisible}---the parameterization changes but the graph structure is static.
+	A vector field $f: \R^{n \times d} \to \R^{n \times d}$ produces \emph{observable dynamics} if $\dot{P} \neq 0$, where $\dot{P} = f(X)X^\top + Xf(X)^\top$.
+	Otherwise, the dynamics are \emph{invisible}---the parameterization changes but the graph structure is static.
 \end{definition}
 
 \begin{theorem}[Characterization of Invisible Dynamics]
-\label{thm:invisible}
-Let $X \in \R^{n \times d}$ have full column rank.
-A vector field $f$ produces invisible dynamics if and only if $f(X) = XA$ for some skew-symmetric matrix $A \in \so(d)$, i.e., $A^\top = -A$.
+	\label{thm:invisible}
+	Let $X \in \R^{n \times d}$ have full column rank.
+	A vector field $f$ produces invisible dynamics if and only if $f(X) = XA$ for some skew-symmetric matrix $A \in \so(d)$, i.e., $A^\top = -A$.
 \end{theorem}
 
 \begin{proof}
-$(\Leftarrow)$ If $f(X) = XA$ with $A^\top = -A$, then $\dot{P} = XAX^\top + XA^\top X^\top = X(A + A^\top)X^\top = 0$.
+	$(\Leftarrow)$ If $f(X) = XA$ with $A^\top = -A$, then $\dot{P} = XAX^\top + XA^\top X^\top = X(A + A^\top)X^\top = 0$.
 
-$(\Rightarrow)$ Suppose $\dot{P} = 0$. Decompose $f(X) = XA + W$ where $A = (X^\top X)^{-1}X^\top f(X)$ and $X^\top W = 0$.
-Substituting and using $\dot{P} = 0$ with full-rank $X$ forces $W = 0$ and $A + A^\top = 0$.
+	$(\Rightarrow)$ Suppose $\dot{P} = 0$. Decompose $f(X) = XA + W$ where $A = (X^\top X)^{-1}X^\top f(X)$ and $X^\top W = 0$.
+	Substituting and using $\dot{P} = 0$ with full-rank $X$ forces $W = 0$ and $A + A^\top = 0$.
 \end{proof}
 
 The invisible dynamics $\dot{X} = XA$ are infinitesimal rotations along gauge orbits.
@@ -172,31 +169,31 @@ Rotation around the \emph{origin} is gauge (invisible), but circulation around a
 Table~\ref{tab:observable} summarizes which dynamics affect the observable $P$.
 
 \begin{table}[h]
-\centering
-\caption{Classification of dynamics by observability.}
-\label{tab:observable}
-\begin{tabular}{lcc}
-\toprule
-Dynamics & $\dot{P} = 0$? & Observable? \\
-\midrule
-$\dot{X} = XA$ (uniform rotation around origin) & Yes & No \\
-$\dot{X}_i = (X_i - \bar{X})A$ with $\bar{X} \neq 0$ & No & Yes \\
-$\dot{X}_i = \alpha X_i$ (radial scaling) & No & Yes \\
-$\dot{X}_i = \sum_j w_{ij}(X_j - X_i)$ (attraction/repulsion) & No & Yes \\
-\bottomrule
-\end{tabular}
+	\centering
+	\caption{Classification of dynamics by observability.}
+	\label{tab:observable}
+	\begin{tabular}{lcc}
+		\toprule
+		Dynamics                                                      & $\dot{P} = 0$? & Observable? \\
+		\midrule
+		$\dot{X} = XA$ (uniform rotation around origin)               & Yes            & No          \\
+		$\dot{X}_i = (X_i - \bar{X})A$ with $\bar{X} \neq 0$          & No             & Yes         \\
+		$\dot{X}_i = \alpha X_i$ (radial scaling)                     & No             & Yes         \\
+		$\dot{X}_i = \sum_j w_{ij}(X_j - X_i)$ (attraction/repulsion) & No             & Yes         \\
+		\bottomrule
+	\end{tabular}
 \end{table}
 
 A natural question arises: given that some dynamics are invisible, can we still learn the observable part?
 
 \begin{theorem}[Identifiability Modulo Gauge]
-\label{thm:identifiability}
-Let $X \in \R^{n \times d}$ have full column rank.
-Given $\dot{P}$ and $X$, the vector field $f(X)$ is uniquely determined up to gauge:
-\begin{equation}
-    f(X) = F + XA
-\end{equation}
-where $F$ is any solution to $\dot{P} = FX^\top + XF^\top$ and $A \in \so(d)$ is arbitrary.
+	\label{thm:identifiability}
+	Let $X \in \R^{n \times d}$ have full column rank.
+	Given $\dot{P}$ and $X$, the vector field $f(X)$ is uniquely determined up to gauge:
+	\begin{equation}
+		f(X) = F + XA
+	\end{equation}
+	where $F$ is any solution to $\dot{P} = FX^\top + XF^\top$ and $A \in \so(d)$ is arbitrary.
 \end{theorem}
 
 This theorem is reassuring: there is \emph{no theoretical obstruction} to learning beyond gauge freedom.
@@ -213,22 +210,22 @@ The learned $f$ determines $\dot{P}$ correctly, but a different alignment proced
 After embedding, we have a sequence of latent positions $\{\bL_t\}_{t=1}^T$.
 We flatten each $\bL_t \in \R^{n \times d}$ into a vector $\mathbf{u}_t \in \R^{nd}$ and model the dynamics as:
 \begin{equation}
-    \frac{d\mathbf{u}}{dt} = f_\theta(\mathbf{u})
+	\frac{d\mathbf{u}}{dt} = f_\theta(\mathbf{u})
 \end{equation}
 where $f_\theta$ is a neural network with parameters $\theta$.
 
 We parameterize $f_\theta$ as a fully-connected network with architecture:
 \begin{equation}
-    f_\theta: \R^{nd} \xrightarrow{\text{Dense}} \R^{128} \xrightarrow{\text{celu}} \R^{128} \xrightarrow{\text{celu}} \R^{64} \xrightarrow{\text{celu}} \R^{nd}
+	f_\theta: \R^{nd} \xrightarrow{\text{Dense}} \R^{128} \xrightarrow{\text{celu}} \R^{128} \xrightarrow{\text{celu}} \R^{64} \xrightarrow{\text{celu}} \R^{nd}
 \end{equation}
 
 Training minimizes the prediction error:
 \begin{equation}
-    \mathcal{L}(\theta) = \sum_{t=1}^T \|\mathbf{u}_t - \hat{\mathbf{u}}_t(\theta)\|_2^2 + \lambda \mathcal{L}_{\text{prob}}
+	\mathcal{L}(\theta) = \sum_{t=1}^T \|\mathbf{u}_t - \hat{\mathbf{u}}_t(\theta)\|_2^2 + \lambda \mathcal{L}_{\text{prob}}
 \end{equation}
 where $\hat{\mathbf{u}}_t$ is obtained by integrating the Neural ODE from $\mathbf{u}_1$, and $\mathcal{L}_{\text{prob}}$ penalizes predicted probabilities outside $[0,1]$:
 \begin{equation}
-    \mathcal{L}_{\text{prob}} = \sum_{i \neq j} \max(0, -P_{ij}) + \max(0, P_{ij} - 1)
+	\mathcal{L}_{\text{prob}} = \sum_{i \neq j} \max(0, -P_{ij}) + \max(0, P_{ij} - 1)
 \end{equation}
 
 We use a two-stage optimization: Adam for initial exploration followed by Lion for fine-tuning.
@@ -240,56 +237,56 @@ Gradients are computed via adjoint sensitivity analysis for memory efficiency~\c
 When domain knowledge suggests a particular functional form for the dynamics, we can incorporate it via Universal Differential Equations (UDEs)~\cite{rackauckas2020universal}.
 The vector field decomposes as:
 \begin{equation}
-    f(\mathbf{u}) = f_{\text{known}}(\mathbf{u}; \phi) + f_{\text{NN}}(\mathbf{u}; \theta)
+	f(\mathbf{u}) = f_{\text{known}}(\mathbf{u}; \phi) + f_{\text{NN}}(\mathbf{u}; \theta)
 \end{equation}
 where $f_{\text{known}}$ encodes known physics with parameters $\phi$, and $f_{\text{NN}}$ is a neural network that learns residual corrections.
 
 For RDPG dynamics, gauge theory (\S\ref{sec:gauge}) suggests a particularly elegant form.
 
 \begin{theorem}[Equivariant Dynamics]
-\label{thm:equivariant}
-Let $X \in \R^{n \times d}$ have full column rank.
-Any $O(d)$-equivariant vector field $f: \R^{n \times d} \to \R^{n \times d}$ has the form:
-\begin{equation}
-    f(X) = N(P) \cdot X
-\end{equation}
-where $N: \R^{n \times n} \to \R^{n \times n}$ depends only on $P = XX^\top$.
+	\label{thm:equivariant}
+	Let $X \in \R^{n \times d}$ have full column rank.
+	Any $O(d)$-equivariant vector field $f: \R^{n \times d} \to \R^{n \times d}$ has the form:
+	\begin{equation}
+		f(X) = N(P) \cdot X
+	\end{equation}
+	where $N: \R^{n \times n} \to \R^{n \times n}$ depends only on $P = XX^\top$.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-Define $N(X) := f(X) X^\dagger$ where $X^\dagger = (X^\top X)^{-1}X^\top$.
-Equivariance $f(XQ) = f(X)Q$ implies $N(XQ) = N(X)$, so $N$ is constant on $O(d)$-orbits.
-Since orbits are indexed by $P = XX^\top$, we have $N = N(P)$.
+	Define $N(X) := f(X) X^\dagger$ where $X^\dagger = (X^\top X)^{-1}X^\top$.
+	Equivariance $f(XQ) = f(X)Q$ implies $N(XQ) = N(X)$, so $N$ is constant on $O(d)$-orbits.
+	Since orbits are indexed by $P = XX^\top$, we have $N = N(P)$.
 \end{proof}
 
 This form is automatically gauge-consistent since $N$ depends on the observable $P$, not the gauge-dependent $X$.
 The key question is: how should we constrain $N$ to eliminate gauge freedom?
 
 \begin{theorem}[Gauge Dynamics are Not Symmetric]
-\label{thm:gauge_not_sym}
-The invisible (gauge) dynamics $\dot{X} = XA$ with $A \in \so(d)$ correspond to $N = XAX^\dagger$.
-For generic full-rank $X$ and nonzero $A$, this $N$ is \textbf{not symmetric}.
+	\label{thm:gauge_not_sym}
+	The invisible (gauge) dynamics $\dot{X} = XA$ with $A \in \so(d)$ correspond to $N = XAX^\dagger$.
+	For generic full-rank $X$ and nonzero $A$, this $N$ is \textbf{not symmetric}.
 \end{theorem}
 
 \begin{proof}[Proof sketch]
-For $X = I_d$ (taking $n = d$), we have $N = A$, which is skew-symmetric.
-For general $X$ with thin SVD $X = U\Sigma V^\top$, we get $N = UBU^\top$ where $B = \Sigma(V^\top A V)\Sigma^{-1}$.
-Since $V^\top A V$ is skew-symmetric and $\Sigma$ generically has distinct singular values, $B \neq B^\top$ unless $A = 0$.
+	For $X = I_d$ (taking $n = d$), we have $N = A$, which is skew-symmetric.
+	For general $X$ with thin SVD $X = U\Sigma V^\top$, we get $N = UBU^\top$ where $B = \Sigma(V^\top A V)\Sigma^{-1}$.
+	Since $V^\top A V$ is skew-symmetric and $\Sigma$ generically has distinct singular values, $B \neq B^\top$ unless $A = 0$.
 \end{proof}
 
 This theorem is the key insight: \emph{gauge directions correspond to non-symmetric $N$}.
 Therefore, constraining $N$ to be symmetric eliminates gauge:
 
 \begin{theorem}[Gauge Elimination via Symmetry]
-\label{thm:symmetric}
-Constraining $N(P) = N(P)^\top$ (symmetric) eliminates all non-trivial gauge freedom.
-Any symmetric $N$ with $NX \neq 0$ produces observable dynamics ($\dot{P} \neq 0$).
-Moreover, symmetric $N$ can produce \emph{any} realizable $\dot{P}$---no expressivity is lost.
+	\label{thm:symmetric}
+	Constraining $N(P) = N(P)^\top$ (symmetric) eliminates all non-trivial gauge freedom.
+	Any symmetric $N$ with $NX \neq 0$ produces observable dynamics ($\dot{P} \neq 0$).
+	Moreover, symmetric $N$ can produce \emph{any} realizable $\dot{P}$---no expressivity is lost.
 \end{theorem}
 
 This suggests a principled UDE architecture:
 \begin{equation}
-    N(P) = N_{\text{known}}(P) + N_{\text{NN}}(P), \quad \text{both symmetric}
+	N(P) = N_{\text{known}}(P) + N_{\text{NN}}(P), \quad \text{both symmetric}
 \end{equation}
 where $N_{\text{known}}$ might be a polynomial in $P$ (encoding local neighbor influence) and $N_{\text{NN}}$ learns corrections.
 
@@ -297,7 +294,7 @@ We consider three parameterization classes in order of increasing expressivity:
 
 \textbf{Polynomial $N(P)$.} The most parsimonious form:
 \begin{equation}
-    N = \alpha_0 I + \alpha_1 P + \alpha_2 P^2 + \cdots + \alpha_k P^k
+	N = \alpha_0 I + \alpha_1 P + \alpha_2 P^2 + \cdots + \alpha_k P^k
 \end{equation}
 with only $k+1$ learnable scalars.
 The interpretation is intuitive: $\alpha_0 I$ represents intrinsic node dynamics, $\alpha_1 P$ captures direct neighbor influence (one-hop interactions), and $\alpha_2 P^2$ captures two-hop effects through shared neighbors.
@@ -311,7 +308,7 @@ By contrast, dynamics expressed directly in $X$ coordinates (e.g., $\dot{X}_1 = 
 
 \textbf{Pairwise kernel $N(P)$.} A flexible homogeneous form:
 \begin{equation}
-    N_{ij} = \begin{cases} \kappa(P_{ij}) & i \neq j \\ h(P_{ii}) & i = j \end{cases}
+	N_{ij} = \begin{cases} \kappa(P_{ij}) & i \neq j \\ h(P_{ii}) & i = j \end{cases}
 \end{equation}
 where $\kappa, h: [0,1] \to \R$ are learned functions (small neural networks or parametric forms).
 Symmetry is automatic since $P_{ij} = P_{ji}$.
@@ -319,7 +316,7 @@ The kernel $\kappa$ can capture nonlinear responses to connection probability, s
 
 \textbf{General symmetric $N(P)$.} A neural network that outputs the upper triangle of a symmetric matrix:
 \begin{equation}
-    \text{NN}: \text{uptri}(P) \mapsto \text{uptri}(N)
+	\text{NN}: \text{uptri}(P) \mapsto \text{uptri}(N)
 \end{equation}
 with $\frac{n(n+1)}{2}$ inputs and outputs.
 This is the most expressive but least parsimonious option.
@@ -327,20 +324,20 @@ This is the most expressive but least parsimonious option.
 Table~\ref{tab:parameterizations} summarizes the parameter counts.
 
 \begin{table}[h]
-\centering
-\caption{Parameter counts for N(P)X architectures vs.\ standard Neural ODE.}
-\label{tab:parameterizations}
-\begin{tabular}{lcc}
-\toprule
-Architecture & Parameters & Expressivity \\
-\midrule
-Polynomial ($k=1$) & 2 & Low \\
-Polynomial ($k=2$) & 3 & Low \\
-Pairwise kernel (16-16 NN) & $\sim$300 & Medium \\
-General symmetric NN & $\sim$5,000 & High \\
-Standard Neural ODE & $\sim$10,000 & Highest \\
-\bottomrule
-\end{tabular}
+	\centering
+	\caption{Parameter counts for N(P)X architectures vs.\ standard Neural ODE.}
+	\label{tab:parameterizations}
+	\begin{tabular}{lcc}
+		\toprule
+		Architecture               & Parameters   & Expressivity \\
+		\midrule
+		Polynomial ($k=1$)         & 2            & Low          \\
+		Polynomial ($k=2$)         & 3            & Low          \\
+		Pairwise kernel (16-16 NN) & $\sim$300    & Medium       \\
+		General symmetric NN       & $\sim$5,000  & High         \\
+		Standard Neural ODE        & $\sim$10,000 & Highest      \\
+		\bottomrule
+	\end{tabular}
 \end{table}
 
 The dynamics $\dot{X} = NX$ have a clear physical interpretation: node $i$'s velocity is $\dot{X}_i = \sum_j N_{ij} X_j$, a weighted combination of all positions where $N_{ij} > 0$ indicates attraction and $N_{ij} < 0$ indicates repulsion.
@@ -352,13 +349,13 @@ When the true dynamics have this form, the polynomial parameterization can recov
 Beyond gauge freedom, RDPG dynamics face a fundamental geometric constraint: the probability matrix $P = XX^\top$ lives on a low-dimensional manifold, so most symmetric perturbations $\dot{P}$ are not achievable.
 
 \begin{proposition}[Tangent Space Constraint]
-\label{prop:tangent}
-Let $V \in \R^{n \times d}$ be an orthonormal basis for $\mathrm{col}(P) \subset \R^n$, and $V_\perp \in \R^{n \times (n-d)}$ span its orthogonal complement.
-Any realizable $\dot{P}$ satisfies:
-\begin{equation}
-    V_\perp^\top \dot{P} \, V_\perp = 0
-\end{equation}
-The realizable tangent space has dimension $nd - \frac{d(d-1)}{2}$.
+	\label{prop:tangent}
+	Let $V \in \R^{n \times d}$ be an orthonormal basis for $\mathrm{col}(P) \subset \R^n$, and $V_\perp \in \R^{n \times (n-d)}$ span its orthogonal complement.
+	Any realizable $\dot{P}$ satisfies:
+	\begin{equation}
+		V_\perp^\top \dot{P} \, V_\perp = 0
+	\end{equation}
+	The realizable tangent space has dimension $nd - \frac{d(d-1)}{2}$.
 \end{proposition}
 
 For $n = 10$ nodes and $d = 2$ dimensions: symmetric matrices have 55 degrees of freedom, but only 19 directions are realizable.
@@ -368,8 +365,8 @@ The remaining 36 directions would require increasing the rank of $P$---that is, 
 This constraint provides a principled diagnostic for model adequacy.
 If observed dynamics have structure in the ``null-null'' block $V_\perp^\top \dot{P} V_\perp$, this indicates one of two possibilities:
 \begin{enumerate}
-    \item \textbf{Model misspecification}: The true dynamics do not preserve low-rank structure, so RDPG embedding is inappropriate.
-    \item \textbf{Dimensional emergence}: The latent dimension $d$ is increasing over time---new factors are emerging in the network structure.
+	\item \textbf{Model misspecification}: The true dynamics do not preserve low-rank structure, so RDPG embedding is inappropriate.
+	\item \textbf{Dimensional emergence}: The latent dimension $d$ is increasing over time---new factors are emerging in the network structure.
 \end{enumerate}
 
 In practice, the constraint is automatically satisfied by dynamics of the form $\dot{X} = N(P)X$, since $\dot{P} = NP + PN$ has the required tangent structure by construction.
@@ -381,7 +378,7 @@ Violations in fitted residuals suggest the chosen $d$ may be too small.
 For edge probabilities to be valid, we require $P_{ij} \in [0,1]$ for all $i,j$.
 A sufficient condition is that all node positions lie in the positive orthant of the unit ball:
 \begin{equation}
-    B^d_+ = \{x \in \R^d : x \geq 0, \|x\| \leq 1\}
+	B^d_+ = \{x \in \R^d : x \geq 0, \|x\| \leq 1\}
 \end{equation}
 If $X_i \in B^d_+$ for all $i$, then $P_{ij} = X_i \cdot X_j \in [0,1]$ by non-negativity of coordinates and Cauchy-Schwarz.
 
@@ -390,7 +387,7 @@ For example, two orthogonal unit vectors in $\R^2$ cannot both have non-negative
 
 We handle constraints via a barrier loss:
 \begin{equation}
-    \mathcal{L}_{\text{prob}} = \gamma \sum_{i,j} \left[\max(0, -P_{ij})^2 + \max(0, P_{ij} - 1)^2\right]
+	\mathcal{L}_{\text{prob}} = \gamma \sum_{i,j} \left[\max(0, -P_{ij})^2 + \max(0, P_{ij} - 1)^2\right]
 \end{equation}
 This encourages learned dynamics to remain in the valid region without breaking the ODE structure.
 Unlike projection-based approaches that clamp values, the barrier loss maintains differentiability throughout training.
@@ -409,7 +406,7 @@ To extract interpretable dynamics, we apply symbolic regression to find closed-f
 
 Given the learned vector field $f_\theta(\mathbf{u})$, we seek symbolic expressions $g(\mathbf{u})$ from a grammar of operations (polynomials, trigonometric functions, etc.) that minimize:
 \begin{equation}
-    \min_g \int \|f_\theta(\mathbf{u}) - g(\mathbf{u})\|^2 \, d\mathbf{u} + \text{complexity}(g)
+	\min_g \int \|f_\theta(\mathbf{u}) - g(\mathbf{u})\|^2 \, d\mathbf{u} + \text{complexity}(g)
 \end{equation}
 
 The complexity penalty encourages parsimonious expressions.
@@ -422,9 +419,9 @@ In a rotated basis, $\dot{X}_1 = \omega X_2$ might appear as $\dot{Y}_1 = aY_1 +
 
 What \emph{is} gauge-invariant:
 \begin{itemize}
-    \item Eigenvalues of the linearization (frequencies, decay rates)
-    \item Equilibrium structure (existence, stability type)
-    \item Qualitative behavior (oscillatory, stable, chaotic)
+	\item Eigenvalues of the linearization (frequencies, decay rates)
+	\item Equilibrium structure (existence, stability type)
+	\item Qualitative behavior (oscillatory, stable, chaotic)
 \end{itemize}
 For truly coordinate-free equations, one could regress $\dot{P}_{ij}$ directly as functions of $P$, though at the cost of higher dimensionality.
 
@@ -441,7 +438,7 @@ A network of $n=5$ nodes where connection probabilities oscillate sinusoidally.
 All nodes belong to a single community whose internal connectivity varies periodically.
 The ground-truth dynamics follow:
 \begin{equation}
-    \frac{dL_{i,1}}{dt} = \omega L_{i,2}, \quad \frac{dL_{i,2}}{dt} = -\omega L_{i,1}
+	\frac{dL_{i,1}}{dt} = \omega L_{i,2}, \quad \frac{dL_{i,2}}{dt} = -\omega L_{i,1}
 \end{equation}
 producing circular trajectories in embedding space.
 This is observable because nodes circulate around a nonzero centroid (Proposition~\ref{prop:centroid}), not the origin.
@@ -466,18 +463,18 @@ This tests whether our method handles networks with heterogeneous node connectiv
 Table~\ref{tab:results} summarizes the training results across all three systems.
 
 \begin{table}[h]
-\centering
-\caption{Training results for three synthetic temporal networks.}
-\label{tab:results}
-\begin{tabular}{lccc}
-\toprule
-Dataset & $n$ & $d$ & Final MSE \\
-\midrule
-Single community oscillation & 5 & 2 & 0.114 \\
-Two communities merging & 11 & 2 & 1.169 \\
-Long-tailed distribution & 36 & 2 & 0.159 \\
-\bottomrule
-\end{tabular}
+	\centering
+	\caption{Training results for three synthetic temporal networks.}
+	\label{tab:results}
+	\begin{tabular}{lccc}
+		\toprule
+		Dataset                      & $n$ & $d$ & Final MSE \\
+		\midrule
+		Single community oscillation & 5   & 2   & 0.114     \\
+		Two communities merging      & 11  & 2   & 1.169     \\
+		Long-tailed distribution     & 36  & 2   & 0.159     \\
+		\bottomrule
+	\end{tabular}
 \end{table}
 
 The single community and long-tail systems achieve low reconstruction error, while the merging communities system is more challenging.
@@ -500,7 +497,7 @@ The model successfully captures the qualitative dynamics in all cases.
 
 For the single community oscillation system, symbolic regression recovers equations of the form:
 \begin{equation}
-    \frac{dL_1}{dt} \approx a L_2, \quad \frac{dL_2}{dt} \approx -a L_1
+	\frac{dL_1}{dt} \approx a L_2, \quad \frac{dL_2}{dt} \approx -a L_1
 \end{equation}
 matching the ground-truth harmonic oscillator dynamics.
 This demonstrates that our framework can recover interpretable, mechanistically meaningful equations from network observations alone.
@@ -509,33 +506,33 @@ This demonstrates that our framework can recover interpretable, mechanistically 
 
 To test whether the theoretically-motivated $\dot{X} = N(P)X$ form offers practical advantages, we compare three architectures on synthetic pairwise dynamics:
 \begin{equation}
-    \dot{X} = (\alpha I + \beta P)X
+	\dot{X} = (\alpha I + \beta P)X
 \end{equation}
 with $\alpha = -0.02$ (slight contraction) and $\beta = 0.001$ (pairwise attraction).
 This dynamics has exactly the polynomial $N(P)X$ form with degree 1, providing a fair test where the correct inductive bias should help.
 
 We compare:
 \begin{enumerate}
-    \item \textbf{Standard Neural ODE}: Generic $f_\theta(X)$ with $\sim$10,000 parameters
-    \item \textbf{Polynomial $N(P)X$}: $N = \alpha_0 I + \alpha_1 P$ with 2 parameters
-    \item \textbf{Kernel $N(P)X$}: $N_{ij} = \kappa(P_{ij})$ with $\sim$300 parameters
+	\item \textbf{Standard Neural ODE}: Generic $f_\theta(X)$ with $\sim$10,000 parameters
+	\item \textbf{Polynomial $N(P)X$}: $N = \alpha_0 I + \alpha_1 P$ with 2 parameters
+	\item \textbf{Kernel $N(P)X$}: $N_{ij} = \kappa(P_{ij})$ with $\sim$300 parameters
 \end{enumerate}
 
 Table~\ref{tab:gauge_results} summarizes the results.
 
 \begin{table}[h]
-\centering
-\caption{Architecture comparison on pairwise dynamics ($n=30$, $d=2$).}
-\label{tab:gauge_results}
-\begin{tabular}{lccc}
-\toprule
-Architecture & Parameters & MSE & Parameter Recovery \\
-\midrule
-Standard Neural ODE & $\sim$10,000 & --- & N/A \\
-Polynomial $N(P)X$ & 2 & --- & $\hat{\alpha}_0 \approx ?$, $\hat{\alpha}_1 \approx ?$ \\
-Kernel $N(P)X$ & $\sim$300 & --- & N/A \\
-\bottomrule
-\end{tabular}
+	\centering
+	\caption{Architecture comparison on pairwise dynamics ($n=30$, $d=2$).}
+	\label{tab:gauge_results}
+	\begin{tabular}{lccc}
+		\toprule
+		Architecture        & Parameters   & MSE & Parameter Recovery                                     \\
+		\midrule
+		Standard Neural ODE & $\sim$10,000 & --- & N/A                                                    \\
+		Polynomial $N(P)X$  & 2            & --- & $\hat{\alpha}_0 \approx ?$, $\hat{\alpha}_1 \approx ?$ \\
+		Kernel $N(P)X$      & $\sim$300    & --- & N/A                                                    \\
+		\bottomrule
+	\end{tabular}
 \end{table}
 
 % TODO: Fill in results after running Example 5
@@ -621,92 +618,92 @@ This appendix provides complete proofs and extended theoretical results supporti
 \subsection{Proof of Theorem~\ref{thm:invisible} (Full Version)}
 
 \begin{proof}
-$(\Leftarrow)$ Suppose $f(X) = XA$ with $A^\top = -A$. Then:
-\begin{equation}
-    \dot{P} = XAX^\top + X(XA)^\top = XAX^\top + XA^\top X^\top = X(A + A^\top)X^\top = 0
-\end{equation}
+	$(\Leftarrow)$ Suppose $f(X) = XA$ with $A^\top = -A$. Then:
+	\begin{equation}
+		\dot{P} = XAX^\top + X(XA)^\top = XAX^\top + XA^\top X^\top = X(A + A^\top)X^\top = 0
+	\end{equation}
 
-$(\Rightarrow)$ Suppose $\dot{P} = f(X)X^\top + Xf(X)^\top = 0$.
+	$(\Rightarrow)$ Suppose $\dot{P} = f(X)X^\top + Xf(X)^\top = 0$.
 
-Decompose $f(X) = XA + W$ where $A = (X^\top X)^{-1}X^\top f(X)$ and $X^\top W = 0$ (i.e., $W$ lies in the orthogonal complement of $\text{col}(X)$).
+	Decompose $f(X) = XA + W$ where $A = (X^\top X)^{-1}X^\top f(X)$ and $X^\top W = 0$ (i.e., $W$ lies in the orthogonal complement of $\text{col}(X)$).
 
-Substituting into $\dot{P} = 0$:
-\begin{equation}
-    0 = (XA + W)X^\top + X(XA + W)^\top = X(A + A^\top)X^\top + WX^\top + XW^\top
-\end{equation}
+	Substituting into $\dot{P} = 0$:
+	\begin{equation}
+		0 = (XA + W)X^\top + X(XA + W)^\top = X(A + A^\top)X^\top + WX^\top + XW^\top
+	\end{equation}
 
-For $X$ with full column rank, consider the constraint $X^\top W = 0$ combined with the equation above.
-Taking the projection onto $\text{col}(X)$: multiplying on left by $(X^\top X)^{-1}X^\top$ and on right by $X(X^\top X)^{-1}$:
-\begin{equation}
-    0 = A + A^\top + (X^\top X)^{-1}X^\top W X^\top X (X^\top X)^{-1} + \text{(similar term)}
-\end{equation}
+	For $X$ with full column rank, consider the constraint $X^\top W = 0$ combined with the equation above.
+	Taking the projection onto $\text{col}(X)$: multiplying on left by $(X^\top X)^{-1}X^\top$ and on right by $X(X^\top X)^{-1}$:
+	\begin{equation}
+		0 = A + A^\top + (X^\top X)^{-1}X^\top W X^\top X (X^\top X)^{-1} + \text{(similar term)}
+	\end{equation}
 
-Since $X^\top W = 0$, the middle terms vanish, giving $A + A^\top = 0$.
+	Since $X^\top W = 0$, the middle terms vanish, giving $A + A^\top = 0$.
 
-For the remaining equation $WX^\top + XW^\top = 0$ with $X^\top W = 0$: this is a symmetric matrix equation. For generic full-rank $X$, the only solution is $W = 0$.
+	For the remaining equation $WX^\top + XW^\top = 0$ with $X^\top W = 0$: this is a symmetric matrix equation. For generic full-rank $X$, the only solution is $W = 0$.
 \end{proof}
 
 \begin{corollary}
-The space of invisible dynamics is isomorphic to $\so(d)$, with dimension $\frac{d(d-1)}{2}$.
-For $d = 2$, this is 1-dimensional (a single rotation rate); for $d = 3$, it is 3-dimensional.
+	The space of invisible dynamics is isomorphic to $\so(d)$, with dimension $\frac{d(d-1)}{2}$.
+	For $d = 2$, this is 1-dimensional (a single rotation rate); for $d = 3$, it is 3-dimensional.
 \end{corollary}
 
 \subsection{Proof of Proposition~\ref{prop:centroid}}
 
 \begin{proof}
-Let $\bar{X} = \frac{1}{n}\sum_i X_i$ be the centroid. The dynamics $\dot{X}_i = (X_i - \bar{X})A$ can be rewritten as:
-\begin{equation}
-    \dot{X}_i = X_i A - \bar{X}A
-\end{equation}
+	Let $\bar{X} = \frac{1}{n}\sum_i X_i$ be the centroid. The dynamics $\dot{X}_i = (X_i - \bar{X})A$ can be rewritten as:
+	\begin{equation}
+		\dot{X}_i = X_i A - \bar{X}A
+	\end{equation}
 
-In matrix form with $\mathbf{1} \in \R^n$ the all-ones vector:
-\begin{equation}
-    \dot{X} = XA - \mathbf{1}\bar{X}^\top A
-\end{equation}
+	In matrix form with $\mathbf{1} \in \R^n$ the all-ones vector:
+	\begin{equation}
+		\dot{X} = XA - \mathbf{1}\bar{X}^\top A
+	\end{equation}
 
-Computing $\dot{P}$:
-\begin{align}
-    \dot{P} &= \dot{X}X^\top + X\dot{X}^\top \\
-    &= (XA - \mathbf{1}\bar{X}^\top A)X^\top + X(XA - \mathbf{1}\bar{X}^\top A)^\top \\
-    &= XAX^\top + XA^\top X^\top - \mathbf{1}\bar{X}^\top A X^\top - X A^\top \bar{X}\mathbf{1}^\top
-\end{align}
+	Computing $\dot{P}$:
+	\begin{align}
+		\dot{P} & = \dot{X}X^\top + X\dot{X}^\top                                                                 \\
+		        & = (XA - \mathbf{1}\bar{X}^\top A)X^\top + X(XA - \mathbf{1}\bar{X}^\top A)^\top                 \\
+		        & = XAX^\top + XA^\top X^\top - \mathbf{1}\bar{X}^\top A X^\top - X A^\top \bar{X}\mathbf{1}^\top
+	\end{align}
 
-The first two terms cancel since $A + A^\top = 0$. Let $v = A^\top \bar{X} = -A\bar{X}$:
-\begin{equation}
-    \dot{P} = \mathbf{1}v^\top X^\top + Xv\mathbf{1}^\top
-\end{equation}
+	The first two terms cancel since $A + A^\top = 0$. Let $v = A^\top \bar{X} = -A\bar{X}$:
+	\begin{equation}
+		\dot{P} = \mathbf{1}v^\top X^\top + Xv\mathbf{1}^\top
+	\end{equation}
 
-Entry-wise: $\dot{P}_{ij} = v \cdot X_j + X_i \cdot v$.
+	Entry-wise: $\dot{P}_{ij} = v \cdot X_j + X_i \cdot v$.
 
-This vanishes for all $i,j$ only if $v = 0$, i.e., $A\bar{X} = 0$. For generic $\bar{X} \neq 0$ and $A \neq 0$, we have $\dot{P} \neq 0$.
+	This vanishes for all $i,j$ only if $v = 0$, i.e., $A\bar{X} = 0$. For generic $\bar{X} \neq 0$ and $A \neq 0$, we have $\dot{P} \neq 0$.
 \end{proof}
 
 \textbf{Interpretation.} Circulation around the centroid decomposes as:
 \begin{equation}
-    \dot{X}_i = \underbrace{X_i A}_{\text{invisible (gauge)}} - \underbrace{\bar{X}A}_{\text{shared drift (observable)}}
+	\dot{X}_i = \underbrace{X_i A}_{\text{invisible (gauge)}} - \underbrace{\bar{X}A}_{\text{shared drift (observable)}}
 \end{equation}
 The first term is pure gauge. The second is a constant velocity applied to all nodes, which shifts all dot products and hence changes $P$.
 
 \subsection{Gauge Equivalence and Canonical Decomposition}
 
 \begin{theorem}[Gauge Equivalence]
-Two vector fields $f$ and $\tilde{f}$ are gauge equivalent (induce the same $\dot{P}$) if and only if:
-\begin{equation}
-    f(X) - \tilde{f}(X) = XA(X)
-\end{equation}
-for some $\so(d)$-valued function $A(X)$.
+	Two vector fields $f$ and $\tilde{f}$ are gauge equivalent (induce the same $\dot{P}$) if and only if:
+	\begin{equation}
+		f(X) - \tilde{f}(X) = XA(X)
+	\end{equation}
+	for some $\so(d)$-valued function $A(X)$.
 \end{theorem}
 
 \begin{proof}
-Apply Theorem~\ref{thm:invisible} to the difference $h = f - \tilde{f}$.
+	Apply Theorem~\ref{thm:invisible} to the difference $h = f - \tilde{f}$.
 \end{proof}
 
 \begin{corollary}[Canonical Decomposition]
-Any vector field decomposes uniquely as:
-\begin{equation}
-    f(X) = f_{\mathrm{phys}}(X) + XA(X)
-\end{equation}
-where $f_{\mathrm{phys}}$ determines $\dot{P}$ and $XA$ is pure gauge.
+	Any vector field decomposes uniquely as:
+	\begin{equation}
+		f(X) = f_{\mathrm{phys}}(X) + XA(X)
+	\end{equation}
+	where $f_{\mathrm{phys}}$ determines $\dot{P}$ and $XA$ is pure gauge.
 \end{corollary}
 
 \textbf{Implication for learning:} If we learn $f$ from observations of $P(t)$, we can only determine $f$ up to the gauge freedom $XA$. The ``physical'' content---what affects the observable---is uniquely determined.
@@ -714,24 +711,24 @@ where $f_{\mathrm{phys}}$ determines $\dot{P}$ and $XA$ is pure gauge.
 \subsection{Differential Rotation Rates}
 
 \begin{theorem}[Differential Rotation is Observable]
-If nodes have different rotation rates:
-\begin{equation}
-    \dot{X}_i = X_i A_i, \quad A_i \in \so(d)
-\end{equation}
-then:
-\begin{equation}
-    \dot{P}_{ij} = X_i (A_i - A_j) X_j^\top
-\end{equation}
-This is generically nonzero when $A_i \neq A_j$.
+	If nodes have different rotation rates:
+	\begin{equation}
+		\dot{X}_i = X_i A_i, \quad A_i \in \so(d)
+	\end{equation}
+	then:
+	\begin{equation}
+		\dot{P}_{ij} = X_i (A_i - A_j) X_j^\top
+	\end{equation}
+	This is generically nonzero when $A_i \neq A_j$.
 \end{theorem}
 
 \begin{proof}
-\begin{align}
-    \dot{P}_{ij} &= \dot{X}_i X_j^\top + X_i \dot{X}_j^\top = (X_i A_i) X_j^\top + X_i (X_j A_j)^\top \\
-    &= X_i A_i X_j^\top + X_i A_j^\top X_j^\top = X_i A_i X_j^\top - X_i A_j X_j^\top \\
-    &= X_i (A_i - A_j) X_j^\top
-\end{align}
-using $A_j^\top = -A_j$. This is nonzero when $A_i \neq A_j$ and $X_i, X_j$ are generic.
+	\begin{align}
+		\dot{P}_{ij} & = \dot{X}_i X_j^\top + X_i \dot{X}_j^\top = (X_i A_i) X_j^\top + X_i (X_j A_j)^\top \\
+		             & = X_i A_i X_j^\top + X_i A_j^\top X_j^\top = X_i A_i X_j^\top - X_i A_j X_j^\top    \\
+		             & = X_i (A_i - A_j) X_j^\top
+	\end{align}
+	using $A_j^\top = -A_j$. This is nonzero when $A_i \neq A_j$ and $X_i, X_j$ are generic.
 \end{proof}
 
 \textbf{Interpretation:} Uniform rotation ($A_i = A$ for all $i$) is invisible, but heterogeneous rotation rates are observable.
@@ -740,24 +737,24 @@ using $A_j^\top = -A_j$. This is nonzero when $A_i \neq A_j$ and $X_i, X_j$ are 
 
 Any velocity $\dot{X}$ decomposes uniquely as:
 \begin{equation}
-    \dot{X} = X \cdot A + W
+	\dot{X} = X \cdot A + W
 \end{equation}
 where $A = (X^\top X)^{-1}X^\top \dot{X} \in \R^{d \times d}$ and $W \perp \mathrm{col}(X)$ (i.e., $X^\top W = 0$).
 
 Further decompose $A = A_{\mathrm{sym}} + A_{\mathrm{skew}}$ into symmetric and skew-symmetric parts:
 
 \begin{table}[h]
-\centering
-\caption{Decomposition of $\dot{X}$ into observable and gauge components.}
-\begin{tabular}{lcc}
-\toprule
-Component & Contributes to $\dot{P}$? & Interpretation \\
-\midrule
-$X \cdot A_{\mathrm{sym}}$ & Yes & Radial/stretching dynamics \\
-$X \cdot A_{\mathrm{skew}}$ & No & Pure rotation (gauge) \\
-$W$ & Yes & Rotates $\mathrm{col}(P)$ in $\R^n$ \\
-\bottomrule
-\end{tabular}
+	\centering
+	\caption{Decomposition of $\dot{X}$ into observable and gauge components.}
+	\begin{tabular}{lcc}
+		\toprule
+		Component                   & Contributes to $\dot{P}$? & Interpretation                      \\
+		\midrule
+		$X \cdot A_{\mathrm{sym}}$  & Yes                       & Radial/stretching dynamics          \\
+		$X \cdot A_{\mathrm{skew}}$ & No                        & Pure rotation (gauge)               \\
+		$W$                         & Yes                       & Rotates $\mathrm{col}(P)$ in $\R^n$ \\
+		\bottomrule
+	\end{tabular}
 \end{table}
 
 \textbf{The observable content of $\dot{X}$ is $(A_{\mathrm{sym}}, W)$.}
@@ -765,38 +762,38 @@ $W$ & Yes & Rotates $\mathrm{col}(P)$ in $\R^n$ \\
 \subsection{Proof of Theorem~\ref{thm:symmetric}}
 
 \begin{theorem*}[Gauge Elimination via Symmetry---Full Statement]
-Let $N = N^\top$ be symmetric. If $NX \neq 0$, then $\dot{P} = NP + PN \neq 0$.
-Moreover, symmetric $N$ eliminates all non-trivial gauge freedom in the sense that no symmetric $N$ can produce invisible dynamics except $N = 0$ restricted to $\text{col}(X)$.
+	Let $N = N^\top$ be symmetric. If $NX \neq 0$, then $\dot{P} = NP + PN \neq 0$.
+	Moreover, symmetric $N$ eliminates all non-trivial gauge freedom in the sense that no symmetric $N$ can produce invisible dynamics except $N = 0$ restricted to $\text{col}(X)$.
 \end{theorem*}
 
 \begin{proof}
-Suppose $N = N^\top$ and $\dot{P} = NP + PN = 0$.
+	Suppose $N = N^\top$ and $\dot{P} = NP + PN = 0$.
 
-Let $P = V\Lambda V^\top$ be the spectral decomposition with $\Lambda = \text{diag}(\lambda_1, \ldots, \lambda_d, 0, \ldots, 0)$ and $\lambda_i > 0$ for $i \leq d$.
+	Let $P = V\Lambda V^\top$ be the spectral decomposition with $\Lambda = \text{diag}(\lambda_1, \ldots, \lambda_d, 0, \ldots, 0)$ and $\lambda_i > 0$ for $i \leq d$.
 
-Define $\tilde{N} = V^\top N V$ (symmetric since $N$ is). The condition $NP + PN = 0$ transforms to:
-\begin{equation}
-    \tilde{N}\Lambda + \Lambda\tilde{N} = 0
-\end{equation}
+	Define $\tilde{N} = V^\top N V$ (symmetric since $N$ is). The condition $NP + PN = 0$ transforms to:
+	\begin{equation}
+		\tilde{N}\Lambda + \Lambda\tilde{N} = 0
+	\end{equation}
 
-Entry-wise: $\tilde{N}_{ij}(\lambda_i + \lambda_j) = 0$.
+	Entry-wise: $\tilde{N}_{ij}(\lambda_i + \lambda_j) = 0$.
 
-\textbf{Case analysis:}
-\begin{itemize}
-    \item For $i, j \leq d$: $\lambda_i + \lambda_j > 0$, so $\tilde{N}_{ij} = 0$.
-    \item For $i \leq d$, $j > d$: $\lambda_i + 0 = \lambda_i > 0$, so $\tilde{N}_{ij} = 0$.
-    \item For $i > d$, $j \leq d$: by symmetry $\tilde{N}_{ij} = \tilde{N}_{ji} = 0$.
-    \item For $i, j > d$: the constraint $0 \cdot \tilde{N}_{ij} = 0$ is vacuous.
-\end{itemize}
+	\textbf{Case analysis:}
+	\begin{itemize}
+		\item For $i, j \leq d$: $\lambda_i + \lambda_j > 0$, so $\tilde{N}_{ij} = 0$.
+		\item For $i \leq d$, $j > d$: $\lambda_i + 0 = \lambda_i > 0$, so $\tilde{N}_{ij} = 0$.
+		\item For $i > d$, $j \leq d$: by symmetry $\tilde{N}_{ij} = \tilde{N}_{ji} = 0$.
+		\item For $i, j > d$: the constraint $0 \cdot \tilde{N}_{ij} = 0$ is vacuous.
+	\end{itemize}
 
-Therefore $\tilde{N} = \begin{pmatrix} 0 & 0 \\ 0 & \tilde{N}_{22} \end{pmatrix}$ where $\tilde{N}_{22} \in \R^{(n-d) \times (n-d)}$ is arbitrary symmetric (supported on $\text{null}(P)$).
+	Therefore $\tilde{N} = \begin{pmatrix} 0 & 0 \\ 0 & \tilde{N}_{22} \end{pmatrix}$ where $\tilde{N}_{22} \in \R^{(n-d) \times (n-d)}$ is arbitrary symmetric (supported on $\text{null}(P)$).
 
-Since $\text{col}(X) = \text{col}(V_1)$ where $V_1$ comprises the first $d$ columns of $V$, we can write $X = V_1 R$ for invertible $R$. Then:
-\begin{equation}
-    NX = V\tilde{N}V^\top V_1 R = V\tilde{N} \begin{pmatrix} I_d \\ 0 \end{pmatrix} R = V \begin{pmatrix} 0 \\ 0 \end{pmatrix} = 0
-\end{equation}
+	Since $\text{col}(X) = \text{col}(V_1)$ where $V_1$ comprises the first $d$ columns of $V$, we can write $X = V_1 R$ for invertible $R$. Then:
+	\begin{equation}
+		NX = V\tilde{N}V^\top V_1 R = V\tilde{N} \begin{pmatrix} I_d \\ 0 \end{pmatrix} R = V \begin{pmatrix} 0 \\ 0 \end{pmatrix} = 0
+	\end{equation}
 
-\textbf{Contrapositive:} If $N = N^\top$ and $NX \neq 0$, then $NP + PN \neq 0$, so $\dot{P} \neq 0$.
+	\textbf{Contrapositive:} If $N = N^\top$ and $NX \neq 0$, then $NP + PN \neq 0$, so $\dot{P} \neq 0$.
 \end{proof}
 
 \subsection{The Tangent Space of RDPG Dynamics}
@@ -804,25 +801,25 @@ Since $\text{col}(X) = \text{col}(V_1)$ where $V_1$ comprises the first $d$ colu
 The probability matrix $P = XX^\top$ lives on the manifold $\mathcal{M}_d$ of rank-$d$ positive semidefinite matrices. Not every symmetric $\dot{P}$ is achievable---only those in the tangent space.
 
 \begin{proposition}[Tangent Space Characterization]
-Let $P = XX^\top$ with $X \in \R^{n \times d}$ full column rank. Let $V \in \R^{n \times d}$ be an orthonormal basis for $\text{col}(X)$, and $V_\perp \in \R^{n \times (n-d)}$ span its orthogonal complement.
+	Let $P = XX^\top$ with $X \in \R^{n \times d}$ full column rank. Let $V \in \R^{n \times d}$ be an orthonormal basis for $\text{col}(X)$, and $V_\perp \in \R^{n \times (n-d)}$ span its orthogonal complement.
 
-The tangent space $T_P\mathcal{M}_d$ consists of symmetric matrices $\dot{P}$ satisfying:
-\begin{equation}
-    V_\perp^\top \dot{P} \, V_\perp = 0
-\end{equation}
+	The tangent space $T_P\mathcal{M}_d$ consists of symmetric matrices $\dot{P}$ satisfying:
+	\begin{equation}
+		V_\perp^\top \dot{P} \, V_\perp = 0
+	\end{equation}
 \end{proposition}
 
 \begin{proof}
-Any realizable $\dot{P} = FX^\top + XF^\top$ for some $F \in \R^{n \times d}$. Since $\text{col}(X) = \text{col}(V)$, we have $X = VR$ for invertible $R \in \R^{d \times d}$. Then:
-\begin{equation}
-    V_\perp^\top \dot{P} \, V_\perp = V_\perp^\top F R^\top V^\top V_\perp + V_\perp^\top V R F^\top V_\perp = 0 + 0 = 0
-\end{equation}
-using $V^\top V_\perp = 0$. Conversely, any symmetric $\dot{P}$ with $V_\perp^\top \dot{P} V_\perp = 0$ can be written in this form.
+	Any realizable $\dot{P} = FX^\top + XF^\top$ for some $F \in \R^{n \times d}$. Since $\text{col}(X) = \text{col}(V)$, we have $X = VR$ for invertible $R \in \R^{d \times d}$. Then:
+	\begin{equation}
+		V_\perp^\top \dot{P} \, V_\perp = V_\perp^\top F R^\top V^\top V_\perp + V_\perp^\top V R F^\top V_\perp = 0 + 0 = 0
+	\end{equation}
+	using $V^\top V_\perp = 0$. Conversely, any symmetric $\dot{P}$ with $V_\perp^\top \dot{P} V_\perp = 0$ can be written in this form.
 \end{proof}
 
 \textbf{Interpretation of blocks.} Any symmetric $n \times n$ matrix $M$ decomposes as:
 \begin{equation}
-    M = \underbrace{V A V^\top}_{\text{range-range}} + \underbrace{V B V_\perp^\top + V_\perp B^\top V^\top}_{\text{range-null cross}} + \underbrace{V_\perp C V_\perp^\top}_{\text{null-null}}
+	M = \underbrace{V A V^\top}_{\text{range-range}} + \underbrace{V B V_\perp^\top + V_\perp B^\top V^\top}_{\text{range-null cross}} + \underbrace{V_\perp C V_\perp^\top}_{\text{null-null}}
 \end{equation}
 For realizable $\dot{P}$: the $A$ and $B$ blocks can be arbitrary, but $C = 0$ always.
 
@@ -830,17 +827,17 @@ The null-null block represents ``structure in the orthogonal complement''---dyna
 If we fit an RDPG model and find systematic residuals with $C \neq 0$, this suggests the latent dimension $d$ is too small or the RDPG model is inappropriate.
 
 \begin{corollary}[Dimension Count]
-\begin{equation}
-    \dim(T_P\mathcal{M}_d) = nd - \frac{d(d-1)}{2}
-\end{equation}
-This equals the dimension of $X$-space ($nd$) minus the gauge freedom ($\frac{d(d-1)}{2}$)---exactly the observable degrees of freedom.
+	\begin{equation}
+		\dim(T_P\mathcal{M}_d) = nd - \frac{d(d-1)}{2}
+	\end{equation}
+	This equals the dimension of $X$-space ($nd$) minus the gauge freedom ($\frac{d(d-1)}{2}$)---exactly the observable degrees of freedom.
 \end{corollary}
 
 \textbf{Example.} For $n = 10$, $d = 2$:
 \begin{itemize}
-    \item Symmetric $n \times n$ matrices: $\frac{10 \cdot 11}{2} = 55$ dimensions
-    \item Tangent space: $10 \cdot 2 - 1 = 19$ dimensions
-    \item Unrealizable directions: $55 - 19 = 36$ dimensions
+	\item Symmetric $n \times n$ matrices: $\frac{10 \cdot 11}{2} = 55$ dimensions
+	\item Tangent space: $10 \cdot 2 - 1 = 19$ dimensions
+	\item Unrealizable directions: $55 - 19 = 36$ dimensions
 \end{itemize}
 Most symmetric perturbations of $P$ are \emph{not} achievable by RDPG dynamics!
 
@@ -852,43 +849,43 @@ This appendix catalogs parameterization choices for $N(P)$ in the UDE framework 
 \subsection{Taxonomy by Homogeneity}
 
 \begin{table}[h]
-\centering
-\caption{Parameterization complexity by homogeneity assumption.}
-\begin{tabular}{lll}
-\toprule
-Type & Description & Parameters \\
-\midrule
-Homogeneous & All node pairs follow same rule & $O(1)$ functions \\
-Type-based & Nodes grouped into $K$ types & $O(K^2)$ functions \\
-Node-specific & Each node has own parameters & $O(n)$ scalars \\
-Fully heterogeneous & Each pair has own parameter & $O(n^2)$---avoid! \\
-\bottomrule
-\end{tabular}
+	\centering
+	\caption{Parameterization complexity by homogeneity assumption.}
+	\begin{tabular}{lll}
+		\toprule
+		Type                & Description                     & Parameters         \\
+		\midrule
+		Homogeneous         & All node pairs follow same rule & $O(1)$ functions   \\
+		Type-based          & Nodes grouped into $K$ types    & $O(K^2)$ functions \\
+		Node-specific       & Each node has own parameters    & $O(n)$ scalars     \\
+		Fully heterogeneous & Each pair has own parameter     & $O(n^2)$---avoid!  \\
+		\bottomrule
+	\end{tabular}
 \end{table}
 
 \subsection{Homogeneous Parameterizations}
 
 \textbf{Polynomial in $P$:}
 \begin{equation}
-    N(P) = \alpha_0 I + \alpha_1 P + \alpha_2 P^2 + \cdots + \alpha_k P^k
+	N(P) = \alpha_0 I + \alpha_1 P + \alpha_2 P^2 + \cdots + \alpha_k P^k
 \end{equation}
 Parameters: $k+1$ scalars. Interpretation: $\alpha_0 I$ is self-dynamics, $\alpha_1 P$ is direct neighbor influence, $\alpha_2 P^2$ is two-hop influence.
 
 \textbf{Pairwise kernel:}
 \begin{equation}
-    N_{ij}(P) = \kappa(P_{ij}) \quad \text{for } i \neq j, \qquad N_{ii}(P) = h(P_{ii})
+	N_{ij}(P) = \kappa(P_{ij}) \quad \text{for } i \neq j, \qquad N_{ii}(P) = h(P_{ii})
 \end{equation}
 Symmetry is automatic since $P_{ij} = P_{ji}$. The function $\kappa$ can be a small neural network or parametric (e.g., $\kappa(p) = a + bp + cp^2$).
 
 \textbf{Attraction-repulsion (Lennard-Jones inspired):}
 \begin{equation}
-    \kappa(p) = \frac{a}{p + \epsilon} - \frac{b}{(p + \epsilon)^2}
+	\kappa(p) = \frac{a}{p + \epsilon} - \frac{b}{(p + \epsilon)^2}
 \end{equation}
 Parameters: $(a, b, \epsilon)$. Equilibrium occurs where attraction balances repulsion.
 
 \textbf{Laplacian-based:}
 \begin{equation}
-    N(P) = \alpha (D^{-1/2} P D^{-1/2} - I)
+	N(P) = \alpha (D^{-1/2} P D^{-1/2} - I)
 \end{equation}
 where $D = \text{diag}(P\mathbf{1})$ is the degree matrix. This encodes normalized diffusion.
 
@@ -898,13 +895,13 @@ When nodes belong to types $\tau: \{1, \ldots, n\} \to \{1, \ldots, K\}$, intera
 
 \textbf{Block kernel:}
 \begin{equation}
-    N_{ij} = \kappa_{\tau(i), \tau(j)}(P_{ij})
+	N_{ij} = \kappa_{\tau(i), \tau(j)}(P_{ij})
 \end{equation}
 Symmetry requires $\kappa_{ab} = \kappa_{ba}$. Parameters: $\frac{K(K+1)}{2}$ functions.
 
 \textbf{Stochastic Block Model prior:}
 \begin{equation}
-    N_{ij} = \alpha_{\tau(i), \tau(j)} + \beta \cdot P_{ij}
+	N_{ij} = \alpha_{\tau(i), \tau(j)} + \beta \cdot P_{ij}
 \end{equation}
 Parameters: $\frac{K(K+1)}{2}$ scalars $\alpha_{ab}$ plus one shared $\beta$.
 
@@ -916,13 +913,13 @@ Each node has individual parameters, but interactions follow shared rules.
 
 \textbf{Diagonal + shared off-diagonal:}
 \begin{equation}
-    N_{ij} = \begin{cases} h_i & i = j \\ \kappa(P_{ij}) & i \neq j \end{cases}
+	N_{ij} = \begin{cases} h_i & i = j \\ \kappa(P_{ij}) & i \neq j \end{cases}
 \end{equation}
 Parameters: $n$ scalars $h_i$ (node-specific self-rates) plus 1 function $\kappa$ (shared interaction).
 
 \textbf{Node features determine rate:}
 \begin{equation}
-    h_i = g(\phi_i), \quad \phi_i = (P_{ii}, \textstyle\sum_j P_{ij}, \max_j P_{ij}, \ldots)
+	h_i = g(\phi_i), \quad \phi_i = (P_{ii}, \textstyle\sum_j P_{ij}, \max_j P_{ij}, \ldots)
 \end{equation}
 where $\phi_i$ are node-level features extracted from $P$ and $g$ is a shared function (can be a small NN).
 
@@ -930,44 +927,44 @@ where $\phi_i$ are node-level features extracted from $P$ and $g$ is a shared fu
 
 An equivalent view writes dynamics as node-level updates:
 \begin{equation}
-    \dot{X}_i = a(P_{ii}) X_i + \sum_{j \neq i} m(P_{ij}) (X_j - X_i)
+	\dot{X}_i = a(P_{ii}) X_i + \sum_{j \neq i} m(P_{ij}) (X_j - X_i)
 \end{equation}
 where $a$ is the intrinsic rate and $m$ is the message function.
 
 The equivalent symmetric $N$ is:
 \begin{equation}
-    N_{ij} = \begin{cases} a(P_{ii}) - \sum_{k \neq i} m(P_{ik}) & i = j \\ m(P_{ij}) & i \neq j \end{cases}
+	N_{ij} = \begin{cases} a(P_{ii}) - \sum_{k \neq i} m(P_{ik}) & i = j \\ m(P_{ij}) & i \neq j \end{cases}
 \end{equation}
 
 \subsection{Low-Rank Parameterizations}
 
 \textbf{Rank-$r$ symmetric:}
 \begin{equation}
-    N = \sum_{k=1}^r \alpha_k u_k u_k^\top = U \text{diag}(\alpha) U^\top
+	N = \sum_{k=1}^r \alpha_k u_k u_k^\top = U \text{diag}(\alpha) U^\top
 \end{equation}
 Parameters: $nr + r$ (with orthogonality constraints on $U$).
 
 \textbf{Data-derived basis:}
 \begin{equation}
-    N = \sum_{k=1}^r \alpha_k v_k v_k^\top
+	N = \sum_{k=1}^r \alpha_k v_k v_k^\top
 \end{equation}
 where $v_k$ are the top eigenvectors of $P$ itself. Parameters: $r$ scalars only.
 
 \subsection{Encoding Qualitative Priors}
 
 \begin{table}[h]
-\centering
-\caption{Parameterizations encoding specific priors.}
-\begin{tabular}{ll}
-\toprule
-Prior & Parameterization \\
-\midrule
-Stability (nodes don't explode) & $N = -\exp(M)$ where $M = M^\top$ \\
-Conservation ($\text{tr}(P)$ constant) & Project $N$ to $\text{tr}(NP) = 0$ \\
-Known equilibrium $P^*$ & $N(P) = (P - P^*)M(P)$ \\
-Sparsity preservation & $N_{ij} = P_{ij} \cdot \kappa(P_{ij})$ \\
-\bottomrule
-\end{tabular}
+	\centering
+	\caption{Parameterizations encoding specific priors.}
+	\begin{tabular}{ll}
+		\toprule
+		Prior                                  & Parameterization                       \\
+		\midrule
+		Stability (nodes don't explode)        & $N = -\exp(M)$ where $M = M^\top$      \\
+		Conservation ($\text{tr}(P)$ constant) & Project $N$ to $\text{tr}(NP) = 0$     \\
+		Known equilibrium $P^*$                & $N(P) = (P - P^*)M(P)$                 \\
+		Sparsity preservation                  & $N_{ij} = P_{ij} \cdot \kappa(P_{ij})$ \\
+		\bottomrule
+	\end{tabular}
 \end{table}
 
 \subsection{Geometric Boundary Constraints}
@@ -978,7 +975,7 @@ There are two independent sources of constraints on $\dot{P}$: algebraic (rank p
 
 From $\dot{P} = NP + PN$:
 \begin{equation}
-    \dot{P}_{ij} = \sum_k N_{ik} P_{kj} + \sum_k P_{ik} N_{kj}
+	\dot{P}_{ij} = \sum_k N_{ik} P_{kj} + \sum_k P_{ik} N_{kj}
 \end{equation}
 
 \textbf{Caution:} This is NOT simply a Metzler condition on $N$. For the linear system $\dot{y} = Ay$, Metzler $A$ (non-negative off-diagonal) preserves the positive orthant. But $\dot{P} = NP + PN$ is a Lyapunov equation---the condition involves the entire structure of $P$, not just local properties of $N$.
@@ -989,7 +986,7 @@ Since $P_{ij} = X_i \cdot X_j \leq \|X_i\| \|X_j\|$, we have $P_{ij} = 1$ only i
 
 \textbf{Practical enforcement:} Rather than modifying $N$ (which breaks the symmetric structure) or projecting onto $B^d_+$ (which distorts the geometry), use a barrier in the loss function:
 \begin{equation}
-    \mathcal{L}_{\text{barrier}} = \gamma \sum_{i,j} \left[\max(0, -P_{ij})^2 + \max(0, P_{ij} - 1)^2\right]
+	\mathcal{L}_{\text{barrier}} = \gamma \sum_{i,j} \left[\max(0, -P_{ij})^2 + \max(0, P_{ij} - 1)^2\right]
 \end{equation}
 This encourages learned dynamics to stay in the valid region while preserving the natural geometry of the embedding space.
 Our experiments show that projection-based constraint enforcement (e.g., onto $B^d_+$) is unnecessary and can actually impede learning.
@@ -1007,7 +1004,7 @@ However, our system $\dot{X} = N(P)X = N(XX^\top)X$ is \emph{nonlinear} because 
 
 At equilibrium $X^*$ with $N(P^*)X^* = 0$, the linearization is:
 \begin{equation}
-    \delta\dot{X} = N(P^*)\delta X + \left[\frac{\partial N}{\partial P}\bigg|_{P^*} \cdot (\delta X \cdot X^{*\top} + X^* \cdot \delta X^\top)\right] X^*
+	\delta\dot{X} = N(P^*)\delta X + \left[\frac{\partial N}{\partial P}\bigg|_{P^*} \cdot (\delta X \cdot X^{*\top} + X^* \cdot \delta X^\top)\right] X^*
 \end{equation}
 
 The Jacobian (as a linear operator on $\delta X \in \R^{n \times d}$) is \emph{not} simply $N(P^*)$. The second term involves derivatives of $N$ and creates coupling that can produce complex eigenvalues.
@@ -1020,23 +1017,23 @@ The Jacobian (as a linear operator on $\delta X \in \R^{n \times d}$) is \emph{n
 
 \textbf{3. Multi-scale interaction:}
 \begin{equation}
-    N(P) = \alpha_1 P - \alpha_2 P^2
+	N(P) = \alpha_1 P - \alpha_2 P^2
 \end{equation}
 Local attraction ($\alpha_1 P$) competes with nonlocal repulsion ($-\alpha_2 P^2$), potentially creating oscillatory approach to equilibrium.
 
 \subsection{What Symmetric $N$ Cannot Do}
 
 \begin{itemize}
-    \item Rotation around origin in latent space (this is gauge/invisible anyway)
-    \item Oscillations in the linear approximation with \emph{constant} $N$
+	\item Rotation around origin in latent space (this is gauge/invisible anyway)
+	\item Oscillations in the linear approximation with \emph{constant} $N$
 \end{itemize}
 
 \subsection{What Symmetric $N$ Can Do}
 
 \begin{itemize}
-    \item Damped oscillations approaching equilibrium (via nonlinear Jacobian)
-    \item Limit cycles via Hopf bifurcation
-    \item Quasi-periodic motion in higher dimensions
+	\item Damped oscillations approaching equilibrium (via nonlinear Jacobian)
+	\item Limit cycles via Hopf bifurcation
+	\item Quasi-periodic motion in higher dimensions
 \end{itemize}
 
 \section{Extension to Directed Graphs}
@@ -1048,7 +1045,7 @@ For directed graphs, the probability matrix factors as $P = LR^\top$ where $L, R
 
 The gauge transformation is $(L, R) \mapsto (LQ, RQ)$ for $Q \in O(d)$:
 \begin{equation}
-    (LQ)(RQ)^\top = LQQ^\top R^\top = LR^\top = P
+	(LQ)(RQ)^\top = LQQ^\top R^\top = LR^\top = P
 \end{equation}
 Crucially, both embeddings rotate by the \emph{same} $Q$.
 
@@ -1056,10 +1053,10 @@ Crucially, both embeddings rotate by the \emph{same} $Q$.
 
 Under $(L, R) \mapsto (LQ, RQ)$:
 \begin{itemize}
-    \item $P = LR^\top$ --- invariant
-    \item $G_L = LL^\top$ --- invariant
-    \item $G_R = RR^\top$ --- invariant
-    \item $L^\top L$, $R^\top R$, $L^\top R$ --- transform by conjugation
+	\item $P = LR^\top$ --- invariant
+	\item $G_L = LL^\top$ --- invariant
+	\item $G_R = RR^\top$ --- invariant
+	\item $L^\top L$, $R^\top R$, $L^\top R$ --- transform by conjugation
 \end{itemize}
 
 The gauge-invariant data is $(P, G_L, G_R)$---three $n \times n$ matrices.
@@ -1068,7 +1065,7 @@ The gauge-invariant data is $(P, G_L, G_R)$---three $n \times n$ matrices.
 
 Any $O(d)$-equivariant vector field has the form:
 \begin{equation}
-    \dot{L} = N_L(P, G_L, G_R) \cdot L, \qquad \dot{R} = N_R(P, G_L, G_R) \cdot R
+	\dot{L} = N_L(P, G_L, G_R) \cdot L, \qquad \dot{R} = N_R(P, G_L, G_R) \cdot R
 \end{equation}
 
 To eliminate gauge, require $N_L = N_L^\top$ and $N_R = N_R^\top$ individually.
@@ -1076,14 +1073,14 @@ To eliminate gauge, require $N_L = N_L^\top$ and $N_R = N_R^\top$ individually.
 \subsection{Induced Dynamics on $P$}
 
 \begin{equation}
-    \dot{P} = N_L P + P N_R^\top
+	\dot{P} = N_L P + P N_R^\top
 \end{equation}
 
 This is a Sylvester equation, enabling:
 \begin{itemize}
-    \item Asymmetric growth patterns
-    \item Directed community formation
-    \item Source-target differentiation
+	\item Asymmetric growth patterns
+	\item Directed community formation
+	\item Source-target differentiation
 \end{itemize}
 
 \textbf{Special case:} If $N_L = N_R = N$ with $N$ symmetric, the directed dynamics reduce to the undirected form $\dot{P} = NP + PN$.
