@@ -122,10 +122,10 @@
 #align(center)[
   #block(width: 85%)[
     *Abstract* \
-    Many phenomena across disparate fields --- ecology, history, economics, social behavior --- can be described in terms of networks whose edges change in time. Temporal networks are commonly studied as time series with the goal of predicting future states. Here, instead, we take a dynamical systems perspective: when the goal is to understand _why_ networks evolve as they do, can we learn the differential equations that govern them?
+    Across ecology, history, economics, social behavior, cultural dynamics, and more, many phenomena can be described in terms of entities establishing and disestablishing interactions with each other. These scenarios are commonly represented mathematically as temporal networks, and the time evolution of these objects is studied as a time series with the goal of predicting future network states. Here, instead, we take a dynamical systems perspective: when the goal is to understand _why_ networks evolve as they do, can we learn the differential equations that govern them?
     We investigate this question within the framework of Random Dot Product Graphs (RDPGs), where each network snapshot is generated from latent positions evolving under unknown dynamics. We identify three fundamental obstructions to recovering these dynamics: gauge freedom from the rotational ambiguity in latent positions, realizability constraints from the manifold structure of the probability matrix, and the trajectory recovery problem arising from spectral embedding artifacts.
     We develop a geometric framework based on principal fiber bundles that formalizes these obstructions and reveals their interplay. A sharp holonomy dichotomy emerges: polynomial dynamics have trivial holonomy, making gauge alignment purely statistical, while Laplacian dynamics generically produce non-trivial holonomy (proven to be full $"SO"(2)$ for $d = 2$, conjectured $"SO"(d)$ for $d >= 3$), adding a topological obstruction. Cramér-Rao lower bounds show that the spectral gap controlling geometric difficulty simultaneously controls statistical difficulty, an inextricable duality.
-    We establish an identifiability principle --- symmetric dynamics cannot absorb skew-symmetric gauge contamination --- but show that significant practical obstacles remain in finite samples. We frame the gap between identifiability and practical recovery as an open challenge and discuss directions for progress.
+    We establish an identifiability principle stating that symmetric dynamics cannot absorb skew-symmetric gauge contamination. Yet, we identify and present significant practical obstacles remain in finite samples. We frame the gap between identifiability and practical recovery as an open challenge and discuss directions for progress.
   ]
 ]
 
@@ -344,7 +344,7 @@ We recall this geometry here, adapting it to the RDPG setting where the connecti
 
 A useful analogy is the relationship between the Earth's surface and its coordinates.
 Every point on the globe has a definite physical location, but many different coordinate systems (map projections) can describe it.
-Choosing coordinates is necessary for computation, but the choice is arbitrary --- it's a "gauge" choice.
+Choosing coordinates is necessary for computation, but the choice is arbitrary and unreleated to the dynamic: it's a "gauge" choice.
 Different observers using different maps will describe the same journey differently, and must reconcile their descriptions when they meet.
 
 The RDPG situation is similar.
@@ -353,14 +353,14 @@ The latent configuration $X$ is like a choice of coordinates: useful for computa
 Replacing $X$ by $X Q$ is like switching from one map projection to another.
 
 A *fiber bundle* formalizes this structure.
-Think of the space of all possible observables $P$ as the "ground level" --- the *base space* $cal(B)$.
+Think of the space of all possible observables $P$ as the "ground level": this is the *base space* $cal(B)$.
 Above each observable $P$, there is a "fiber" of equivalent latent configurations ${X Q : Q in O(d)}$, all producing the same $P$.
 The full space of latent configurations $X$ forms the *total space* $cal(E)$, with a projection $pi: X |-> X X^top$ dropping from total space to base space.
 
 The key concept is *lifting*: given a path $P(t)$ of evolving observables in the base space, we want to "lift" it to a path $X(t)$ in the total space.
 But there are infinitely many lifts, differing by time-varying gauge choices $Q(t)$.
 The connection and curvature of the bundle tell us which lifts are "natural" (no spurious rotation) and whether consistent lifting is possible at all.
-When it isn't --- when the bundle is curved --- we get *holonomy*: gauge drift that accumulates even along the most careful trajectory.
+When it isn't, that is, when the bundle is curved, we get *holonomy*: gauge drift that accumulates even along the most careful trajectory.
 
 We now make this precise.
 
@@ -426,7 +426,7 @@ The *horizontal subspace* $cal(H)_X$ consists of directions transverse to the fi
 $ cal(H)_X = {Z in T_X cal(E) : X^top Z in "Sym"(d)} $
 
 Every tangent vector decomposes uniquely into vertical and horizontal parts:
-$ T_X cal(E) = cal(V)_X plus.o cal(H)_X $
+$ T_X cal(E) = cal(V)_X plus.circle cal(H)_X $
 
 #proposition(title: "Horizontal Characterization")[
   A tangent vector $dot(X) in T_X cal(E)$ is horizontal if and only if $X^top dot(X)$ is symmetric.
@@ -524,6 +524,11 @@ This is the same Lyapunov structure as in the connection 1-form above. And not c
   $ dot(X) = V tilde(Sigma) Lambda^(1\/2) + V_perp B^top Lambda^(-1\/2) $
   where $tilde(Sigma)$ is the symmetric solution to @eq:horizontal-lift-lyapunov, given elementwise by:
   $ tilde(Sigma)_(iota gamma) = ((Lambda^(-1\/2) A Lambda^(-1\/2))_(iota gamma)) / (lambda_iota + lambda_gamma) $
+]
+
+#proof[
+  The derivation above (@eq:horizontal-lift-lyapunov and the preceding block algebra) constructs $dot(X)$ satisfying both the projection condition $dot(P) = dot(X) X^top + X dot(X)^top$ and the horizontality condition $X^top dot(X)$ symmetric.
+  The Lyapunov equation has a unique symmetric solution because $lambda_iota + lambda_gamma > 0$ for all $iota, gamma$.
 ]
 
 The formula reveals two contributions to horizontal motion:
@@ -699,72 +704,45 @@ Similar issues affect Omnibus embedding @levin2017central and COSIE @arroyo2021i
 Recent work @loyal2025 proposes Bayesian inference for dynamic RDPGs using hierarchical priors on latent positions.
 By placing priors on successive differences (or equivalently, using Gaussian processes with smooth kernels), the resulting trajectories are smooth: velocities and accelerations are well-defined and continuous.
 
-However, *smoothness is necessary but not sufficient for dynamical consistency*.
-
-*The fundamental distinction:*
-An ODE $dot(X) = f(X)$ constrains the velocity to be a *function of the current state*.
-A smoothness prior constrains velocities to vary continuously, but does not require that $dot(X)(t)$ is determined by $X(t)$.
+However, smoothness is necessary but not sufficient for dynamical consistency.
+An ODE $dot(X) = f(X)$ constrains the velocity to be a *function of the current state*; a smoothness prior constrains velocities to vary continuously, but does not require that $dot(X)(t)$ is determined by $X(t)$.
 
 #definition(title: "Dynamical Consistency")[
   A trajectory $X(t)$ is *dynamically consistent* with respect to a function class $cal(F)$ if there exists $f in cal(F)$ such that $dot(X)(t) = f(X(t))$ for all $t$.
 ]
 
-Hierarchical Bayesian priors enforce:
-- $X(t)$ is smooth #h(1em) ✓
-- $dot(X)(t)$ is smooth #h(1em) ✓
-- $accent(X, dot.double)(t)$ is smooth #h(1em) ✓
+Hierarchical Bayesian priors ensure that $X(t)$, $dot(X)(t)$, and higher derivatives are all smooth, but they do not enforce the state-dependence constraint $dot(X)(t) = f(X(t))$ for any $f$.
+This distinction is the gap between kinematic regularity and dynamical structure.
 
-But they do *not* enforce:
-- $dot(X)(t) = f(X(t))$ for some $f$ #h(1em) ✗
-
-*Prior support and the ODE solution manifold:*
+*Prior support and the ODE solution manifold.*
 For a given initial condition $X(0) = X_0$ and dynamics $dot(X) = f(X)$, the solution $X(t)$ traces a *unique* curve: there is no uncertainty in the trajectory given $(f, X_0)$.
 The space of all ODE solutions (over all $f in cal(F)$ and $X_0$) forms a *finite-dimensional manifold* in the infinite-dimensional space of smooth paths.
-
-A hierarchical smoothness prior assigns positive probability to a much larger set: all smooth paths, not just those satisfying some ODE.
-The ODE solution manifold has *measure zero* under such priors.
+A hierarchical smoothness prior assigns positive probability to all smooth paths, a much larger set than just those satisfying some ODE. So, the ODE solution manifold has measure zero under such priors.
 
 #proposition(title: "Measure Zero")[
   Let $mu$ be any Gaussian measure on smooth paths $C^k([0,T], RR^(n times d))$ with full support.
   Let $cal(M)_cal(F) = {X(dot) : dot(X) = f(X) "for some" f in cal(F)}$ be the manifold of ODE solutions.
   Then $mu(cal(M)_cal(F)) = 0$.
+] <prop:measure-zero>
+
+#proof[
+  See @app:deferred-proofs.
 ]
 
-The proposition itself is a straightforward consequence of comparing a finite-dimensional manifold to an infinite-dimensional space.
 The substantive implication concerns *posterior behavior*: Gaussian process posteriors with standard kernels (RBF, Matérn) cannot concentrate on $cal(M)_cal(F)$ as the number of observations grows, because the RKHS of these kernels spans the full path space and has no mechanism to enforce the ODE constraint.
 The posterior will converge to a smooth path that best fits the data in the RKHS norm, which is generically not an ODE solution.
 
-*Consequence:* The posterior under a smoothness prior concentrates on trajectories that:
-+ Are smooth (from the prior)
-+ Explain observed edges well (from the likelihood)
-+ But do *not* satisfy $dot(X) = f(X)$ for any reasonable $f$
+The posterior under a smoothness prior therefore concentrates on trajectories that are smooth (from the prior) and explain observed edges well (from the likelihood), but do not satisfy $dot(X) = f(X)$ for any reasonable $f$.
+This is the distinction between *interpolation* and *dynamics learning*: both produce smooth curves through the data, but only the latter respects the constraint that velocity is state-dependent.
 
-This is the distinction between *interpolation* and *dynamics learning*.
-Both produce smooth curves through the data; only the latter respects the constraint that velocity is state-dependent.
+*Diagnostics for detecting dynamical inconsistency.*
+Several tests can distinguish smooth-but-dynamically-inconsistent trajectories from genuine ODE solutions.
+First, a *state-dependence test*: for autonomous dynamics $dot(X) = f(X)$, if the trajectory passes through similar positions at two different times ($X(t_1) approx X(t_2)$), then the inferred velocities must also be similar ($dot(X)(t_1) approx dot(X)(t_2)$); smoothing priors do not enforce this, and large velocity discrepancies at revisited states indicate dynamical inconsistency.
+Second, an *ODE residual test*: fit candidate dynamics $hat(f)$ to the smoothed trajectory and compute residuals $r(t) = dot(hat(X))(t) - hat(f)(hat(X)(t))$; for dynamically consistent trajectories $||r(t)||$ should be small, while for smooth-but-wrong trajectories residuals will be systematically large.
+Third, *flow consistency*: integrate the fitted $hat(f)$ forward from various initial conditions along the trajectory; dynamically consistent trajectories will track the integrated flow, while interpolated trajectories will diverge.
+Finally, *medium-to-long-term forecasting* discriminates the two approaches: kinematic extrapolation assumes velocity and acceleration persist, while dynamic extrapolation adapts velocity to the current state via $f(X)$, and only the latter remains accurate when the trajectory enters new regions of state space.
 
-*Empirical signature:*
-In our experiments with the Loyal (2025) approach on data generated from known ODE dynamics, the recovered trajectories are indeed smooth, but:
-- The inferred velocities $dot(hat(X))(t)$ do not match $f(hat(X)(t))$ for the true $f$
-- The trajectories "cut corners" through state space rather than following the flow
-
-*Diagnostics for detecting dynamical inconsistency:*
-
-+ *State-dependence test:* For autonomous dynamics $dot(X) = f(X)$, if $X(t_1) approx X(t_2)$ at two different times, then $dot(X)(t_1) approx dot(X)(t_2)$ (same position implies same velocity).
-  Smoothing priors do not enforce this.
-  Find times where the trajectory passes through similar positions and compare the inferred velocities: large discrepancies indicate dynamical inconsistency.
-
-+ *ODE residual test:* Fit candidate dynamics $hat(f)$ to the smoothed trajectory, then compute residuals $r(t) = dot(hat(X))(t) - hat(f)(hat(X)(t))$.
-  For dynamically consistent trajectories, $||r(t)||$ should be small.
-  For smooth-but-wrong trajectories, residuals will be systematically large.
-
-+ *Flow consistency:* Integrate the fitted $hat(f)$ forward from various initial conditions along the trajectory.
-  Dynamically consistent trajectories will track the integrated flow; interpolated trajectories will diverge.
-
-+ *Medium-to-long-term forecasting:* Both approaches can make short-term predictions: smoothing uses Taylor extrapolation ($X(T + delta t) approx X(T) + delta t dot(X)(T) + ...$), while ODE-based methods integrate $dot(X) = f(X)$.
-  The distinction emerges over longer horizons: kinematic extrapolation assumes velocity/acceleration persist, while dynamic extrapolation adapts velocity to the current state via $f(X)$.
-  When the trajectory enters new regions of state space, only the latter remains accurate.
-
-*Alternative approaches with dynamical consistency:*
+*Alternative approaches with dynamical consistency.*
 
 #figure(
   table(
@@ -774,18 +752,18 @@ In our experiments with the Loyal (2025) approach on data generated from known O
     table.hline(),
     table.header([*Approach*], [*Smoothness*], [*Dynamical Consistency*]),
     table.hline(stroke: 0.5pt),
-    [Hierarchical GP prior], [Yes ($C^k$)], [No: it interpolates only],
+    [Hierarchical GP prior], [Yes ($C^k$)], [No: interpolation only],
     [SDE $d X = f(X) d t + sigma d W$], [No (Hölder $< 1\/2$)], [Yes, as $sigma -> 0$],
     [Neural ODE], [Yes ($C^k$)], [Yes (by construction)],
-    [GP-ODE (NPODE) @heinonen2018learning], [Yes ($C^1$)], [Yes: it learns $f$ as GP],
-    [Structure-constrained (ours)], [Yes], [Yes: the family $cal(F)$ is enforced],
+    [GP-ODE (NPODE) @heinonen2018learning], [Yes ($C^1$)], [Yes: learns $f$ as GP],
+    [Structure-constrained (ours)], [Yes], [Yes: family $cal(F)$ enforced],
     table.hline()
   ),
   caption: [Comparison of approaches: smoothness vs dynamical consistency.]
 )
 
 The SDE formulation $d X = f(X) d t + sigma d W$ provides a principled bridge: Freidlin-Wentzell theory @freidlin1998random shows that as $sigma -> 0$, solutions concentrate around ODE solutions with rate function $J_T(phi) = 1/2 integral_0^T ||dot(phi)(t) - f(phi(t))||^2 d t$.
-This rate function is precisely the *dynamical consistency penalty*, which measures how far a path deviates from being an ODE solution.
+This rate function is precisely the *dynamical consistency penalty*, measuring how far a path deviates from being an ODE solution.
 
 == Honest assessment
 
@@ -967,7 +945,7 @@ $ [overline(xi)_1, overline(xi)_2](X) = (M_2 M_1 - M_1 M_2) X = -[M_1, M_2] X $
 Writing $S = -[M_1, M_2]$ (which is skew-symmetric), the bracket $S X$ is _not_ purely vertical: vertical vectors have the form $X Omega$ for $Omega in so(d)$ (right multiplication), while $S X$ is left multiplication by a skew-symmetric matrix, and these coincide only when $S$ maps $"col"(X)$ into itself, which generically fails for $n >> d$.
 
 However, the O'Neill formula requires only the vertical component $[overline(xi)_1, overline(xi)_2]^cal(V)$.
-The vertical projection of $S X$ at $X$ is $X Omega^*$ where $Omega^*$ solves the Lyapunov equation $G Omega^* + Omega^* G = 2 X^top S X$ with $G = X^top X$ (this is the standard formula for orthogonal projection onto $cal(V)_X$ in the Euclidean metric).
+The vertical projection of $Z = S X$ at $X$ onto the vertical space $cal(V)_X = {X Omega : Omega in so(d)}$ is $X Omega^*$ where $Omega^*$ solves the Lyapunov equation $G Omega^* + Omega^* G = 2 "skew"(X^top Z) = 2 X^top S X$ with $G = X^top X$ (see @app:vertical-projection for the derivation).
 Since $S$ is skew-symmetric, $X^top S X$ is skew-symmetric, and the Lyapunov equation has a unique solution because all eigenvalues of $G$ are positive.
 In the eigenbasis of $G$ (eigenvalues $lambda_1, ..., lambda_d$), the solution is:
 $ Omega^*_(iota gamma) = 2(X^top S X)_(iota gamma) / (lambda_iota + lambda_gamma) $
@@ -976,7 +954,7 @@ The vertical component thus vanishes if and only if $X^top [M_1, M_2] X = 0$ (th
 This is weaker than $[M_1, M_2] = 0$: the full $n times n$ commutator may be nonzero while its projection through $X$ vanishes.
 However, for generic trajectories with $n >> d$, if $[M_1, M_2] != 0$ then $X^top [M_1, M_2] X != 0$ as well, since the "blind spot" $"col"(X)^perp$ is a high-codimension subspace.
 
-Remembering @prop:curv-spectral-gap, by O'Neill's formula @oneill1966fundamental the sectional curvature of the 2-plane spanned by the projections of $overline(xi)_1, overline(xi)_2$ in $cal(B)$ is: $K(xi_1, xi_2) = 3/4 ||[overline(xi)_1, overline(xi)_2]^cal(V)||^2 slash (||overline(xi)_1||^2 ||overline(xi)_2||^2 - chevron.l overline(xi)_1, overline(xi)_2 chevron.r^2)$.
+Remembering @prop:curv-spectral-gap, by O'Neill's formula @oneill1966fundamental the sectional curvature of the 2-plane spanned by the projections of $overline(xi)_1, overline(xi)_2$ in $cal(B)$ is: $K(xi_1, xi_2) = 3/4 ||[overline(xi)_1, overline(xi)_2]^cal(V)||^2 slash (||overline(xi)_1||^2 ||overline(xi)_2||^2 - angle.l overline(xi)_1, overline(xi)_2 angle.r^2)$.
 The $1 \/ (lambda_iota + lambda_gamma)$ factors in $Omega^*$ connect the curvature directly to the connection coefficients of the fiber bundle: the same denominators that amplify gauge sensitivity also amplify the vertical bracket.
 
 Since $RR_*^(n times d)$ is flat (it is an open subset of Euclidean space), the base curvature arises *entirely* from the vertical bracket.
@@ -988,6 +966,13 @@ Since $RR_*^(n times d)$ is flat (it is an open subset of Euclidean space), the 
   $ ||[overline(xi)_1, overline(xi)_2]^cal(V)||^2 = 4 sum_(iota < gamma) (lambda_iota lambda_gamma) / (lambda_iota + lambda_gamma) [(U^top [M_1, M_2] U)_(iota gamma)]^2 $
   where $P = U Lambda U^top$ is the eigendecomposition. The $1 \/ (lambda_iota + lambda_gamma)$ factors link the curvature directly to the connection coefficients of the fiber bundle.
 ] <prop:curvature-criterion>
+
+#proof[
+  The Lie bracket of the constant-coefficient horizontal extensions $overline(xi)_i (Y) = M_i Y$ is $[overline(xi)_1, overline(xi)_2](X) = -[M_1, M_2] X$ (standard commutator of linear vector fields).
+  The vertical projection of $S X$ (with $S = -[M_1, M_2]$ skew-symmetric) is $X Omega^*$ where $Omega^*$ solves $G Omega^* + Omega^* G = 2 X^top S X$ (@app:vertical-projection).
+  This vanishes iff $X^top [M_1, M_2] X = 0$.
+  The norm formula follows from $||X Omega^*||^2 = "tr"(Omega^(*top) G Omega^*)$ evaluated in the eigenbasis of $G$ (see @app:vertical-norm for the computation).
+]
 
 *Polynomial dynamics: trivial holonomy.*
 For polynomial dynamics $dot(X) = N(P) X$ with $N(P) = sum_(k=0)^K alpha_k P^k$, the induced $P$-dynamics are:
@@ -1094,7 +1079,7 @@ For $d = 2$, the result is particularly sharp.
   A single nonzero element spans the one-dimensional Lie algebra, so by the Ambrose-Singer theorem, the holonomy algebra is all of $frak(s o)(2)$, and the restricted holonomy group (holonomy of contractible loops) is $"SO"(2)$.
 ]
 
-This means that for rank-2 latent spaces under Laplacian dynamics, the gauge ambiguity is not merely a discrete sign flip (as for polynomial dynamics) but a continuous rotation by an arbitrary angle---the worst possible case for alignment.
+This means that for rank-2 latent spaces under Laplacian dynamics, the gauge ambiguity is not merely a discrete sign flip (as for polynomial dynamics) but a continuous rotation by an arbitrary angle: the worst possible case for alignment.
 
 *Quantitative estimate.* For $d = 2$, the holonomy around a loop $gamma$ in $cal(B)$ is a rotation by angle:
 $ phi(gamma) = integral.double_Sigma K thin d A $
@@ -1109,7 +1094,7 @@ We state this as a conjecture.
 
 #conjecture(title: "Full Holonomy in Higher Dimensions")[
   For $d >= 2$, $n > d$, and initial conditions with $D(P(0))$ not scalar (non-regular graph), the restricted holonomy group of Laplacian dynamics $dot(X) = -L(P) X$ is $"SO"(d)$.
-]
+] <conj:full-holonomy>
 
 A proof would require showing that the holonomy algebra elements $Omega^*_(iota gamma) = 2(X^top [L(P(t_1)), L(P(t_2))] X)_(iota gamma) \/ (lambda_iota + lambda_gamma)$, as $t_1, t_2$ vary along the trajectory, span $frak(s o)(d)$.
 Since the Lyapunov weights $1\/(lambda_iota + lambda_gamma)$ are positive scalars that do not change rank, this is equivalent to requiring that the projected commutators $X^top [L(P(t_1)), L(P(t_2))] X$ span $frak(s o)(d)$.
@@ -1124,6 +1109,20 @@ Polynomial dynamics, which operate on the spectral structure of $P$ through comm
 Laplacian and message-passing dynamics, which mix spectral and spatial structure through non-commuting generators, rotate eigenvectors and produce non-trivial holonomy: gauge drift accumulates even along horizontal trajectories, and no local alignment procedure can achieve global consistency over cycles.
 
 This distinction has practical implications: for polynomial dynamics, the constructive alignment problem (@sec:constructive) is purely a statistical challenge (overcoming Bernoulli noise); for Laplacian dynamics, it is simultaneously a statistical _and_ topological challenge.
+
+#remark[
+  *Ambrose-Singer perspective.*
+  The relationship between local curvature and global holonomy is formalized by the Ambrose-Singer theorem @kobayashi1963foundations: the Lie algebra $frak(h o l)_p$ of the restricted holonomy group at $p$ equals the subalgebra of $frak(s o)(d)$ spanned by all curvature endomorphisms $Omega_q (u, v)$, where $q$ varies over points reachable by horizontal curves from $p$ and the endomorphisms are parallel-transported back to $p$.
+
+  For $d = 2$, $frak(s o)(2)$ has no proper nonzero subalgebras, so a single nonzero curvature element generates the full algebra and forces $"Hol"_p^0 = "SO"(2)$ (as used in the $d = 2$ corollary above).
+
+  For $d >= 3$, the algebra $frak(s o)(d)$ has dimension $d(d-1)\/2$, and a single curvature value spans only a one-dimensional subspace.
+  Full holonomy requires a bracket-generating condition (analogous to Hörmander's condition in sub-Riemannian geometry): the Lie brackets of the curvature tensors at different trajectory points, $[Omega(t_1), Omega(t_2)]$ and their iterated brackets, must span $frak(s o)(d)$.
+  Since the degree matrix $D(X)$ depends nonlinearly on the latent positions, the orientation of $Omega^*$ within $frak(s o)(d)$ rotates as the trajectory evolves, preventing confinement to a sub-variety where curvature values commute.
+  This is the mechanism behind @conj:full-holonomy.
+
+  As shown in @prop:curvature-criterion, the curvature magnitude is weighted by $1\/(lambda_iota + lambda_gamma)$; a small spectral gap therefore not only amplifies statistical noise (through ASE error bounds) but also enlarges the holonomy effect, since the curvature-generated rotations are larger in the ill-conditioned directions.
+]
 
 
 
@@ -1239,6 +1238,10 @@ For linear dynamics (single scalar parameter $alpha_0$), the Fisher information 
   For linear dynamics $dot(X) = alpha_0 X$ with $T$ snapshots at times $t_1, ..., t_T$, the Fisher information is:
   $ cal(I)(alpha_0) = 4 sum_(t=1)^T t^2 sum_(i < j) P_(i j)(t) / (1 - P_(i j)(t)) $
   This scales as $Theta(T^3 dot n^2)$ when edge probabilities remain bounded away from 0 and 1 throughout the trajectory, giving a Cramér-Rao lower bound of $Omega(1\/(T^3 n^2))$.
+] <cor:linear-fisher>
+
+#proof[
+  See @app:deferred-proofs.
 ]
 
 The cubic dependence on $T$ (rather than linear) reflects the fact that the sensitivity $partial P_(i j) \/ partial alpha_0 = 2 t P_(i j)$ grows with time: later snapshots are more informative because the perturbation has had longer to propagate.
@@ -1424,7 +1427,7 @@ The difficulties above are genuine in the general case.
 However, there is a natural special case in which the gauge problem admits a clean solution: when a subset of nodes is known (or assumed) to be stationary.
 
 *The anchor principle.*
-Suppose a subset $S subset {1, ..., n}$ of nodes has $dot(x)_i = 0$ for $i in S$ --- their latent positions do not move.
+Suppose a subset $S subset {1, ..., n}$ of nodes has $dot(x)_i = 0$ for $i in S$. These are "anchor" points whose latent positions do not move.
 At each time $t$, the ASE produces $hat(X)^((t)) = X^((t)) R^((t)) + E^((t))$ with random gauge $R^((t)) in O(d)$.
 For anchor nodes $i in S$, the true positions satisfy $x_i^((t)) = x_i^((0))$ for all $t$, so the anchor rows of the embedding are:
 $ hat(X)_S^((t)) = X_S R^((t)) + E_S^((t)) $
@@ -1463,19 +1466,23 @@ But when such knowledge is available, it provides a clean and computationally tr
 
 == Numerical illustration <sec:numerics>
 
-We illustrate the anchor-based alignment with a controlled experiment on synthetic RDPG dynamics, demonstrating both its effectiveness and its failure modes.
+We illustrate the theory with two controlled experiments on synthetic RDPG data.
+The first demonstrates anchor-based alignment on gauge-equivariant polynomial dynamics, where alignment quality can be assessed independently of dynamics recovery.
+The second demonstrates the full downstream pipeline: UDE training and symbolic regression; to do this more visibily, we move to a non-gauge-equivariant dynamics, where alignment quality directly impacts dynamics recovery.
+
+=== Experiment 1: Anchor-based alignment <sec:numerics-anchor>
 
 *Setup.*
-We generate an RDPG with $n$ nodes in $d = 2$ latent dimensions.
+We generate an RDPG with $n = 200$ nodes in $d = 2$ latent dimensions.
 The initial positions $X(0)$ are drawn uniformly from $B_+^2 = {x in RR^2 : x_1, x_2 >= 0, ||x|| <= 1}$, with a designated anchor set $S$ of $n_a$ nodes.
-The non-anchor nodes evolve under polynomial dynamics $dot(X) = (alpha_0 I + alpha_1 P) X$ while anchor nodes remain fixed: $dot(x)_i = 0$ for $i in S$.
-We integrate the ODE to produce a trajectory $X(t)$ at $T$ equally-spaced times, generate adjacency matrices $A^((t)) tilde "Bernoulli"(X(t) X(t)^top)$ at each time, compute ASE embeddings $hat(X)^((t))$, align using anchor-node Procrustes, and compare the recovered trajectory to the ground truth.
+The non-anchor nodes evolve under polynomial dynamics $dot(X) = (alpha_0 I + alpha_1 P) X$ with $(alpha_0, alpha_1) = (-0.3, 0.003)$, while anchor nodes remain fixed: $dot(x)_i = 0$ for $i in S$.
+We integrate the ODE to produce a trajectory $X(t)$ at $T$ equally-spaced times, generate $K = 3$ independent adjacency matrices $A_k^((t)) tilde "Bernoulli"(X(t) X(t)^top)$ at each time (averaging to reduce noise), compute ASE embeddings $hat(X)^((t))$, and compare anchor-based alignment to sequential Procrustes.
 
 *Metrics.*
-We measure alignment quality by the mean Procrustes error after anchor-based alignment:
+We measure alignment quality by the mean Procrustes error:
 $ "err"(t) = 1/n ||hat(X)^((t)) hat(Q)^((t)) - X^((t)) Q^*||_F $
 where $Q^*$ is the best global alignment to the true trajectory (accounting for the residual gauge at $t = 0$).
-We also measure dynamics recovery by fitting the polynomial coefficients $(hat(alpha)_0, hat(alpha)_1)$ from the aligned trajectory and comparing to the true values.
+We sweep over four experimental conditions: anchor count $n_a$, trajectory length $T$, anchor drift rate $epsilon$, and initial embedding norm scale (controlling signal-to-noise ratio).
 
 #figure(
   image("plots/anchor-main-results.png", width: 95%),
@@ -1492,22 +1499,87 @@ We also measure dynamics recovery by fitting the polynomial coefficients $(hat(a
 #figure(
   image("plots/anchor-spectral-portrait.png", width: 95%),
   caption: [
-    *(a)* Alignment error as a function of the initial embedding norm scale (proxy for spectral gap $lambda_d$): smaller norms yield weaker spectral gaps, increasing ASE noise and degrading alignment for both methods; anchor-based alignment shows a slight advantage in the low spectral gap regime.
-    *(b)* Example phase portrait with $n_a = 15$ anchor nodes (red diamonds, stationary) and non-anchor nodes (gray trajectories evolving under polynomial dynamics).
+    *(a)* Alignment error as a function of the initial embedding norm scale (proxy for signal strength): smaller norms yield weaker signals and less informative Bernoulli observations, increasing ASE noise and degrading alignment for both methods. Note that uniform scaling preserves the condition number $sigma_1 \/ sigma_2$ (constant at $approx 2.2$); this experiment varies signal _magnitude_ rather than the spectral gap ratio.
+    *(b)* Phase portrait with $n_a = 15$ anchor nodes (red diamonds, stationary) and non-anchor nodes (gray trajectories evolving under polynomial dynamics) in $B_+^2$.
   ],
 ) <fig:anchor-spectral>
 
-For dynamics recovery, we fit the polynomial coefficients from the gauge-free $P$-space estimator (@sec:constructive).
-Since $P = X X^top$ is rotation-invariant, this estimator does not require alignment and yields comparable estimates regardless of anchor count: with $n_a = 15$, we recover $(hat(alpha)_0, hat(alpha)_1) = (-0.250 plus.minus 0.008, 0.0024 plus.minus 0.0001)$ against true values $(-0.3, 0.003)$; with $n_a = 0$ the estimates are $(-0.282 plus.minus 0.008, 0.0028 plus.minus 0.0001)$.
-The modest bias reflects finite-sample ASE noise rather than gauge corruption, confirming that the $P$-based estimator is gauge-free by construction.
+*Results.*
+The experiment confirms the theoretical predictions.
+Alignment error stabilizes at the ASE noise floor once $n_a >= d$ (@fig:anchor-main\a); below $n_a = d = 2$, Procrustes is underdetermined and fails catastrophically, consistent with the well-conditioned anchor requirement of @sec:constructive.
+At short trajectory lengths ($T <= 50$), sequential Procrustes is marginally better than anchor-based alignment (by $approx 2%$), because it uses all $n = 200$ nodes for each Procrustes step rather than only the $n_a = 15$ anchors.
+The crossover occurs around $T approx 100$, after which the sequential method's accumulated drift dominates: at $T = 200$, sequential Procrustes is approximately 13% worse (@fig:anchor-main\b, d), consistent with $O(sqrt(T))$ drift accumulation.
+A systematic bias from drifting anchors becomes visible for $epsilon >= 0.05$ in alignment error, and for $epsilon >= 0.1$ in the variability of the recovered dynamics parameters (standard deviation of $hat(alpha)_0$ roughly doubles); at $epsilon = 0.01$ and below, the effect is negligible (@fig:anchor-main\c).
 
-*Expected results.*
-We expect the following behavior:
-+ *Sufficient anchors ($n_a >= c sqrt(n)$):* alignment succeeds, trajectory recovery is accurate, and fitted dynamics coefficients are close to truth. The alignment error is dominated by ASE noise, not gauge artifacts.
-+ *Too few anchors ($n_a < d$):* Procrustes is underdetermined and alignment fails catastrophically.
-+ *Drifting anchors ($epsilon > 0$):* a systematic bias accumulates, visible as a slow rotation of the recovered trajectory relative to truth. The bias grows linearly in $epsilon T$.
-+ *Comparison to naive Procrustes:* sequential pairwise alignment (without anchors) accumulates $O(sqrt(T))$ error, while anchor-based alignment has $O(1)$ error independent of $T$.
-+ *Spectral gap dependence:* for networks near rank-deficiency ($lambda_2 approx 0$), ASE noise increases and more anchors are needed to compensate.
+*Dynamics recovery is gauge-free.*
+A notable observation: for polynomial dynamics, the coefficients $(alpha_0, alpha_1)$ can be estimated from the $P$-space trajectory via the gauge-invariant estimator, since $P = X X^top$ is rotation-invariant.
+With $n_a = 15$, we recover $(hat(alpha)_0, hat(alpha)_1) = (-0.250 plus.minus 0.008, 0.0024 plus.minus 0.0001)$ against true values $(-0.3, 0.003)$; with $n_a = 0$ the estimates are $(-0.282 plus.minus 0.008, 0.0028 plus.minus 0.0001)$.
+The comparable precision (standard errors $approx 0.008$) regardless of anchor count confirms that the $P$-based estimator does not require alignment.
+The systematic shift in the point estimate (from $-0.282$ at $n_a = 0$ to $-0.250$ at $n_a = 15$) reflects the fact that more frozen anchor nodes change the effective trajectory of $P$, not a gauge effect.
+This motivates a natural question: when the dynamics _cannot_ be recovered from $P$ alone, does alignment quality directly impact dynamics recovery?
+The second experiment addresses this.
+
+
+=== Experiment 2: UDE pipeline with non-gauge-equivariant dynamics <sec:numerics-ude>
+
+*Motivation.*
+The polynomial dynamics in Experiment 1 are gauge-equivariant: $P = X X^top$ is rotation-invariant, so the dynamics parameters live in $P$-space and can be recovered without alignment.
+To demonstrate the full UDE pipeline and the necessity of anchor-based alignment for dynamics recovery, we design dynamics that depend on the coordinates of $X$ directly, so that alignment quality is a bottleneck.
+
+*Setup.*
+We generate an RDPG with $n = 200$ nodes in $d = 3$ latent dimensions, with $n_a = 100$ anchor nodes organized into 3 communities near the vertices of $B_+^3$ (at positions $(0.7, 0.2, 0.2)$, $(0.2, 0.7, 0.2)$, $(0.2, 0.2, 0.7)$ plus Gaussian noise).
+The 100 non-anchor nodes evolve under damped spiral dynamics around their community centroids $mu_k$:
+$ dot(x)_i = (-gamma + beta ||x_i - mu_k||^2)(x_i - mu_k) + omega J(x_i - mu_k) $
+where $J = 1/sqrt(3) mat(0, -1, 1; 1, 0, -1; -1, 1, 0)$ is the rotation generator around the $(1,1,1)/sqrt(3)$ axis, and $(gamma, beta, omega) = (0.3, -0.5, 1.0)$.
+These dynamics are _not_ gauge-equivariant: the centroids $mu_k$ and rotation axis live in $X$-space coordinates, so a misaligned trajectory $tilde(X)(t)$ produces different offsets $tilde(x)_i - mu_k != x_i - mu_k$, corrupting the dynamics structure.
+
+We observe $K = 10$ independent adjacency matrices per time step over $T = 50$ steps at $delta t = 0.1$, compute ASE embeddings, and apply three alignment conditions: anchor-based Procrustes, sequential Procrustes, and no alignment (raw ASE with random per-frame rotations).
+
+*UDE architecture.*
+Following the framework of @sec:constructive, we decompose the dynamics into known and unknown components:
+$ dot(x)_i = underbrace(-hat(gamma) (x_i - mu_k), f_"known") + underbrace(f_theta (x_i - mu_k), f_"NN") $
+where $hat(gamma)$ is a learnable scalar parameter and $f_theta: RR^3 -> RR^3$ is a small neural network (architecture: $3 -> 16 -> 16 -> 3$ with $tanh$ activations, $approx 390$ parameters total).
+The known part encodes the structural assumption that non-anchor nodes are attracted toward their community centroids; the unknown part captures whatever additional dynamics exist.
+L2 regularization on the network weights ($lambda = 10^(-3)$) discourages the network from absorbing the linear damping term, improving the identifiability of the known-unknown decomposition.
+The UDE is trained by solving the neural ODE forward from the initial condition and minimizing the trajectory MSE via adjoint sensitivity methods.
+
+*Primary metric: total dynamics MSE.*
+Since the neural network component can absorb part of the linear damping, the additive UDE decomposition has an inherent identifiability issue. This produces a shifting of $hat(gamma)$ values away from the generative truth, but without changing the goodness of fit of the learned dynamics (indeed, this is essentially an algebraic sum zero movement). For this reason, we evaluate the _total_ learned dynamics function $f_"learned"(delta) = -hat(gamma) delta + f_theta (delta)$ against the true dynamics $f_"true"(delta) = (-gamma + beta ||delta||^2) delta + omega J delta$, evaluated on random test inputs $delta in [-0.3, 0.3]^3$.
+This metric is invariant to the gamma--network split.
+
+#figure(
+  image("plots/ude-pipeline-results.png", width: 95%),
+  caption: [
+    UDE pipeline experiment ($n = 200$, $d = 3$, damped spiral dynamics with rotation around $(1,1,1)/sqrt(3)$, $K = 10$ samples).
+    *(a)* True trajectories (gray) and anchor-aligned ASE (blue) in $B_+^3$; anchor nodes shown as red diamonds.
+    *(b)* Learned NN residual $f_theta(delta)$ vs.\ true residual $f_u(delta)$: anchor-aligned data (left) produces tight agreement along the diagonal; sequential Procrustes (center) and unaligned data (right) degrade progressively.
+    *(c)* Symbolic regression Pareto fronts (loss vs.\ expression complexity): anchor-aligned data achieves $1$--$2$ orders of magnitude lower loss at each complexity level.
+    *(d)* Total dynamics MSE (log scale) by alignment condition: anchor alignment achieves MSE $approx 6 times 10^(-4)$, sequential Procrustes $approx 8 times 10^(-3)$ ($13 times$ worse), and unaligned $approx 0.44$ ($approx 700 times$ worse).
+    Error bars show $plus.minus 1$ standard deviation across 5 repetitions.
+  ],
+) <fig:ude-pipeline>
+
+*Results.*
+The total dynamics MSE cleanly separates the three alignment conditions (@fig:ude-pipeline\d):
+- *Anchor-aligned:* MSE $= 6 times 10^(-4) plus.minus 4 times 10^(-4)$: the UDE accurately recovers the complete dynamics function.
+- *Sequential Procrustes:* MSE $= 7.6 times 10^(-3) plus.minus 3 times 10^(-4)$: approximately $13 times$ worse, reflecting systematic gauge drift that corrupts the coordinate-dependent dynamics.
+- *Unaligned:* MSE $= 0.44 plus.minus 0.35$: approximately $700 times$ worse, with high variance; the network cannot learn coherent dynamics from incoherently-rotated frames.
+
+The NN residual accuracy (@fig:ude-pipeline\b) shows the mechanism: with anchor alignment, the learned $f_theta$ closely matches the true nonlinear residual $beta ||delta||^2 delta + omega J delta$; without alignment, the network fits noise rather than structure.
+
+*Symbolic regression.*
+Symbolic regression on the trained network's input-output pairs (@fig:ude-pipeline\c) achieves Pareto-optimal expressions with losses $1$--$2$ orders of magnitude lower under anchor alignment than under the other conditions at each complexity level.
+The anchor-aligned expressions contain the expected structural terms (products of coordinates and cross-terms consistent with the rotation generator $J$).
+As noted in @sec:constructive, symbolic regression requires working with gauge-invariant features or a canonically aligned frame; the anchor alignment provides the latter.
+
+*The identifiability caveat.*
+The learned damping parameter $hat(gamma)$ shows high variance across repetitions ($0.26 plus.minus 0.08$ for anchor-aligned, vs.\ true $gamma = 0.3$), reflecting the fundamental identifiability issue in additive UDE decompositions: the network can absorb part of the linear term.
+This is a known limitation, and the total dynamics MSE confirms it is benign: the complete dynamics function $f_"known" + f_"NN"$ is well-recovered regardless of the $hat(gamma)$-network split.
+
+*Takeaway.*
+When dynamics are gauge-equivariant ($dot(X) = N(P) X$), alignment quality is irrelevant for parameter recovery (Experiment 1).
+When dynamics depend on $X$-space coordinates, alignment quality directly controls the fidelity of the learned dynamics (Experiment 2).
+Anchor-based alignment provides the gauge-consistent trajectories that the downstream UDE pipeline requires.
 
 
 = Discussion <sec:discussion>
@@ -1585,16 +1657,83 @@ Progress on these problems, whether through $P$-level dynamics, tighter informat
 
 // APPENDICES
 
-= Oscillatory Dynamics with Symmetric $N$ <app:oscillations>
+= Deferred Proofs <app:deferred-proofs>
 
-Can symmetric $N(P)$ produce oscillations?
-For linear $dot(X) = N X$ with constant symmetric $N$, eigenvalues are real, so no oscillations.
+*Proof of @prop:measure-zero (Measure Zero).*
+The function class $cal(F)$ is assumed to be a finite-dimensional family with $p$ parameters (e.g., polynomial dynamics with $p = K+1$ coefficients).
+For each $(f, X_0) in cal(F) times RR^(n times d)$, the Picard-Lindelöf theorem yields a unique solution $X(dot; f, X_0) in C^k([0,T], RR^(n times d))$.
+The map $Phi: (f, X_0) |-> X(dot; f, X_0)$ is smooth (by smooth dependence on parameters and initial conditions), so $cal(M)_cal(F) = "im"(Phi)$ is the image of a smooth map from an $m$-dimensional manifold (with $m = p + n d$) into the infinite-dimensional path space $cal(X) = C^k([0,T], RR^(n times d))$.
+Choose $m + 1$ continuous linear functionals $ell_1, ..., ell_(m+1)$ on $cal(X)$ (e.g., evaluations of specific coordinates at distinct times) and let $L = (ell_1, ..., ell_(m+1)): cal(X) -> RR^(m+1)$.
+The composition $L circle.small Phi: RR^m -> RR^(m+1)$ is a smooth map between finite-dimensional spaces, and by Sard's theorem its image has Lebesgue measure zero in $RR^(m+1)$.
+Since $L(cal(M)_cal(F)) subset.eq "im"(L circle.small Phi)$, the set $L(cal(M)_cal(F))$ also has Lebesgue measure zero.
+The pushforward $L_* mu$ is an $(m+1)$-dimensional Gaussian (absolutely continuous with respect to Lebesgue measure), so $mu(cal(M)_cal(F)) <= (L_* mu)(L(cal(M)_cal(F))) = 0$. $square$
 
-However, $dot(X) = N(P) X$ with $P = X X^top$ is *nonlinear*.
-Near an equilibrium $X^*$, linearization can yield complex eigenvalues through the coupling.
+*Proof of @cor:linear-fisher (Linear Dynamics: Explicit Fisher Information).*
+For linear dynamics $dot(X) = alpha_0 X$, the solution is $X(t) = e^(alpha_0 t) X(0)$, giving $P(t) = e^(2 alpha_0 t) P(0)$.
+The sensitivity is $partial P_(i j)(t) \/ partial alpha_0 = 2t e^(2 alpha_0 t) P_(i j)(0) = 2t P_(i j)(t)$.
+Since there is a single scalar parameter, the Fisher information is:
+$ cal(I)(alpha_0) = sum_(t=1)^T sum_(i < j) ((partial P_(i j)(t)) / (partial alpha_0))^2 dot 1 / (P_(i j)(t)(1 - P_(i j)(t))) = 4 sum_(t=1)^T t^2 sum_(i < j) P_(i j)(t) / (1 - P_(i j)(t)) $
+For the scaling claim: when $P_(i j)(t) in [epsilon, 1 - epsilon]$ for some $epsilon > 0$, the inner sum $sum_(i < j) P_(i j) \/ (1 - P_(i j))$ is $Theta(n^2)$ (there are $binom(n, 2)$ terms, each bounded away from zero and infinity).
+The outer sum $sum_(t=1)^T t^2 = T(T+1)(2T+1)\/6 = Theta(T^3)$.
+Therefore $cal(I)(alpha_0) = Theta(T^3 dot n^2)$, giving a Cramér-Rao lower bound $"Var"(hat(alpha)_0) >= cal(I)^(-1) = Omega(1\/(T^3 n^2))$. $square$
 
-*Example:* Two nodes with $x_1, x_2 in RR^2$ and $N(P) = alpha I + beta P$.
-The equilibrium and Jacobian analysis shows oscillations are possible for appropriate $alpha, beta$.
+
+= Vertical Projection onto the Fiber <app:vertical-projection>
+
+We derive the formula for projecting a tangent vector $Z in T_X RR_*^(n times d)$ onto the vertical subspace $cal(V)_X = {X Omega : Omega in frak(s o)(d)}$.
+
+The vertical component $Z^cal(V) = X Omega^*$ is defined by the orthogonality condition $Z - X Omega^* in cal(H)_X$ (the remainder is horizontal).
+By @prop:horizontal, a vector $W$ at $X$ is horizontal if and only if $X^top W$ is symmetric.
+Applying this to $W = Z - X Omega^*$:
+$ X^top (Z - X Omega^*) = X^top Z - G Omega^* quad "must be symmetric" $
+where $G = X^top X$ is positive definite.
+Decomposing $X^top Z$ into symmetric and skew-symmetric parts, $X^top Z = "sym"(X^top Z) + "skew"(X^top Z)$, the condition becomes:
+$ "skew"(G Omega^*) = "skew"(X^top Z) $
+
+Since $Omega^*$ is skew-symmetric and $G$ is symmetric, the skew-symmetric part of $G Omega^*$ is:
+$ "skew"(G Omega^*) = 1/2 (G Omega^* - (G Omega^*)^top) = 1/2 (G Omega^* + Omega^* G) $
+where the last step uses $Omega^(*top) = -Omega^*$ and $G^top = G$.
+Equating:
+$ G Omega^* + Omega^* G = 2 "skew"(X^top Z) $
+
+This is a Lyapunov equation in $Omega^*$.
+Since $G$ is positive definite, all sums $lambda_iota + lambda_gamma > 0$, so the equation has a unique solution.
+In the eigenbasis of $G = "diag"(lambda_1, ..., lambda_d)$, the solution is elementwise:
+$ Omega^*_(iota gamma) = (2 "skew"(X^top Z)_(iota gamma)) / (lambda_iota + lambda_gamma) $
+
+For the application in @prop:curvature-criterion, $Z = S X$ with $S$ skew-symmetric.
+Then $X^top Z = X^top S X$, which is already skew-symmetric (since $(X^top S X)^top = X^top S^top X = -X^top S X$), so $"skew"(X^top S X) = X^top S X$ and the Lyapunov equation becomes $G Omega^* + Omega^* G = 2 X^top S X$.
+
+
+= Norm of the Vertical Bracket Component <app:vertical-norm>
+
+We derive the explicit formula for $||[overline(xi)_1, overline(xi)_2]^cal(V)||^2$ stated in @prop:curvature-criterion.
+
+The vertical component is $X Omega^*$ with $Omega^*_(iota gamma) = 2(X^top S X)_(iota gamma) \/ (lambda_iota + lambda_gamma)$ where $S = -[M_1, M_2]$ (@app:vertical-projection).
+Its squared norm in the ambient Euclidean metric is:
+$ ||X Omega^*||^2 = "tr"((X Omega^*)^top X Omega^*) = "tr"(Omega^(*top) G Omega^*) $
+
+Working in the eigenbasis of $G = "diag"(lambda_1, ..., lambda_d)$:
+$ "tr"(Omega^(*top) G Omega^*) = sum_(iota, gamma) lambda_gamma (Omega^*_(iota gamma))^2 $
+(using $("tr"(A^top B A))$ in coordinates with diagonal $B$; diagonal terms vanish since $Omega^*_(iota iota) = 0$).
+Collecting the pair $(iota, gamma)$ and $( gamma, iota)$ for $iota < gamma$ and using skew-symmetry $(Omega^*_(gamma iota))^2 = (Omega^*_(iota gamma))^2$:
+$ = sum_(iota < gamma) (lambda_iota + lambda_gamma)(Omega^*_(iota gamma))^2 $
+
+Substituting $Omega^*_(iota gamma) = 2(X^top S X)_(iota gamma) \/ (lambda_iota + lambda_gamma)$:
+$ = sum_(iota < gamma) (lambda_iota + lambda_gamma) dot (4(X^top S X)_(iota gamma)^2) / (lambda_iota + lambda_gamma)^2 = 4 sum_(iota < gamma) ((X^top S X)_(iota gamma)^2) / (lambda_iota + lambda_gamma) $
+
+It remains to express $(X^top S X)_(iota gamma)$ in terms of $(U^top [M_1, M_2] U)_(iota gamma)$.
+Writing $X = U Lambda^(1\/2)$ in the canonical gauge (where $U$ has orthonormal columns spanning $"col"(X)$ and $Lambda = "diag"(lambda_1, ..., lambda_d)$):
+$ X^top S X = Lambda^(1\/2) U^top S U Lambda^(1\/2) $
+so $(X^top S X)_(iota gamma) = sqrt(lambda_iota) (U^top S U)_(iota gamma) sqrt(lambda_gamma)$.
+Since $S = -[M_1, M_2]$:
+$ (X^top S X)_(iota gamma)^2 = lambda_iota lambda_gamma (U^top [M_1, M_2] U)_(iota gamma)^2 $
+
+Substituting:
+$ ||X Omega^*||^2 = 4 sum_(iota < gamma) (lambda_iota lambda_gamma) / (lambda_iota + lambda_gamma) [(U^top [M_1, M_2] U)_(iota gamma)]^2 $
+
+This is the formula stated in @prop:curvature-criterion.
+The $1 \/ (lambda_iota + lambda_gamma)$ weighting shows that curvature is amplified when both eigenvalues in a pair are small, matching the connection coefficient structure of the fiber bundle.
 
 
 = Extension to Directed Graphs <app:directed>
@@ -1602,43 +1741,9 @@ The equilibrium and Jacobian analysis shows oscillations are possible for approp
 For directed graphs, each node has source position $g_i$ and target position $r_i$.
 The probability matrix is $P = G R^top$ (not symmetric).
 
-*Gauge group:* $(G, R) ~ (G Q, R Q)$ for $Q in O(d)$.
+The gauge group becomes $(G, R) tilde (G Q, R Q)$ for $Q in O(d)$, and the invisible dynamics are $dot(G) = G A$, $dot(R) = R A$ with $A in so(d)$.
 
-*Invisible dynamics:* $dot(G) = G A$, $dot(R) = R A$ with $A in so(d)$.
-
-The gauge-consistent architecture becomes:
+The gauge-consistent architecture generalizes to:
 $ dot(G) = N_G (P) G, quad dot(R) = N_R (P) R $
-with appropriate symmetry constraints on $(N_G, N_R)$.
-
-
-= Riemannian Optimization on the Quotient Manifold <app:riemannian>
-
-This appendix provides computational details for optimization on the quotient $cal(B) = RR_*^(n times d) \/ O(d)$.
-
-== Riemannian gradient
-
-For a function $f: cal(B) -> RR$, the Riemannian gradient at $[X]$ is the horizontal lift of the Euclidean gradient:
-$ "grad"_cal(B) f = "proj"_(cal(H)_X) (nabla f) $
-where $"proj"_(cal(H)_X)(Z) = Z - X omega_X(Z)$ projects onto the horizontal space.
-
-== Retractions
-
-A retraction $R_X: T_X cal(B) -> cal(B)$ approximates the exponential map. Common choices:
-
-*QR-based:* For tangent vector $Z$, compute $X + Z = Q R$ (thin QR), return $[Q]$.
-
-*Metric projection:* Return $[U_d]$ where $X + Z = U_d Sigma V^top$ (truncated SVD).
-
-== Vector transport
-
-Approximate parallel transport for optimization: $T_(X -> Y)(Z) = "proj"_(cal(H)_Y)(Z)$.
-
-== Conjugate gradient on quotient
-
-Given $f: cal(B) -> RR$, the Riemannian CG iteration:
-+ Compute gradient $g_k = "grad" f(X_k)$
-+ Compute search direction $d_k = -g_k + beta_k T_(X_(k-1) -> X_k)(d_(k-1))$
-+ Line search: $alpha_k = arg min_alpha f(R_(X_k)(alpha d_k))$
-+ Update: $X_(k+1) = R_(X_k)(alpha_k d_k)$
-
-The coefficient $beta_k$ uses a transported version of Fletcher-Reeves or Polak-Ribière.
+with appropriate symmetry constraints on $(N_G, N_R)$ ensuring that the induced dynamics on $P = G R^top$ are well-defined.
+The fiber bundle framework carries over: the total space is pairs $(G, R) in RR_*^(n times d) times RR_*^(n times d)$, the structure group is $O(d)$ acting diagonally, and the connection, curvature, and holonomy theory applies with the same Lyapunov-type structures, though the asymmetry of $P$ introduces additional subtleties in the spectral decomposition.
