@@ -426,7 +426,7 @@ The *horizontal subspace* $cal(H)_X$ consists of directions transverse to the fi
 $ cal(H)_X = {Z in T_X cal(E) : X^top Z in "Sym"(d)} $
 
 Every tangent vector decomposes uniquely into vertical and horizontal parts:
-$ T_X cal(E) = cal(V)_X plus.o cal(H)_X $
+$ T_X cal(E) = cal(V)_X plus.circle cal(H)_X $
 
 #proposition(title: "Horizontal Characterization")[
   A tangent vector $dot(X) in T_X cal(E)$ is horizontal if and only if $X^top dot(X)$ is symmetric.
@@ -976,7 +976,7 @@ The vertical component thus vanishes if and only if $X^top [M_1, M_2] X = 0$ (th
 This is weaker than $[M_1, M_2] = 0$: the full $n times n$ commutator may be nonzero while its projection through $X$ vanishes.
 However, for generic trajectories with $n >> d$, if $[M_1, M_2] != 0$ then $X^top [M_1, M_2] X != 0$ as well, since the "blind spot" $"col"(X)^perp$ is a high-codimension subspace.
 
-Remembering @prop:curv-spectral-gap, by O'Neill's formula @oneill1966fundamental the sectional curvature of the 2-plane spanned by the projections of $overline(xi)_1, overline(xi)_2$ in $cal(B)$ is: $K(xi_1, xi_2) = 3/4 ||[overline(xi)_1, overline(xi)_2]^cal(V)||^2 slash (||overline(xi)_1||^2 ||overline(xi)_2||^2 - chevron.l overline(xi)_1, overline(xi)_2 chevron.r^2)$.
+Remembering @prop:curv-spectral-gap, by O'Neill's formula @oneill1966fundamental the sectional curvature of the 2-plane spanned by the projections of $overline(xi)_1, overline(xi)_2$ in $cal(B)$ is: $K(xi_1, xi_2) = 3/4 ||[overline(xi)_1, overline(xi)_2]^cal(V)||^2 slash (||overline(xi)_1||^2 ||overline(xi)_2||^2 - angle.l overline(xi)_1, overline(xi)_2 angle.r^2)$.
 The $1 \/ (lambda_iota + lambda_gamma)$ factors in $Omega^*$ connect the curvature directly to the connection coefficients of the fiber bundle: the same denominators that amplify gauge sensitivity also amplify the vertical bracket.
 
 Since $RR_*^(n times d)$ is flat (it is an open subset of Euclidean space), the base curvature arises *entirely* from the vertical bracket.
@@ -1477,29 +1477,7 @@ $ "err"(t) = 1/n ||hat(X)^((t)) hat(Q)^((t)) - X^((t)) Q^*||_F $
 where $Q^*$ is the best global alignment to the true trajectory (accounting for the residual gauge at $t = 0$).
 We also measure dynamics recovery by fitting the polynomial coefficients $(hat(alpha)_0, hat(alpha)_1)$ from the aligned trajectory and comparing to the true values.
 
-#figure(
-  image("plots/anchor-main-results.png", width: 95%),
-  caption: [
-    Anchor-based alignment experiment ($n = 200$, $d = 2$, polynomial dynamics $dot(X) = (alpha_0 I + alpha_1 P) X$ with $K = 3$ Bernoulli samples per time step).
-    *(a)* Alignment error vs.\ number of anchor nodes: below $n_a = d = 2$ (dashed vertical line) Procrustes is underdetermined and alignment fails; with sufficient anchors, error stabilizes at the ASE noise floor.
-    *(b)* Error accumulation over trajectory length: anchor-based alignment (blue) remains bounded while sequential Procrustes (coral, dashed) grows with $T$, consistent with $O(sqrt(T))$ drift accumulation.
-    *(c)* Effect of anchor drift rate $epsilon$: with larger $epsilon$, systematic bias from drifting anchors becomes visible.
-    *(d)* Per-timestep alignment error for the $T = 200$ trajectory: the anchor-based error (blue) remains approximately flat, while sequential Procrustes (coral) accumulates drift, with the gap widening toward later time steps.
-    Shaded bands show $plus.minus 1$ standard deviation across 20 Monte Carlo repetitions.
-  ],
-) <fig:anchor-main>
-
-#figure(
-  image("plots/anchor-spectral-portrait.png", width: 95%),
-  caption: [
-    *(a)* Alignment error as a function of the initial embedding norm scale (proxy for spectral gap $lambda_d$): smaller norms yield weaker spectral gaps, increasing ASE noise and degrading alignment for both methods; anchor-based alignment shows a slight advantage in the low spectral gap regime.
-    *(b)* Example phase portrait with $n_a = 15$ anchor nodes (red diamonds, stationary) and non-anchor nodes (gray trajectories evolving under polynomial dynamics).
-  ],
-) <fig:anchor-spectral>
-
-For dynamics recovery, we fit the polynomial coefficients from the gauge-free $P$-space estimator (@sec:constructive).
-Since $P = X X^top$ is rotation-invariant, this estimator does not require alignment and yields comparable estimates regardless of anchor count: with $n_a = 15$, we recover $(hat(alpha)_0, hat(alpha)_1) = (-0.250 plus.minus 0.008, 0.0024 plus.minus 0.0001)$ against true values $(-0.3, 0.003)$; with $n_a = 0$ the estimates are $(-0.282 plus.minus 0.008, 0.0028 plus.minus 0.0001)$.
-The modest bias reflects finite-sample ASE noise rather than gauge corruption, confirming that the $P$-based estimator is gauge-free by construction.
+// TODO: insert experimental results figure
 
 *Expected results.*
 We expect the following behavior:
