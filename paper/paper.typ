@@ -160,6 +160,17 @@ Joint embedding methods like UASE @gallagher2021spectral and Omnibus @levin2017c
 Bayesian approaches with hierarchical smoothness priors @loyal2025 produce smooth trajectories but lack *dynamical consistency*: they interpolate well but don't enforce that velocity depends on state according to $dot(X) = f(X)$.
 Pairwise Procrustes alignment is local and cannot ensure global consistency.
 
+A related strategy, pursued by Athreya, Lubberts, Park, and Priebe
+@athreya2024euclidean, avoids gauge freedom by defining a
+Procrustes-aligned distance $d_(M V)$ between network states at different
+times and using classical multidimensional scaling to extract a
+low-dimensional curve (the "mirror") that summarizes network evolution.
+Their $d_(M V)$ is gauge-invariant and can be consistently estimated from
+adjacency spectral embeddings. It is well suited to change-point detection
+and visualization, but captures the _distance_ between network states
+rather than the _differential equation_ governing their evolution, which
+is the target of the present paper.
+
 Our main contributions are theoretical.
 We develop a geometric framework based on principal fiber bundles that formalizes gauge freedom, realizability, and trajectory recovery as distinct but interrelated obstructions.
 We prove that random gauge artifacts introduce skew-symmetric contamination that cannot be absorbed by symmetric dynamics (@thm:gauge-contamination), establishing an identifiability principle.
@@ -928,6 +939,33 @@ Richer families quickly become underdetermined without strong structural assumpt
   The two perspectives are complementary: the algebraic result tells us what information is available; the geometric framework tells us what it costs to extract it.
 ]
 
+The Euclidean mirror of @athreya2024euclidean provides a concrete,
+estimable gauge-invariant trajectory summary. Their inter-time distance
+$ hat(d)_(M V)(hat(X)_t, hat(X)_(t')) = min_(W in O(d))
+  n^(-1\/2) ||hat(X)_t - hat(X)_(t') W||_2 $
+is a Procrustes distance on spectral embeddings. Like our Riemannian
+distance $d_(cal(B))([X],[Y]) = min_(Q in O(d)) ||X - Y Q||_F$, it
+quotients out the $O(d)$ gauge and yields a metric on the base space
+$cal(B)$. The two differ in their choice of norm: $d_(cal(B))$ uses the
+Frobenius norm (yielding the Riemannian submersion metric from which our
+connection and curvature derive), while $d_(M V)$ uses the spectral norm
+(measuring the worst-case directional variation, after the $1\/sqrt(n)$
+scaling). For $d = 1$ they coincide; for $d >= 2$ the minimizing
+rotations and the resulting distances are generally distinct.
+
+Despite this difference, the conceptual point is shared: both project
+from the total space to $cal(B)$ and thereby discard gauge.
+Athreya et al.~prove that $hat(d)_(M V)$ consistently estimates $d_(M V)$
+from adjacency spectral embeddings at rate $O(log(n) \/ sqrt(n))$
+(their Theorem 3), providing a concrete estimation guarantee for a
+gauge-invariant quantity. From the dynamics-learning perspective, however,
+any scalar inter-time distance (whether Frobenius- or spectral-norm-based)
+captures _how far_ $P$ has moved but not _how_: it does not recover
+the generator $N$ or the Lyapunov structure $dot(P) = N P + P N$.
+Extending the mirror's estimation guarantees from the scalar distance to
+the full matrix $dot(P)$ is an interesting open problem that would
+connect their framework to the Lyapunov inversion of
+@prop:lyapunov-invert.
 
 == Holonomy for horizontal dynamics families <sec:holonomy-dynamics>
 
@@ -1182,7 +1220,7 @@ For $dot(X) = alpha_0 X$ (single parameter), the eigenvalue dynamics are $dot(la
 The sensitivity is $partial lambda_iota \/ partial alpha_0 = 2 t lambda_iota (t)$, and therefore:
 $ (partial P_(i j))/(partial alpha_0) = 2 t sum_iota U_(i iota) lambda_iota (t) U_(j iota) = 2 t P_(i j)(t) $
 The Fisher information at a single snapshot $t$ is:
-$ cal(I)_t (alpha_0) = 4 t^2 sum_(i < j) P_(i j)(t)^2 / (P_(i j)(t)(1 - P_(i j)(t))) = 4 t^2 sum_(i < j) P_(i j)(t) / (1 - P_(i j)(t)) $
+$ cal(I)_t (alpha_0) = 4 t^2 sum_(i < j) (P_(i j)(t)^2) / (P_(i j)(t)(1 - P_(i j)(t))) = 4 t^2 sum_(i < j) (P_(i j)(t)) / (1 - P_(i j)(t)) $
 Summing over $T$ equally-spaced snapshots gives $cal(I)(alpha_0) = 4 sum_(t=1)^T t^2 sum_(i<j) P_(i j)(t) \/ (1 - P_(i j)(t))$, which scales as $O(T^3 dot n^2)$ when the edge probabilities are bounded away from 0 and 1.
 
 *Higher-degree terms and the spectral gap.*
@@ -1251,7 +1289,7 @@ For linear dynamics (single scalar parameter $alpha_0$), the Fisher information 
 
 #corollary(title: "Linear Dynamics: Explicit Fisher Information")[
   For linear dynamics $dot(X) = alpha_0 X$ with $T$ snapshots at times $t_1, ..., t_T$, the Fisher information is:
-  $ cal(I)(alpha_0) = 4 sum_(t=1)^T t^2 sum_(i < j) P_(i j)(t) / (1 - P_(i j)(t)) $
+  $ cal(I)(alpha_0) = 4 sum_(t=1)^T t^2 sum_(i < j) (P_(i j)(t)) / (1 - P_(i j)(t)) $
   This scales as $Theta(T^3 dot n^2)$ when edge probabilities remain bounded away from 0 and 1 throughout the trajectory, giving a Cramér-Rao lower bound of $Omega(1\/(T^3 n^2))$.
 ] <cor:linear-fisher>
 
@@ -1568,7 +1606,7 @@ To exercise the full trajectory-recovery $\to$ UDE pipeline, we now design dynam
 We generate an RDPG with $n = 200$ nodes in $d = 3$ latent dimensions, with $n_a = 100$ anchor nodes organized into $K_c = 3$ communities near the vertices of $B_+^3$ (at positions $(0.7, 0.2, 0.2)$, $(0.2, 0.7, 0.2)$, $(0.2, 0.2, 0.7)$ plus Gaussian noise).
 The 100 non-anchor nodes evolve under damped spiral dynamics around their community centroids $mu_k$:
 $ dot(x)_i = (-gamma + beta ||x_i - mu_k||^2)(x_i - mu_k) + omega J(x_i - mu_k) $
-where $J = 1/sqrt(3) mat(0, -1, 1; 1, 0, -1; -1, 1, 0)$ is the rotation generator around the $(1,1,1)/sqrt(3)$ axis, and $(gamma, beta, omega) = (0.3, -0.5, 1.0)$.
+where $J = 1/sqrt(3) mat(0, -1, 1; 1, 0, -1; -1, 1, 0)$ is the rotation generator around the $(\(1,1,1\))/sqrt(3)$ axis, and $(gamma, beta, omega) = (0.3, -0.5, 1.0)$.
 These dynamics are _not_ gauge-equivariant: the centroids $mu_k$ and rotation axis live in $X$-space coordinates, so a misaligned trajectory $tilde(X)(t)$ produces different offsets $tilde(x)_i - mu_k != x_i - mu_k$, corrupting the dynamics structure.
 
 We observe $m = 10$ independent adjacency matrices per time step over $T = 50$ steps at $delta t = 0.1$, compute ASE embeddings, and apply three alignment conditions: anchor-based Procrustes, sequential Procrustes, and no alignment (raw ASE with random per-frame rotations).
@@ -1593,7 +1631,7 @@ This metric is intentionally invariant to how the model splits responsibility be
 #figure(
   image("plots/ude-pipeline-results.png", width: 95%),
   caption: [
-    UDE pipeline experiment ($n = 200$, $d = 3$, damped spiral dynamics with rotation around $(1,1,1)/sqrt(3)$, $m = 10$ Bernoulli samples per frame).
+    UDE pipeline experiment ($n = 200$, $d = 3$, damped spiral dynamics with rotation around $(\(1,1,1\))/sqrt(3)$, $m = 10$ Bernoulli samples per frame).
     *(a)* True trajectories (gray) and anchor-aligned ASE (blue) in $B_+^3$; anchor nodes shown as red diamonds.
     *(b)* Learned NN residual $f_theta(delta)$ vs.\ true residual $f_u(delta)$: anchor-aligned data (left) produces tight agreement along the diagonal; sequential Procrustes (center) and unaligned data (right) degrade progressively.
     *(c)* Symbolic regression Pareto fronts (loss vs.\ expression complexity): anchor-aligned data achieves $1$--$2$ orders of magnitude lower loss at each complexity level.
@@ -1648,7 +1686,20 @@ Finite-sample spectral bias and noise interact with alignment; expressive dynami
 Bridging this gap seems to be the central open problem. In particular, we want to characterize when structure-constrained alignment is stable, and when it is doomed.
 
 *Concrete directions that seem worth the effort.*
-1. *Work in $P$-space when you can.* The $P$-dynamics viewpoint (@sec:p-dynamics) bypasses gauge in principle, but we lack an estimation theory for recovering $dot(P)$ and inverting the Lyapunov structure from Bernoulli samples. The $1\/(lambda_iota + lambda_gamma)$ amplification suggests minimax rates will depend sharply on the spectral gap; pinning this down would tell us whether $P$-level inference is practically viable.
+1. *Work in $P$-space when you can.* The $P$-dynamics viewpoint
+(@sec:p-dynamics) bypasses gauge in principle. The Euclidean mirror
+framework of @athreya2024euclidean demonstrates that a gauge-invariant
+scalar summary of the $P$-trajectory (the spectral-norm Procrustes
+distance between network states) can be consistently estimated and is
+practically useful for change-point detection. But dynamics learning
+requires the full matrix $dot(P)$, not just the scalar inter-time
+distance. We lack an estimation theory for recovering $dot(P)$ and
+inverting the Lyapunov structure from Bernoulli samples. The
+$1\/(lambda_iota + lambda_gamma)$ amplification suggests minimax rates
+will depend sharply on the spectral gap; pinning this down would clarify
+whether $P$-level dynamics inference is practically viable, and whether
+the mirror's estimation guarantees can be extended to the richer
+differential structure needed.
 2. *Quantify holonomy, not just its existence.* Beyond generic nontriviality, we want trajectory-dependent "holonomy budgets": how much gauge drift should we expect over a cycle as a function of curvature and how close the trajectory gets to rank-deficiency?
 3. *Achievability of the CRB.* For polynomial dynamics (trivial holonomy, explicit eigenvalue ODEs), a matching upper bound via likelihood-based estimators on the $P$-trajectory looks plausible. For Laplacian dynamics, holonomy suggests that achieving the CRB may require estimators that explicitly account for gauge transport.
 4. *Sparsity changes everything.* In the sparse regime $P = rho_n X X^top$ with $rho_n -> 0$, injectivity shrinks and curvature and ASE error deteriorate. The combined effect on dynamics recovery is largely unexplored.
@@ -1717,7 +1768,7 @@ $ mu(cal(M)_cal(F)) <= (L_* mu)(L(cal(M)_cal(F))) = 0$. $square$
 For linear dynamics $dot(X) = alpha_0 X$, the solution is $X(t) = e^(alpha_0 t) X(0)$, giving $P(t) = e^(2 alpha_0 t) P(0)$.
 The sensitivity is $partial P_(i j)(t) \/ partial alpha_0 = 2t e^(2 alpha_0 t) P_(i j)(0) = 2t P_(i j)(t)$.
 Since there is a single scalar parameter, the Fisher information is:
-$ cal(I)(alpha_0) = sum_(t=1)^T sum_(i < j) ((partial P_(i j)(t)) / (partial alpha_0))^2 dot 1 / (P_(i j)(t)(1 - P_(i j)(t))) = 4 sum_(t=1)^T t^2 sum_(i < j) P_(i j)(t) / (1 - P_(i j)(t)) $
+$ cal(I)(alpha_0) = sum_(t=1)^T sum_(i < j) ((partial P_(i j)(t)) / (partial alpha_0))^2 dot 1 / (P_(i j)(t)(1 - P_(i j)(t))) = 4 sum_(t=1)^T t^2 sum_(i < j) (P_(i j)(t)) / (1 - P_(i j)(t)) $
 For the scaling claim: when $P_(i j)(t) in [epsilon, 1 - epsilon]$ for some $epsilon > 0$, the inner sum $sum_(i < j) P_(i j) \/ (1 - P_(i j))$ is $Theta(n^2)$ (there are $binom(n, 2)$ terms, each bounded away from zero and infinity).
 The outer sum $sum_(t=1)^T t^2 = T(T+1)(2T+1)\/6 = Theta(T^3)$.
 Therefore $cal(I)(alpha_0) = Theta(T^3 dot n^2)$, giving a Cramér-Rao lower bound $"Var"(hat(alpha)_0) >= cal(I)^(-1) = Omega(1\/(T^3 n^2))$. $square$
