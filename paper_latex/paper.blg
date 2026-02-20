@@ -1,0 +1,51 @@
+This is BibTeX, Version 0.99d (TeX Live 2022/dev/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: paper.aux
+The style file: ieeetr.bst
+Database file #1: bibliography.bib
+Warning--entry type for "symbolicregression" isn't style-file defined
+--line 161 of file bibliography.bib
+Warning--empty booktitle in journee2010low
+Warning--can't use both volume and number fields in journee2010low
+You've used 28 entries,
+            1876 wiz_defined-function locations,
+            649 strings with 9351 characters,
+and the built_in function-call counts, 8686 in all, are:
+= -- 861
+> -- 377
+< -- 0
++ -- 136
+- -- 108
+* -- 652
+:= -- 1221
+add.period$ -- 30
+call.type$ -- 28
+change.case$ -- 26
+chr.to.int$ -- 0
+cite$ -- 30
+duplicate$ -- 423
+empty$ -- 778
+format.name$ -- 108
+if$ -- 2093
+int.to.chr$ -- 0
+int.to.str$ -- 28
+missing$ -- 29
+newline$ -- 89
+num.names$ -- 28
+pop$ -- 80
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 308
+stack$ -- 0
+substring$ -- 662
+swap$ -- 192
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 2
+while$ -- 85
+width$ -- 30
+write$ -- 281
+(There were 3 warnings)

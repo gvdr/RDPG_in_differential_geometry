@@ -1,0 +1,148 @@
+\begin{thebibliography}{10}
+
+\bibitem{poisot2015species}
+T.~Poisot, D.~B. Stouffer, and D.~Gravel, ``Beyond species: why ecological
+  interaction networks vary through space and time,'' {\em Oikos}, vol.~124,
+  no.~3, pp.~243--251, 2015.
+
+\bibitem{dallariva2016exploring}
+G.~V. Dalla~Riva and D.~B. Stouffer, ``Exploring the evolutionary signature of
+  food webs' backbones using functional traits,'' {\em Oikos}, vol.~125, no.~4,
+  pp.~446--456, 2016.
+
+\bibitem{strydom2022food}
+T.~Strydom, S.~Bouskila, F.~Banville, C.~Barros, D.~Caron, M.~J. Farrell, M.-J.
+  Fortin, V.~Hemming, B.~Mercier, L.~J. Pollock, R.~Runghen, G.~V. Dalla~Riva,
+  and T.~Poisot, ``Food web reconstruction through phylogenetic transfer of
+  low-rank network representation,'' {\em Methods in Ecology and Evolution},
+  vol.~13, no.~12, pp.~2838--2849, 2022.
+
+\bibitem{athreya2017statistical}
+A.~Athreya, D.~E. Fishkind, M.~Tang, C.~E. Priebe, Y.~Park, J.~T. Vogelstein,
+  K.~Levin, V.~Lyzinski, Y.~Qin, and D.~L. Sussman, ``Statistical inference on
+  random dot product graphs: a survey,'' {\em The Journal of Machine Learning
+  Research}, vol.~18, no.~1, pp.~8393--8484, 2018.
+
+\bibitem{young2007random}
+S.~J. Young and E.~R. Scheinerman, ``Random dot product graph models for social
+  networks,'' in {\em Algorithms and Models for the Web-Graph: 5th
+  International Workshop, WAW 2007}, pp.~138--149, Springer, 2007.
+
+\bibitem{gallagher2021spectral}
+I.~Gallagher, A.~Jones, and P.~Rubin-Delanchy, ``Spectral embedding for dynamic
+  networks with stability guarantees,'' in {\em Advances in Neural Information
+  Processing Systems}, vol.~34, pp.~10158--10170, 2021.
+
+\bibitem{levin2017central}
+K.~Levin, A.~Athreya, M.~Tang, V.~Lyzinski, Y.~Park, and C.~E. Priebe, ``A
+  central limit theorem for an omnibus embedding of multiple random graphs and
+  implications for multiscale network inference,'' {\em arXiv preprint
+  arXiv:1705.09355}, 2017.
+
+\bibitem{loyal2025}
+J.~D. Loyal, ``Bayesian inference for generalized random dot product graphs
+  with scaled mixtures of normals,'' {\em arXiv preprint arXiv:2509.19748},
+  2025.
+
+\bibitem{athreya2024euclidean}
+A.~Athreya, Z.~Lubberts, Y.~Park, and C.~E. Priebe, ``Euclidean mirrors and
+  dynamics in network time series,'' {\em Journal of the American Statistical
+  Association}, vol.~120, no.~550, pp.~1025--1036, 2025.
+
+\bibitem{athreya2016limit}
+A.~Athreya, C.~E. Priebe, M.~Tang, V.~Lyzinski, D.~J. Marchette, and D.~L.
+  Sussman, ``A limit theorem for scaled eigenvectors of random dot product
+  graphs,'' {\em Sankhya A}, vol.~78, no.~1, pp.~1--18, 2016.
+
+\bibitem{rubindelanchy2022statistical}
+P.~Rubin-Delanchy, J.~Cape, M.~Tang, and C.~E. Priebe, ``A statistical
+  interpretation of spectral embedding: the generalised random dot product
+  graph,'' {\em Journal of the Royal Statistical Society: Series B}, vol.~84,
+  no.~4, pp.~1446--1473, 2022.
+
+\bibitem{cape2019two}
+J.~Cape, M.~Tang, and C.~E. Priebe, ``The two-to-infinity norm and singular
+  subspace geometry with applications to high-dimensional statistics,'' {\em
+  The Annals of Statistics}, vol.~47, no.~5, pp.~2405--2439, 2019.
+
+\bibitem{xie2021efficient}
+F.~Xie and Y.~Xu, ``Efficient estimation for random dot product graphs via a
+  one-step procedure,'' {\em Journal of the American Statistical Association},
+  vol.~118, no.~541, pp.~651--664, 2023.
+
+\bibitem{tang2022efficient}
+M.~Tang, J.~Cape, and C.~E. Priebe, ``Asymptotically efficient estimators for
+  stochastic blockmodels: the naive {MLE}, the rank-constrained {MLE}, and the
+  spectral estimator,'' {\em Bernoulli}, vol.~28, no.~2, pp.~1049--1073, 2022.
+
+\bibitem{tang2018eigenvalues}
+M.~Tang, J.~Cape, and C.~E. Priebe, ``The eigenvalues of stochastic blockmodel
+  graphs,'' {\em arXiv preprint arXiv:1803.11551}, 2018.
+
+\bibitem{absil2008optimization}
+P.-A. Absil, R.~Mahony, and R.~Sepulchre, {\em Optimization Algorithms on
+  Matrix Manifolds}.
+\newblock Princeton University Press, 2008.
+
+\bibitem{journee2010low}
+M.~Journ{\'e}e, F.~Bach, P.-A. Absil, and R.~Sepulchre, ``Low-rank optimization
+  on the cone of positive semidefinite matrices,'' vol.~20, pp.~2327--2351,
+  SIAM, 2010.
+
+\bibitem{massart2020quotient}
+E.~Massart and P.-A. Absil, ``Quotient geometry with simple geodesics for the
+  manifold of fixed-rank positive-semidefinite matrices,'' {\em SIAM Journal on
+  Matrix Analysis and Applications}, vol.~41, no.~1, pp.~171--198, 2020.
+
+\bibitem{massart2019curvature}
+E.~Massart, J.~M. Hendrickx, and P.-A. Absil, ``Curvature of the manifold of
+  fixed-rank positive-semidefinite matrices endowed with the
+  {Bures--Wasserstein} metric,'' in {\em Geometric Science of Information (GSI
+  2019)}, vol.~11712 of {\em Lecture Notes in Computer Science}, pp.~739--748,
+  Springer, 2019.
+
+\bibitem{kobayashi1963foundations}
+S.~Kobayashi and K.~Nomizu, {\em Foundations of Differential Geometry}, vol.~1.
+\newblock Wiley, 1963.
+
+\bibitem{oneill1966fundamental}
+B.~O'Neill, ``The fundamental equations of a submersion,'' {\em Michigan
+  Mathematical Journal}, vol.~13, no.~4, pp.~459--469, 1966.
+
+\bibitem{arroyo2021inference}
+J.~Arroyo, A.~Athreya, J.~Cape, G.~Chen, C.~E. Priebe, and J.~T. Vogelstein,
+  ``Inference for multiple heterogeneous networks with a common invariant
+  subspace,'' {\em Journal of Machine Learning Research}, vol.~22, no.~142,
+  pp.~1--49, 2021.
+
+\bibitem{heinonen2018learning}
+M.~Heinonen, C.~Yildiz, H.~Mannerstr{\"o}m, J.~Intosalmi, and
+  H.~L{\"a}hdesm{\"a}ki, ``Learning unknown ode models with gaussian
+  processes,'' {\em International Conference on Machine Learning},
+  pp.~1959--1968, 2018.
+
+\bibitem{freidlin1998random}
+M.~I. Freidlin and A.~D. Wentzell, ``Random perturbations of dynamical
+  systems,'' {\em Grundlehren der mathematischen Wissenschaften}, vol.~260,
+  1998.
+
+\bibitem{xie2020optimal}
+F.~Xie and Y.~Xu, ``Optimal {B}ayesian estimation for random dot product
+  graphs,'' {\em Biometrika}, vol.~107, no.~4, pp.~875--889, 2020.
+
+\bibitem{agterberg2023minimax}
+J.~Agterberg, Q.~Yan, and K.~Levin, ``Minimax rates for latent position
+  estimation in the generalized random dot product graph,'' {\em arXiv preprint
+  arXiv:2307.01942}, 2023.
+
+\bibitem{rackauckas2020universal}
+C.~Rackauckas, Y.~Ma, J.~Martensen, C.~Warner, K.~Zubov, R.~Supekar,
+  D.~Skinner, A.~Ramadhan, and A.~Edelman, ``Universal differential equations
+  for scientific machine learning,'' {\em arXiv preprint arXiv:2001.04385},
+  2020.
+
+\bibitem{symbolicregression}
+M.~Cranmer, ``{SymbolicRegression.jl}: Distributed high-performance symbolic
+  regression in julia,'' 2023.
+
+\end{thebibliography}
