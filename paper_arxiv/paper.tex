@@ -29,6 +29,10 @@
 \DeclareMathOperator{\sym}{sym}
 \DeclareMathOperator{\skewop}{skew}
 \DeclareMathOperator{\im}{im}
+\DeclareMathOperator{\Hol}{Hol}
+\DeclareMathOperator{\Lie}{Lie}
+\DeclareMathOperator{\Ad}{Ad}
+\DeclareMathOperator{\spn}{span}
 
 %%% Cleveref names %%%
 \crefname{theorem}{Theorem}{Theorems}
@@ -73,11 +77,12 @@
 \begin{abstract}
 Across ecology, history, economics, social behavior, cultural dynamics, and more, many phenomena can be described in terms of entities establishing and disestablishing interactions with each other. These scenarios are commonly represented mathematically as temporal networks, and the time evolution of these objects is studied as a time series with the goal of predicting future network states. Here, instead, we take a dynamical systems perspective: when the goal is to understand \emph{why} networks evolve as they do, can we learn the differential equations that govern them?
 We investigate this question within the framework of Random Dot Product Graphs (RDPGs), where each network snapshot is generated from latent positions evolving under unknown dynamics. We identify three fundamental obstructions to recovering these dynamics: gauge freedom from the rotational ambiguity in latent positions, realizability constraints from the manifold structure of the probability matrix, and the trajectory recovery problem arising from spectral embedding artifacts.
-We develop a geometric framework based on principal fiber bundles that formalizes these obstructions and reveals their interplay. A sharp holonomy dichotomy emerges: polynomial dynamics have trivial holonomy, making gauge alignment purely statistical, while Laplacian dynamics generically produce nontrivial holonomy (proven to be full $\mathrm{SO}(2)$ for $d = 2$, conjectured $\mathrm{SO}(d)$ for $d \ge 3$), adding a topological obstruction. Cram\'er--Rao lower bounds show that the spectral gap controlling geometric difficulty simultaneously controls statistical difficulty, an inextricable duality.
+We develop a geometric framework based on principal fiber bundles that formalizes these obstructions and reveals their interplay. For horizontal families, polynomial dynamics have trivial holonomy, while Laplacian dynamics satisfy an explicit non-commutativity criterion for nontrivial holonomy; in $d = 2$ this yields full restricted holonomy $\mathrm{SO}(2)$, in general $d$ we provide a conditional full-holonomy criterion, and for $d \ge 3$ the generic full $\mathrm{SO}(d)$ statement remains conjectural. Cram\'er--Rao lower bounds show that the spectral gap controlling geometric difficulty simultaneously controls statistical difficulty, an inextricable duality.
 We establish an identifiability principle stating that symmetric dynamics cannot absorb skew-symmetric gauge contamination. Yet, we show that significant practical obstacles remain in finite samples. We frame the gap between identifiability and practical recovery as an open challenge and discuss directions for progress.
 \end{abstract}
 
 \keywords{random dot product graphs \and spectral embedding \and dynamical systems \and principal fiber bundles \and gauge freedom}
+
 \section{Introduction}\label{sec:intro}
 
 Temporal networks are networks whose edges and nodes change over time. They appear throughout science, from ecological food webs that vary across space and time~\citep{poisot2015species} to neural connectomes that rewire during development.
@@ -115,7 +120,7 @@ Their $d_{MV}$ is gauge-invariant and can be consistently estimated from adjacen
 Our main contributions are theoretical.
 We develop a geometric framework based on principal fiber bundles that formalizes gauge freedom, realizability, and trajectory recovery as distinct but interrelated obstructions.
 We prove that random gauge artifacts introduce skew-symmetric contamination that cannot be absorbed by symmetric dynamics (\cref{thm:gauge-contamination}), establishing an identifiability principle.
-We establish a holonomy dichotomy among horizontal dynamics families: polynomial dynamics have commuting generators and trivial holonomy, so gauge alignment is purely a statistical problem; Laplacian dynamics generically produce nontrivial holonomy (full $\mathrm{SO}(2)$ for $d = 2$; conjectured $\mathrm{SO}(d)$ for $d \ge 3$), adding a topological obstruction on top of the statistical one.
+We establish a concrete contrast among horizontal dynamics families: polynomial dynamics have commuting generators and trivial holonomy, so gauge alignment is purely a statistical problem; for Laplacian dynamics, we prove a local commutator criterion for nontrivial holonomy and a full restricted $\mathrm{SO}(2)$ consequence in dimension $d = 2$, provide a conditional full-holonomy criterion in general $d$, and leave generic full $\mathrm{SO}(d)$ for $d \ge 3$ as a conjecture.
 We derive Cram\'er--Rao lower bounds showing that the spectral gap controlling curvature simultaneously controls Fisher information, so geometric and statistical difficulty are inextricable.
 However, we show that exploiting these structures in practice faces fundamental difficulties: the bias induced by finite samples and the expressiveness of natural dynamics families make the constructive problem substantially harder than the identifiability theory suggests.
 We frame the gap between identifiability and practical recovery as an open problem and discuss directions for progress.
@@ -124,7 +129,7 @@ We frame the gap between identifiability and practical recovery as an open probl
 \Cref{sec:rdpg} reviews RDPG fundamentals.
 \Cref{sec:obstructions} develops the geometric framework: gauge freedom, realizability, and the fiber bundle perspective with connections, curvature, and holonomy.
 \Cref{sec:trajectory-problem} addresses the practical problem of recovering trajectories from spectral embeddings, showing why existing methods fail and motivating the need for dynamics-aware approaches.
-\Cref{sec:dynamics} catalogs concrete dynamics families, analyzes their observable consequences through the Lyapunov equation, and establishes the holonomy dichotomy.
+\Cref{sec:dynamics} catalogs concrete dynamics families, analyzes their observable consequences through the Lyapunov equation, and formalizes the polynomial-vs-Laplacian holonomy contrast with explicit proved/conditional/conjectural status.
 \Cref{sec:info-theoretic} derives information-theoretic lower bounds revealing the statistical-geometric duality.
 \Cref{sec:constructive} discusses the constructive problem: the identifiability principle, its algorithmic implications, the practical obstacles that remain, and a tractable special case using anchor nodes, illustrated with numerical experiments.
 \Cref{sec:discussion} reflects on achievements and open problems.
@@ -139,6 +144,38 @@ $\|\cdot\|_F$ is the Frobenius norm; $\|M\|_{2 \to \infty} = \max_i \|e_i^\top M
 $O_p(\cdot)$ denotes stochastic order: $Y_n = O_p(a_n)$ means $Y_n / a_n$ is bounded in probability.
 $\Sym(d)$ denotes $d \times d$ symmetric matrices.
 Indices $i, j$ refer to nodes; indices $\iota, \gamma$ refer to eigenvector directions when working in a spectral basis.
+
+\textbf{Standing assumptions (default throughout).}
+Unless a result states otherwise, we work under:
+\begin{enumerate}
+\item[\textbf{(S1)}] fixed dimensions with $n \ge d \ge 2$;
+\item[\textbf{(S2)}] trajectories on a time interval where $X(t)$ remains in the interior of $\mathcal{E}$ (hence $\rank(X(t)) = d$ and $0 < P_{ij}(t) < 1$);
+\item[\textbf{(S3)}] sufficient smoothness of trajectories/fields for the stated derivatives and Lie brackets;
+\item[\textbf{(S4)}] for statistical bounds, the regularity assumptions are those listed in \cref{prop:cramer-rao}.
+\end{enumerate}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Result} & \textbf{Status} & \textbf{Scope} \\
+\midrule
+\Cref{thm:invisible} & Proved & Full-rank latent states \\
+\Cref{prop:curvature-criterion} & Proved & Horizontal symmetric families \\
+\Cref{prop:laplacian-holonomy} & Proved & Local nonzero commutator criterion \\
+\Cref{cor:linear-fisher} & Proved & Linear dynamics \\
+\Cref{prop:cramer-rao} & Proved & Polynomial dynamics + regularity assumptions \\
+\Cref{thm:gauge-contamination} & Proved & Symmetric-generator identifiability \\
+Full restricted holonomy via curvature span & Conditional theorem & Requires curvature-span hypothesis \\
+Finite-time rank criterion at base point & Conditional proposition & Sufficient condition for full restricted holonomy \\
+\Cref{conj:full-holonomy} & Conjecture & $d \ge 3$ generic full holonomy \\
+\bottomrule
+\end{tabular}
+\caption{Result status map: proved results vs conditional criteria vs conjecture.}
+\label{tab:result-status}
+\end{table}
+
+We use \cref{tab:result-status} as the authoritative status legend for theorem claims throughout the manuscript.
 
 
 \section{Random Dot Product Graphs}\label{sec:rdpg}
@@ -210,6 +247,10 @@ This bias is negligible relative to the leading eigenvalue ($\lambda_1 \sim n$),
 The orthogonal matrix $Q$ reflects the fundamental gauge ambiguity: eigenvectors are determined only up to sign, and rotations within repeated eigenspaces are arbitrary.
 This ambiguity is unavoidable and is the source of the trajectory estimation problem discussed in \cref{sec:trajectory-problem}.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% SECTION 3: THE GAUGE OBSTRUCTION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{The Gauge Obstruction}\label{sec:obstructions}
 
@@ -452,6 +493,8 @@ Thus $X^\top \dot{X}$ is symmetric iff $\Omega = 0$ iff $\dot{X}$ is purely hori
 
 The horizontal condition $X^\top \dot{X} \in \Sym(d)$ is a \textbf{gauge-fixing condition}: it picks out, among all ways to move in $\mathcal{E}$, the ones with no ``wasted motion'' along the fiber.
 
+%% PLACEHOLDER: sections 3.3.5 through end will be appended
+%% paper_part2.tex — continuation from the connection 1-form onward
 
 \subsubsection{The connection 1-form: extracting gauge components}
 
@@ -519,24 +562,24 @@ The difficulty is that in practice we observe noisy adjacency matrices, not $P(t
 
 \textbf{Computing horizontal lifts.}
 The horizontal lift formula connects directly to the block decomposition of \cref{prop:tangent}.
-Let $P = V\Lambda V^\top$ where $V \in \RR^{n \times d}$ has orthonormal columns and $\Lambda = \diag(\lambda_1, \ldots, \lambda_d)$ with $\lambda_\iota > 0$.
-A natural lift is $X = V\Lambda^{1/2}$, giving $X^\top X = \Lambda$.
+Let $P = V \Lambda V^\top$ where $V \in \RR^{n \times d}$ has orthonormal columns and $\Lambda = \diag(\lambda_1, \ldots, \lambda_d)$ with $\lambda_\iota > 0$.
+A natural lift is $X = V \Lambda^{1/2}$, giving $X^\top X = \Lambda$.
 
 Given realizable $\dot{P}$, the block decomposition yields:
 \begin{equation}
-\dot{P} = VAV^\top + VBV_\perp^\top + V_\perp B^\top V^\top
+\dot{P} = V A V^\top + V B V_\perp^\top + V_\perp B^\top V^\top
 \end{equation}
 where $A = V^\top \dot{P} V$ (symmetric, $d \times d$) and $B = V^\top \dot{P} V_\perp$ (the cross term).
 
-We seek the horizontal lift $\dot{X} = VS + V_\perp T$ satisfying:
+We seek the horizontal lift $\dot{X} = V S + V_\perp T$ satisfying:
 \begin{enumerate}
-\item \textbf{Projection}: $\dot{P} = \dot{X} X^\top + X \dot{X}^\top$
-\item \textbf{Horizontality}: $X^\top \dot{X} = \Lambda^{1/2} S$ is symmetric
+\item \emph{Projection}: $\dot{P} = \dot{X} X^\top + X \dot{X}^\top$
+\item \emph{Horizontality}: $X^\top \dot{X} = \Lambda^{1/2} S$ is symmetric
 \end{enumerate}
 
 From the projection condition, matching blocks:
 \begin{itemize}
-\item Range-range: $A = S\Lambda^{1/2} + \Lambda^{1/2} S^\top$
+\item Range-range: $A = S \Lambda^{1/2} + \Lambda^{1/2} S^\top$
 \item Cross terms: $B = T^\top \Lambda^{1/2}$, giving $T = B^\top \Lambda^{-1/2}$
 \end{itemize}
 
@@ -546,34 +589,35 @@ Substituting into the range-range equation and setting $\tilde{\Sigma} = \Lambda
 \Lambda \tilde{\Sigma} + \tilde{\Sigma} \Lambda = A
 \end{equation}
 
-A small notational point: $A = V^\top \dot{P} V$ is already the range-range block expressed in the eigenbasis of $P = V\Lambda V^\top$. That is why the right-hand side is simply $A$, with no additional conjugation by powers of $\Lambda$.
+A small notational point: $A = V^\top \dot{P} V$ is already the range-range block expressed in the eigenbasis of $P = V \Lambda V^\top$. That is why the right-hand side is simply $A$, with no additional conjugation by powers of $\Lambda$.
 
 This is the same Lyapunov structure as in the connection 1-form above. And not coincidentally: both of them involve separating gauge from observable components. The following formula is essentially the horizontal projection of \citet{absil2008optimization} and \citet{massart2020quotient}, specialized to the spectral decomposition of $P$.
 
 \begin{proposition}[Horizontal Lift Formula]
-Given $P = V\Lambda V^\top$ and realizable $\dot{P}$ with blocks $A = V^\top \dot{P} V$ and $B = V^\top \dot{P} V_\perp$, the horizontal lift at $X = V\Lambda^{1/2}$ is:
+Given $P = V \Lambda V^\top$ and realizable $\dot{P}$ with blocks $A = V^\top \dot{P} V$ and $B = V^\top \dot{P} V_\perp$, the horizontal lift at $X = V \Lambda^{1/2}$ is:
 \begin{equation}
-\dot{X} = V\tilde{\Sigma}\Lambda^{1/2} + V_\perp B^\top \Lambda^{-1/2}
+\dot{X} = V \tilde{\Sigma} \Lambda^{1/2} + V_\perp B^\top \Lambda^{-1/2}
 \end{equation}
-where $\tilde{\Sigma}$ is the symmetric solution to \eqref{eq:horizontal-lift-lyapunov}, given elementwise by:
+where $\tilde{\Sigma}$ is the symmetric solution to \cref{eq:horizontal-lift-lyapunov}, given elementwise by:
 \begin{equation}
 \tilde{\Sigma}_{\iota\gamma} = \frac{A_{\iota\gamma}}{\lambda_\iota + \lambda_\gamma}
 \end{equation}
 \end{proposition}
 
 \begin{proof}
-The derivation above (\eqref{eq:horizontal-lift-lyapunov} and the preceding block algebra) constructs $\dot{X}$ satisfying both the projection condition $\dot{P} = \dot{X} X^\top + X \dot{X}^\top$ and the horizontality condition $X^\top \dot{X}$ symmetric.
+The derivation above (\cref{eq:horizontal-lift-lyapunov} and the preceding block algebra) constructs $\dot{X}$ satisfying both the projection condition $\dot{P} = \dot{X} X^\top + X \dot{X}^\top$ and the horizontality condition $X^\top \dot{X}$ symmetric.
 The Lyapunov equation has a unique symmetric solution because $\lambda_\iota + \lambda_\gamma > 0$ for all $\iota, \gamma$.
 \end{proof}
 
 The formula reveals two contributions to horizontal motion:
 \begin{itemize}
-\item The first term $V\tilde{\Sigma}\Lambda^{1/2}$ handles motion within the current column space of $X$, determined by the range-range block $A$ via a Lyapunov equation
+\item The first term $V \tilde{\Sigma} \Lambda^{1/2}$ handles motion within the current column space of $X$, determined by the range-range block $A$ via a Lyapunov equation
 \item The second term $V_\perp B^\top \Lambda^{-1/2}$ handles motion expanding into new directions, determined directly by the cross block $B$
 \end{itemize}
 
 In practice, computing horizontal lifts from discrete noisy observations requires interpolation and ODE integration.
 We discuss in \cref{sec:constructive} how discrete Procrustes alignment approximates horizontal transport.
+
 
 \subsubsection{Curvature and holonomy}
 
@@ -595,7 +639,7 @@ This has a striking consequence for closed loops:
 
 \begin{definition}[Holonomy]
 Let $\gamma: [0,1] \to \mathcal{B}$ be a closed curve with $\gamma(0) = \gamma(1) = P$.
-The horizontal lift starting at $X$ ends at $XQ_\gamma$ for some $Q_\gamma \in O(d)$.
+The horizontal lift starting at $X$ ends at $X Q_\gamma$ for some $Q_\gamma \in O(d)$.
 The \textbf{holonomy} of $\gamma$ is this accumulated rotation $Q_\gamma$.
 \end{definition}
 
@@ -608,13 +652,13 @@ If the curvature is nonzero, then the restricted holonomy group is nontrivial. I
 The result implies that, if the true dynamics $P(t)$ trace a closed loop (periodic network behavior), the underlying $X(t)$ may not close on itself. Instead, it returns rotated by the holonomy.
 This is a fundamental obstruction: even perfect local alignment accumulates global gauge drift over cycles.
 
-We can connect the holonomy obstruction to spectral properties of the (observed) graphs: the curvature of $\mathcal{B}$ depends on the eigenvalues of $P = XX^\top$. Since the nonzero eigenvalues of $P$ are exactly those of $X^\top X$ (the Gram matrix of the latent positions), small $\lambda_d$ arises in several common scenarios.
+We can connect the holonomy obstruction to spectral properties of the (observed) graphs: the curvature of $\mathcal{B}$ depends on the eigenvalues of $P = X X^\top$. Since the nonzero eigenvalues of $P$ are exactly those of $X^\top X$ (the Gram matrix of the latent positions), small $\lambda_d$ arises in several common scenarios.
 
 \begin{remark}
 \textbf{When the spectral gap is small (examples).} Small $\lambda_d$ occurs, for example, when:
 \begin{itemize}
 \item \emph{Latent positions cluster in a lower-dimensional subspace:} if nodes' positions are nearly coplanar in $\RR^d$, the columns of $X$ become nearly linearly dependent.
-\item \emph{Stochastic block models with weak community structure:} for SBM with $X = ZB^{1/2}$ (membership $Z$, block matrix $B$), the spectral gap of $P$ reflects that of $B$. When communities are hard to distinguish, $\lambda_d$ is small.
+\item \emph{Stochastic block models with weak community structure:} for SBM with $X = Z B^{1/2}$ (membership $Z$, block matrix $B$), the spectral gap of $P$ reflects that of $B$. When communities are hard to distinguish, $\lambda_d$ is small.
 \item \emph{Sparse networks:} if all entries of $X$ scale as $\rho_n \to 0$ (sparsity parameter), then $\lambda_d \sim \rho_n^2 \to 0$.
 \end{itemize}
 \end{remark}
@@ -623,11 +667,11 @@ This matters doubly: not only do geometric obstructions worsen as $\lambda_d \to
 Configurations with small spectral gap are thus problematic both statistically (harder to estimate) and geometrically (harder to track gauges). We emphasize this expectation-setting point here because it will reappear later: in \cref{sec:dynamics} and \cref{sec:info-theoretic}, the same spectral quantities controlling curvature and injectivity also control estimation error and Fisher information.
 
 \begin{proposition}[Curvature and Spectral Gap]\label{prop:curv-spectral-gap}
-The quotient manifold $\mathcal{B} = \RR_*^{n \times d} / O(d)$ with the Procrustes metric has \textbf{sectional curvature} $K$ (a scalar measuring the Gaussian curvature of 2-dimensional sections, distinct from the Lie algebra-valued curvature 2-form $\Omega$ above) given by O'Neill's formula for Riemannian submersions~\citep{oneill1966fundamental}: for orthonormal horizontal vectors $\overline{\xi}, \overline{\eta} \in \mathcal{H}_X$,
+The quotient manifold $\mathcal{B} = \RR_*^{n \times d} / O(d)$ with the Procrustes metric has \emph{sectional curvature} $K$ (a scalar measuring the Gaussian curvature of 2-dimensional sections, distinct from the Lie algebra-valued curvature 2-form $\Omega$ above) given by O'Neill's formula for Riemannian submersions~\citep{oneill1966fundamental}: for orthonormal horizontal vectors $\bar{\xi}, \bar{\eta} \in \mathcal{H}_X$,
 \begin{equation}
-K(\xi, \eta) = 3 \|\mathcal{A}_{\overline{\xi}} \overline{\eta}\|^2 = \frac{3}{4} \|[\overline{\xi}, \overline{\eta}]^{\mathcal{V}}\|^2
+K(\xi, \eta) = 3 \|\mathcal{A}_{\bar{\xi}} \bar{\eta}\|^2 = \frac{3}{4} \|[\bar{\xi}, \bar{\eta}]^{\mathcal{V}}\|^2
 \end{equation}
-where $\mathcal{A}_{\overline{\xi}} \overline{\eta} = \frac{1}{2} [\overline{\xi}, \overline{\eta}]^{\mathcal{V}}$ is the O'Neill $A$-tensor and $[\overline{\xi}, \overline{\eta}]^{\mathcal{V}}$ denotes the vertical component of the Lie bracket. Since the total space $\RR_*^{n \times d}$ is flat, all base curvature arises from the $A$-tensor.
+where $\mathcal{A}_{\bar{\xi}} \bar{\eta} = \frac{1}{2} [\bar{\xi}, \bar{\eta}]^{\mathcal{V}}$ is the O'Neill $A$-tensor and $[\bar{\xi}, \bar{\eta}]^{\mathcal{V}}$ denotes the vertical component of the Lie bracket. Since the total space $\RR_*^{n \times d}$ is flat, all base curvature arises from the $A$-tensor.
 
 \citet{massart2019curvature} compute the sectional curvature explicitly for this quotient:
 \begin{itemize}
@@ -638,10 +682,10 @@ where $\mathcal{A}_{\overline{\xi}} \overline{\eta} = \frac{1}{2} [\overline{\xi
 \end{proposition}
 
 Two related but distinct geometric obstructions emerge from the spectral gap.
-The \textbf{curvature} depends on the $A$-tensor, which involves the connection coefficients $1/(\lambda_\iota + \lambda_\gamma)$ for $\iota \neq \gamma$.
+The \emph{curvature} depends on the $A$-tensor, which involves the connection coefficients $1/(\lambda_\iota + \lambda_\gamma)$ for $\iota \neq \gamma$.
 Since the connection is skew-symmetric, the worst case is $1/(\lambda_{d-1} + \lambda_d)$: curvature blows up only when \emph{both} of the two smallest eigenvalues approach zero.
 If $\lambda_d \to 0$ but $\lambda_{d-1}$ remains bounded, the curvature stays finite (the manifold looks locally like a cylinder in the collapsing direction).
-By contrast, the \textbf{injectivity radius} at $[X]$ equals $\sqrt{\lambda_d}$~\citep{massart2020quotient} and vanishes whenever $\lambda_d \to 0$ alone: beyond this radius, geodesics cease to be length-minimizing and multiple paths can connect the same points.
+By contrast, the \emph{injectivity radius} at $[X]$ equals $\sqrt{\lambda_d}$~\citep{massart2020quotient} and vanishes whenever $\lambda_d \to 0$ alone: beyond this radius, geodesics cease to be length-minimizing and multiple paths can connect the same points.
 
 For dynamics estimation, both phenomena matter.
 Large curvature means that even short paths produce substantial holonomy, making local Procrustes alignment inconsistent over moderate distances.
@@ -663,6 +707,10 @@ This connects the geometry to computation: Procrustes alignment computes geodesi
 The global injectivity radius of $\mathcal{B}$ is zero (since $\lambda_d$ can be arbitrarily small), reflecting the nontrivial topology of the quotient.
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% SECTION 4: RECOVERING TRAJECTORIES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Recovering trajectories from spectral embeddings}\label{sec:trajectory-problem}
 
@@ -712,13 +760,13 @@ This has a closed-form solution via SVD and finds the best rotation to match adj
 However, sequential pairwise alignment suffers from fundamental limitations:
 
 \begin{enumerate}
-\item \textbf{Local, not global:} Each alignment minimizes error between adjacent frames but doesn't ensure consistency across the full trajectory.
+\item \emph{Local, not global:} Each alignment minimizes error between adjacent frames but doesn't ensure consistency across the full trajectory.
 
-\item \textbf{Error accumulation:} The ASE gauge $R^{(t)}$ behaves like an arbitrary $O(1)$ rotation at each time step, unrelated across time. Pairwise Procrustes targets the relative gauge $R^{(t)^{-1}} R^{(t+1)}$ between consecutive frames, with error controlled by the ASE noise $E^{(t)}$. When these noise-induced errors are roughly independent across steps, the accumulated rotation error after aligning $T$ frames behaves diffusively, scaling like $O(\sqrt{T} \sigma)$ where $\sigma$ is the per-step noise level.
+\item \emph{Error accumulation:} The ASE gauge $R^{(t)}$ behaves like an arbitrary $O(1)$ rotation at each time step, unrelated across time. Pairwise Procrustes targets the relative gauge $(R^{(t)})^{-1} R^{(t+1)}$ between consecutive frames, with error controlled by the ASE noise $E^{(t)}$. When these noise-induced errors are roughly independent across steps, the accumulated rotation error after aligning $T$ frames behaves diffusively, scaling like $O(\sqrt{T} \sigma)$ where $\sigma$ is the per-step noise level.
 
-\item \textbf{Holonomy is a separate obstruction:} The $O(\sqrt{T} \sigma)$ diffusive error is the \emph{statistical} difficulty of alignment. The holonomy obstruction (\cref{sec:fiber-bundle}) is \emph{geometric/topological} and exists even with perfect data ($\sigma = 0$): for dynamics with nontrivial holonomy, no globally consistent gauge exists over closed loops, regardless of how accurately each pairwise alignment is performed. The two obstructions interact but should not be conflated.
+\item \emph{Holonomy is a separate obstruction:} The $O(\sqrt{T} \sigma)$ diffusive error is the \emph{statistical} difficulty of alignment. The holonomy obstruction (\cref{sec:fiber-bundle}) is \emph{geometric/topological} and exists even with perfect data ($\sigma = 0$): for dynamics with nontrivial holonomy, no globally consistent gauge exists over closed loops, regardless of how accurately each pairwise alignment is performed. The two obstructions interact but should not be conflated.
 
-\item \textbf{No dynamical constraint:} Even a perfectly aligned sequence need not correspond to a dynamically meaningful lift: Procrustes alignment is purely geometric and does not enforce that $\dot{X} = f(X)$ for any structured family.
+\item \emph{No dynamical constraint:} Even a perfectly aligned sequence need not correspond to a dynamically meaningful lift: Procrustes alignment is purely geometric and does not enforce that $\dot{X} = f(X)$ for any structured family.
 \end{enumerate}
 
 \textbf{Noise in spectral embeddings:}
@@ -744,11 +792,11 @@ P^{(t)}_{ij} = x_i^{(t)\top} x_j^{(t)}
 \end{equation}
 where the \emph{same} position $x_i^{(t)}$ evolves according to $\dot{x}_i = f(x_i, \ldots)$.
 
-We can state the mismatch precisely in terms of the rank of the concatenated data.
+We can express the mismatch through the shared-subspace assumption.
 UASE assumes that the concatenated matrix $[A^{(1)}; A^{(2)}; \ldots; A^{(T)}]$ has a \emph{common invariant column space} of dimension $d$: all time slices share the same left-singular vectors.
-Under ODE dynamics on latent positions, the column space of $P^{(t)} = X^{(t)} X^{(t)^\top}$ generically evolves (especially for Laplacian dynamics, where eigenvectors rotate), so the rank of the concatenated probability matrix grows with $T$.
+Under ODE dynamics on latent positions, the column space of $P^{(t)} = X^{(t)} X^{(t)\top}$ can evolve over time; for non-commuting families (notably Laplacian dynamics), eigenvectors rotate and a single invariant subspace is typically absent.
 UASE therefore fits a static average subspace to what is inherently an evolving one, compressing the dynamical signal into a deformation of ``activity scores'' within a fixed basis.
-In short: joint embeddings enforce a shared subspace; ODE-driven temporal RDPGs generically do not have one.
+In short: joint embeddings enforce a shared subspace; ODE-driven temporal RDPGs need not have one (except in special commuting/symmetric regimes).
 Applying UASE to data from our model distorts the recovered trajectory, attributing genuine positional evolution to time-varying activities against fixed identities.
 
 Similar issues affect Omnibus embedding~\citep{levin2017central} and COSIE~\citep{arroyo2021inference}: all assume a shared subspace structure that ODE dynamics do not preserve.
@@ -777,24 +825,37 @@ For a given initial condition $X(0) = X_0$ and dynamics $\dot{X} = f(X)$, the so
 The space of all ODE solutions (over all $f \in \mathcal{F}$ and $X_0$) forms a \emph{finite-dimensional manifold} in the infinite-dimensional space of smooth paths.
 A hierarchical smoothness prior assigns positive probability to all smooth paths, a much larger set than just those satisfying some ODE. So, the ODE solution manifold has measure zero under such priors.
 
-\begin{proposition}[Measure Zero]\label{prop:measure-zero}
-Let $\mu$ be any Gaussian measure on
-$C^k([0,T], \allowbreak{}\RR^{n \times d})$
-with full support.
-Let
-$\mathcal{M}_{\mathcal{F}} = \{X(\cdot) : \dot{X} = f(X) \text{ for some } f \in \mathcal{F}\}$
-be the manifold of ODE solutions.
-Then $\mu(\mathcal{M}_{\mathcal{F}}) = 0$.
+\begin{proposition}[Measure Zero for Finite-Dimensional ODE Families]\label{prop:measure-zero}
+Let $\mathcal{F} = \{f_\theta : \theta \in \Theta \subset \RR^p\}$ be a finite-dimensional $C^1$ family of vector fields on $\RR^{n \times d}$, and assume each ODE $\dot{X} = f_\theta(X)$ has a unique solution on $[0,T]$ for every initial condition.
+Let $\mu$ be a non-degenerate Gaussian measure on $C^k([0,T], \RR^{n \times d})$ with full support.
+Define
+\begin{equation}
+\mathcal{M}_\mathcal{F} = \{X(\cdot) : \dot{X} = f_\theta(X) \text{ for some } \theta \in \Theta\}.
+\end{equation}
+Then $\mu(\mathcal{M}_\mathcal{F}) = 0$.
 \end{proposition}
 
 \begin{proof}
 See \cref{app:deferred-proofs}.
 \end{proof}
 
-The substantive implication concerns \emph{posterior behavior}: Gaussian process posteriors with standard kernels (RBF, Mat\'ern) cannot concentrate on $\mathcal{M}_{\mathcal{F}}$ as the number of observations grows, because the RKHS of these kernels spans the full path space and has no mechanism to enforce the ODE constraint.
-The posterior will converge to a smooth path that best fits the data in the RKHS norm, which is generically not an ODE solution.
+\begin{proposition}[Zero Posterior Mass Without an ODE-Constrained Prior]
+Let $\Pi_0 = \mu$ be a prior on path space with $\mu(\mathcal{M}_\mathcal{F}) = 0$.
+For observed data $y$, define a posterior via
+\begin{equation}
+\Pi(A \mid y) = \frac{\int_A L(y \mid X) \, d\mu(X)}{\int L(y \mid X) \, d\mu(X)}
+\end{equation}
+with measurable likelihood $L$ and finite, positive normalizer.
+Then $\Pi(\mathcal{M}_\mathcal{F} \mid y) = 0$ for every such dataset $y$.
+\end{proposition}
 
-The posterior under a smoothness prior therefore concentrates on trajectories that are smooth (from the prior) and explain observed edges well (from the likelihood), but do not satisfy $\dot{X} = f(X)$ for any reasonable $f$.
+\begin{proof}
+The posterior is absolutely continuous with respect to $\mu$, with Radon--Nikodym derivative proportional to $L(y \mid X)$.
+Therefore every $\mu$-null set is posterior-null, in particular $\mathcal{M}_\mathcal{F}$.
+\end{proof}
+
+Thus, unless the ODE constraint is built into the prior/model, Bayesian updating cannot assign positive posterior mass to exactly dynamically consistent trajectories.
+Asymptotic concentration near (rather than on) $\mathcal{M}_\mathcal{F}$ depends on model misspecification and is a separate question.
 This is the distinction between \emph{interpolation} and \emph{dynamics learning}: both produce smooth curves through the data, but only the latter respects the constraint that velocity is state-dependent.
 
 \textbf{Diagnostics for detecting dynamical inconsistency.}
@@ -806,24 +867,23 @@ Finally, \emph{medium-to-long-term forecasting} discriminates the two approaches
 
 \textbf{Alternative approaches with dynamical consistency.}
 
-\begin{table}[!htbp]
+\begin{table}[ht]
 \centering
-\small
 \begin{tabular}{lll}
 \toprule
-\textbf{Approach} & \textbf{Smoothness} & \textbf{Dyn.\ Consistency} \\
+\textbf{Approach} & \textbf{Smoothness} & \textbf{Dynamical Consistency} \\
 \midrule
 Hierarchical GP prior & Yes ($C^k$) & No: interpolation only \\
-SDE $dX\!=\!f(X)\,dt + \sigma\,dW$ & No (H\"older $< 1/2$) & Yes, as $\sigma \to 0$ \\
+SDE $dX = f(X)\,dt + \sigma\,dW$ & No (H\"older $< 1/2$) & Yes, as $\sigma \to 0$ \\
 Neural ODE & Yes ($C^k$) & Yes (by construction) \\
-GP-ODE~\citep{heinonen2018learning} & Yes ($C^1$) & Yes: learns $f$ as GP \\
-Structure-constr.\ (ours) & Yes & Yes: family $\mathcal{F}$ enforced \\
+GP-ODE (NPODE)~\citep{heinonen2018learning} & Yes ($C^1$) & Yes: learns $f$ as GP \\
+Structure-constrained (ours) & Yes & Yes: family $\mathcal{F}$ enforced \\
 \bottomrule
 \end{tabular}
 \caption{Comparison of approaches: smoothness vs dynamical consistency.}
 \end{table}
 
-The SDE formulation $dX = f(X)\,dt + \sigma\,dW$ provides a principled bridge: Freidlin--Wentzell theory~\citep{freidlin1998random} shows that as $\sigma \to 0$, solutions concentrate around ODE solutions with rate function $J_T(\phi) = \frac{1}{2} \int_0^T \|\dot{\phi}(t) - f(\phi(t))\|^2\,dt$.
+The SDE formulation $dX = f(X)\,dt + \sigma\,dW$ provides a principled bridge: Freidlin--Wentzell theory~\citep{freidlin1998random} shows that as $\sigma \to 0$, solutions concentrate around ODE solutions with rate function $J_T(\phi) = \frac{1}{2} \int_0^T \|\dot{\phi}(t) - f(\phi(t))\|^2 \, dt$.
 This rate function is precisely the \emph{dynamical consistency penalty}, measuring how far a path deviates from being an ODE solution.
 
 \begin{remark}
@@ -837,6 +897,12 @@ Finally, holonomy implies that even in the absence of statistical noise, globall
 
 These considerations motivate our focus on dynamics structure as a source of additional constraints for alignment; we return to this constructive question in \cref{sec:constructive} after analyzing concrete dynamics families in \cref{sec:dynamics}.
 \end{remark}
+
+%% paper_part3.tex — Section 5 (Dynamics) and Section 6 (Information-theoretic limits)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% SECTION 5: DYNAMICS ON RDPGs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Dynamics on RDPGs}\label{sec:dynamics}
 
@@ -877,13 +943,13 @@ Horizontality depends on $g$; the locality constraint (velocity depends only on 
 
 \textbf{Observable non-horizontal dynamics.}
 Not all observable dynamics are horizontal.
-Centroid circulation $\dot{x}_i = (x_i - \bar{x}) A$ with $A \in \so(d)$ decomposes as $\dot{x}_i = x_i A - \bar{x} A$: the first term is pure gauge (\cref{thm:invisible}), but the shared drift $-\bar{x} A$ shifts dot products, making $\dot{P} \neq 0$ generically.
-However, $X^\top \dot{X} = CA$ where $C$ is the sample covariance of positions, and the product of a symmetric and skew-symmetric matrix is generically not symmetric, so the dynamics are not horizontal: the trajectory spirals through the fibers.
+Centroid circulation $\dot{x}_i = (x_i - \bar{x}) A$ with $A \in \so(d)$ decomposes as $\dot{x}_i = x_i A - \bar{x} A$: the first term is pure gauge (\cref{thm:invisible}), while the shared drift $-\bar{x} A$ generally shifts dot products, so $\dot{P}$ is typically nonzero except in special symmetric configurations.
+However, $X^\top \dot{X} = CA$ where $C$ is the sample covariance of positions; this is symmetric only under additional algebraic constraints (e.g., commutation-compatible structure), so the dynamics are typically non-horizontal and the trajectory spirals through the fibers.
 Similarly, differential rotation $\dot{x}_i = x_i A_i$ with node-specific $A_i \in \so(d)$ gives $\dot{P}_{ij} = x_i (A_i - A_j) x_j^\top$, which is observable whenever rotation rates differ.
 
 \textbf{Summary.}
 
-\begin{table}[!htbp]
+\begin{table}[ht]
 \centering
 \begin{tabular}{llcl}
 \toprule
@@ -897,7 +963,8 @@ Centroid circulation & $\dot{x}_i = (x_i - \bar{x}) A$ & No & $d(d-1)/2$ \\
 General linear & $\dot{X} = NX$ & If $X^\top NX$ sym. & $n^2$ \\
 \bottomrule
 \end{tabular}
-\caption{Families of RDPG dynamics. The polynomial family is always horizontal, has few parameters ($K + 1$ independent of $n$), and is gauge-invariant ($N(P)$ computable without alignment). Centroid circulation is observable but not horizontal.}\label{tab:dynamics-families}
+\caption{Families of RDPG dynamics. The polynomial family is always horizontal, has few parameters ($K + 1$ independent of $n$), and is gauge-invariant ($N(P)$ computable without alignment). Centroid circulation is observable but not horizontal.}
+\label{tab:dynamics-families}
 \end{table}
 
 
@@ -921,7 +988,7 @@ Without the low-rank factorization, $P(t)$ is just an arbitrary time-varying pro
 
 The Lyapunov operator $\mathcal{L}_P: \Sym(n) \to \Sym(n)$ defined by $\mathcal{L}_P(N) = NP + PN$ is a linear map on symmetric matrices.
 To analyze it, we pass to the eigenbasis of $P$.
-Let $P = U\Lambda U^\top$ be the eigendecomposition, and write $\tilde{N} = U^\top NU$ and $\tilde{\dot{P}} = U^\top \dot{P} U$ for the representations in this basis, with indices $\iota, \gamma \in \{1, \ldots, n\}$ labeling eigenvector directions (not nodes).
+Let $P = U \Lambda U^\top$ be the eigendecomposition, and write $\tilde{N} = U^\top N U$ and $\tilde{\dot{P}} = U^\top \dot{P} U$ for the representations in this basis, with indices $\iota, \gamma \in \{1, \ldots, n\}$ labeling eigenvector directions (not nodes).
 In this basis, $\mathcal{L}_P$ acts diagonally: $(\mathcal{L}_P(N))_{\iota\gamma} = (\lambda_\iota + \lambda_\gamma) \tilde{N}_{\iota\gamma}$.
 
 For the RDPG setting, where $P = XX^\top$ with $X \in \RR^{n \times d}$, the matrix $P$ has rank $d$ with eigenvalues $\lambda_1 \ge \cdots \ge \lambda_d > 0$ and $\lambda_{d+1} = \cdots = \lambda_n = 0$.
@@ -933,14 +1000,14 @@ However, the resolution is clean: the undetermined part of $N$ is exactly the pa
 
 \begin{proposition}[Partial Lyapunov Identifiability]\label{prop:lyapunov-invert}
 Let $P = XX^\top$ with $\rank(P) = d < n$, and let $V \in \RR^{n \times d}$ and $V_\perp \in \RR^{n \times (n-d)}$ span the range and null space of $P$ respectively.
-In the eigenbasis of $P$ (indices $\iota, \gamma$), the Lyapunov equation $\dot{P} = NP + PN$ uniquely determines the following blocks of $\tilde{N} = U^\top NU$:
+In the eigenbasis of $P$ (indices $\iota, \gamma$), the Lyapunov equation $\dot{P} = NP + PN$ uniquely determines the following blocks of $\tilde{N} = U^\top N U$:
 
 \begin{itemize}
-\item \textbf{Range-range block} ($\iota, \gamma \le d$): $\tilde{N}_{\iota\gamma} = \tilde{\dot{P}}_{\iota\gamma} / (\lambda_\iota + \lambda_\gamma)$, giving $d(d+1)/2$ entries.
-\item \textbf{Cross block} ($\iota \le d, \gamma > d$ or vice versa): $\tilde{N}_{\iota\gamma} = \tilde{\dot{P}}_{\iota\gamma} / \lambda_\iota$, giving $d(n - d)$ entries.
+\item \emph{Range-range block} ($\iota, \gamma \le d$): $\tilde{N}_{\iota\gamma} = \tilde{\dot{P}}_{\iota\gamma} / (\lambda_\iota + \lambda_\gamma)$, giving $d(d+1)/2$ entries.
+\item \emph{Cross block} ($\iota \le d, \gamma > d$ or vice versa): $\tilde{N}_{\iota\gamma} = \tilde{\dot{P}}_{\iota\gamma} / \lambda_\iota$, giving $d(n - d)$ entries.
 \end{itemize}
 
-The \textbf{null-null block} ($\iota, \gamma > d$): $(n-d)(n-d+1)/2$ entries remain unconstrained.
+The \emph{null-null block} ($\iota, \gamma > d$): $(n-d)(n-d+1)/2$ entries remain unconstrained.
 
 The total number of determined entries is $nd - d(d-1)/2$, matching the dimension of the realizable tangent space.
 \end{proposition}
@@ -1000,32 +1067,39 @@ The Euclidean mirror of \citet{athreya2024euclidean} provides a concrete, estima
 is a Procrustes distance on spectral embeddings. Like our Riemannian distance $d_{\mathcal{B}}([X],[Y]) = \min_{Q \in O(d)} \|X - YQ\|_F$, it quotients out the $O(d)$ gauge and yields a metric on the base space $\mathcal{B}$. The two differ in their choice of norm: $d_{\mathcal{B}}$ uses the Frobenius norm (yielding the Riemannian submersion metric from which our connection and curvature derive), while $d_{MV}$ uses the spectral norm (measuring the worst-case directional variation, after the $1/\sqrt{n}$ scaling). For $d = 1$ they coincide; for $d \ge 2$ the minimizing rotations and the resulting distances are generally distinct.
 
 Despite this difference, the conceptual point is shared: both project from the total space to $\mathcal{B}$ and thereby discard gauge.
-Athreya et al.~prove that $\hat{d}_{MV}$ consistently estimates $d_{MV}$ from adjacency spectral embeddings at rate $O(\log(n) / \sqrt{n})$ (their Theorem~3), providing a concrete estimation guarantee for a gauge-invariant quantity. From the dynamics-learning perspective, however, any scalar inter-time distance (whether Frobenius- or spectral-norm-based) captures \emph{how far} $P$ has moved but not \emph{how}: it does not recover the generator $N$ or the Lyapunov structure $\dot{P} = NP + PN$.
+\citet{athreya2024euclidean} prove that $\hat{d}_{MV}$ consistently estimates $d_{MV}$ from adjacency spectral embeddings at rate $O(\log(n) / \sqrt{n})$ (their Theorem~6), and then prove consistency of the CMDS mirror estimate from the estimated distance matrix (their Theorem~7), providing a concrete estimation guarantee for a gauge-invariant quantity. From the dynamics-learning perspective, however, any scalar inter-time distance (whether Frobenius- or spectral-norm-based) captures \emph{how far} $P$ has moved but not \emph{how}: it does not recover the generator $N$ or the Lyapunov structure $\dot{P} = NP + PN$.
 Extending the mirror's estimation guarantees from the scalar distance to the full matrix $\dot{P}$ is an interesting open problem that would connect their framework to the Lyapunov inversion of \cref{prop:lyapunov-invert}.
 
-\subsection{Holonomy for horizontal dynamics families}\label{sec:holonomy-dynamics}
+\subsection{Holonomy for horizontal dynamics families (proved/conditional/conjectural)}\label{sec:holonomy-dynamics}
 
 The holonomy obstruction (\cref{sec:fiber-bundle}) raises a concrete question: for which horizontal dynamics families is holonomy trivial, and for which is it nontrivial?
 This distinction has practical bite: trivial holonomy means a globally consistent gauge is achievable \emph{in principle} (put differently: alignment is ``only'' statistical); nontrivial holonomy means that even perfect local alignment can accumulate global drift over cycles.
 
+As summarized in \cref{tab:result-status}, this section contains:
+\begin{enumerate}
+\item proved local criteria and the $d = 2$ full restricted holonomy consequence,
+\item a conditional theorem/proposition for general $d$,
+\item and a conjectural generic full-holonomy extension for $d \ge 3$.
+\end{enumerate}
+
 In this section we make the mechanism explicit for two dynamics families.
-The punchline is a sharp commuting/non-commuting dichotomy:
-polynomial dynamics use generators that commute along the trajectory (hence no curvature along that path, and no loops to begin with), while Laplacian-type generators generically do not commute, which produces curvature and allows nontrivial holonomy.
+The punchline is a commuting/non-commuting contrast:
+polynomial dynamics use generators that commute along the trajectory (hence no curvature along that path, and no loops to begin with), while Laplacian-type generators can fail to commute; whenever the projected-commutator criterion is nonzero, curvature is positive and nontrivial holonomy becomes possible.
 
 \textbf{Curvature from non-commuting generators.}
 Consider horizontal dynamics $\dot{X} = M(X) X$ with $M(X)$ symmetric, so that $X^\top \dot{X} = X^\top M(X) X$ is symmetric and the dynamics are horizontal.
 At two distinct times $t_1, t_2$, the generators $M_1 = M(X(t_1))$ and $M_2 = M(X(t_2))$ are both symmetric.
 The commutator $[M_1, M_2] = M_1 M_2 - M_2 M_1$ is skew-symmetric (since transposing reverses the order).
 
-The Lie bracket of the corresponding horizontal vector fields $\overline{\xi}_i(X) = M_i X$ (constant-coefficient extensions, horizontal since each $M_i$ is symmetric) is:
+The Lie bracket of the corresponding horizontal vector fields $\bar{\xi}_i(X) = M_i X$ (constant-coefficient extensions, horizontal since each $M_i$ is symmetric) is:
 \begin{equation}
-[\overline{\xi}_1, \overline{\xi}_2](X) = (M_2 M_1 - M_1 M_2) X = -[M_1, M_2] X
+[\bar{\xi}_1, \bar{\xi}_2](X) = (M_2 M_1 - M_1 M_2) X = -[M_1, M_2] X
 \end{equation}
 
-Writing $S = -[M_1, M_2]$ (skew-symmetric), the bracket is $[\overline{\xi}_1, \overline{\xi}_2](X) = SX$.
+Writing $S = -[M_1, M_2]$ (skew-symmetric), the bracket is $[\bar{\xi}_1, \bar{\xi}_2](X) = SX$.
 This is \emph{not} automatically vertical: vertical directions are right-multiplications $X\Omega$, while $SX$ is a left-multiplication. They only coincide in special cases (roughly, when $S$ preserves $\col(X)$).
 
-But for curvature we only need the \emph{vertical component} $[\overline{\xi}_1, \overline{\xi}_2]^{\mathcal{V}}$.
+But for curvature we only need the \emph{vertical component} $[\bar{\xi}_1, \bar{\xi}_2]^{\mathcal{V}}$.
 Projecting $Z = SX$ onto $\mathcal{V}_X = \{X\Omega : \Omega \in \so(d)\}$ gives $X\Omega^*$ where $\Omega^*$ solves the Lyapunov equation
 \begin{equation}
 G \Omega^* + \Omega^* G = 2 \skewop(X^\top Z) = 2 X^\top S X
@@ -1037,12 +1111,30 @@ Since $G$ is positive definite, this has a unique solution. In the eigenbasis of
 \end{equation}
 
 So the vertical component vanishes iff the \emph{projected commutator} vanishes:
-\begin{equation}
-X^\top [M_1, M_2] X = 0.
-\end{equation}
-This is weaker than $[M_1, M_2]=0$, but for generic trajectories with $n \gg d$ a nonzero commutator will typically have a nonzero projection as well.
+$X^\top [M_1, M_2] X = 0$.
 
-Remembering \cref{prop:curv-spectral-gap}, by O'Neill's formula~\citep{oneill1966fundamental} the sectional curvature of the 2-plane spanned by the projections of $\overline{\xi}_1, \overline{\xi}_2$ in $\mathcal{B}$ is: $K(\xi_1, \xi_2) = \frac{3}{4} \|[\overline{\xi}_1, \overline{\xi}_2]^{\mathcal{V}}\|^2 / (\|\overline{\xi}_1\|^2 \|\overline{\xi}_2\|^2 - \langle \overline{\xi}_1, \overline{\xi}_2 \rangle^2)$.
+\begin{proposition}[Generic Nonvanishing of Projected Skew Action]\label{prop:generic-projected-skew}
+Let $n \ge d \ge 2$ and let $S \in \so(n)$ be nonzero.
+Define
+\begin{equation}
+\mathcal{N}_S := \{X \in \RR_*^{n \times d} : X^\top S X = 0\}.
+\end{equation}
+Then $\mathcal{N}_S$ is a proper real-algebraic subset of $\RR_*^{n \times d}$.
+In particular, it has empty interior and Lebesgue measure zero.
+\end{proposition}
+
+\begin{proof}
+Each entry of $X^\top S X$ is polynomial in the entries of $X$, so $\mathcal{N}_S$ is algebraic.
+It is proper because $S \neq 0$ implies there exist indices $i \neq j$ with $S_{ij} \neq 0$.
+Choose $x_1 = e_i$ and $x_2 = e_j$; then $x_1^\top S x_2 = S_{ij} \neq 0$, so for $X_0 = [x_1, x_2, x_3, \ldots, x_d]$ with remaining columns chosen to make full column rank, $(X_0^\top S X_0)_{12} \neq 0$.
+Hence $X_0$ is outside $\mathcal{N}_S$, so $\mathcal{N}_S$ is proper.
+Proper real-algebraic subsets of Euclidean space have empty interior and measure zero.
+\end{proof}
+
+Thus $X^\top [M_1, M_2] X = 0$ is strictly weaker than $[M_1, M_2]=0$, and for fixed nonzero commutator it fails only on an algebraic exceptional set in $X$.
+Intersecting that exceptional set with the interior of the valid domain $\mathcal{E}$ preserves this interpretation: on the interior model domain, the failure set remains proper.
+
+Remembering \cref{prop:curv-spectral-gap}, by O'Neill's formula~\citep{oneill1966fundamental} the sectional curvature of the 2-plane spanned by the projections of $\bar{\xi}_1, \bar{\xi}_2$ in $\mathcal{B}$ is: $K(\xi_1, \xi_2) = \frac{3}{4} \|[\bar{\xi}_1, \bar{\xi}_2]^{\mathcal{V}}\|^2 / (\|\bar{\xi}_1\|^2 \|\bar{\xi}_2\|^2 - \langle \bar{\xi}_1, \bar{\xi}_2 \rangle^2)$.
 The $1 / (\lambda_\iota + \lambda_\gamma)$ factors in $\Omega^*$ connect the curvature directly to the connection coefficients of the fiber bundle: the same denominators that amplify gauge sensitivity also amplify the vertical bracket.
 
 Since $\RR_*^{n \times d}$ is flat (it is an open subset of Euclidean space), the base curvature arises \emph{entirely} from the vertical bracket.
@@ -1052,29 +1144,29 @@ For horizontal dynamics $\dot{X} = M(X) X$ with $M$ symmetric, the sectional cur
 A sufficient condition is that the full generators commute: $[M(X(t_1)), M(X(t_2))] = 0$.
 When the projected commutator is nonzero, the curvature is strictly positive, with:
 \begin{equation}
-\|[\overline{\xi}_1, \overline{\xi}_2]^{\mathcal{V}}\|^2 = 4 \sum_{\iota < \gamma} \frac{\lambda_\iota \lambda_\gamma}{\lambda_\iota + \lambda_\gamma} [(U^\top [M_1, M_2] U)_{\iota\gamma}]^2
+\|[\bar{\xi}_1, \bar{\xi}_2]^{\mathcal{V}}\|^2 = 4 \sum_{\iota < \gamma} \frac{\lambda_\iota \lambda_\gamma}{\lambda_\iota + \lambda_\gamma} [(U^\top [M_1, M_2] U)_{\iota\gamma}]^2
 \end{equation}
-where $P = U\Lambda U^\top$ is the eigendecomposition. The $1 / (\lambda_\iota + \lambda_\gamma)$ factors link the curvature directly to the connection coefficients of the fiber bundle.
+where $P = U \Lambda U^\top$ is the eigendecomposition. The $1 / (\lambda_\iota + \lambda_\gamma)$ factors link the curvature directly to the connection coefficients of the fiber bundle.
 \end{proposition}
 
 \begin{proof}
-The Lie bracket of the constant-coefficient horizontal extensions $\overline{\xi}_i(Y) = M_i Y$ is $[\overline{\xi}_1, \overline{\xi}_2](X) = -[M_1, M_2] X$ (standard commutator of linear vector fields).
-The vertical projection of $SX$ (with $S = -[M_1, M_2]$ skew-symmetric) is $X\Omega^*$ where $\Omega^*$ solves $G \Omega^* + \Omega^* G = 2 X^\top S X$ (\cref{app:vertical-projection}).
+The Lie bracket of the constant-coefficient horizontal extensions $\bar{\xi}_i(Y) = M_i Y$ is $[\bar{\xi}_1, \bar{\xi}_2](X) = -[M_1, M_2] X$ (standard commutator of linear vector fields).
+The vertical projection of $SX$ (with $S = -[M_1, M_2]$ skew-symmetric) is $X\Omega^*$ where $\Omega^*$ solves $G\Omega^* + \Omega^* G = 2 X^\top S X$ (\cref{app:vertical-projection}).
 This vanishes iff $X^\top [M_1, M_2] X = 0$.
 The norm formula follows from $\|X\Omega^*\|^2 = \tr(\Omega^{*\top} G \Omega^*)$ evaluated in the eigenbasis of $G$ (see \cref{app:vertical-norm} for the computation).
 \end{proof}
 
 \textbf{Polynomial dynamics: trivial holonomy.}
-For polynomial dynamics $\dot{X} = N(P) X$ with $N(P) = \sum_{k=0}^{K} \alpha_k P^k$, the induced $P$-dynamics are:
+For polynomial dynamics $\dot{X} = N(P) X$ with $N(P) = \sum_{k=0}^K \alpha_k P^k$, the induced $P$-dynamics are:
 \begin{equation}
-\dot{P} = N(P) P + P N(P) = 2 \sum_{k=0}^{K} \alpha_k P^{k+1}
+\dot{P} = N(P) P + P N(P) = 2 \sum_{k=0}^K \alpha_k P^{k+1}
 \end{equation}
-This is a polynomial in $P$ alone. Writing $P = U\Lambda U^\top$ in its eigendecomposition, every power $P^k = U\Lambda^k U^\top$ shares the same eigenvectors $U$.
+This is a polynomial in $P$ alone. Writing $P = U \Lambda U^\top$ in its eigendecomposition, every power $P^k = U \Lambda^k U^\top$ shares the same eigenvectors $U$.
 Therefore $\dot{P} = U (2 \sum \alpha_k \Lambda^{k+1}) U^\top$ also has eigenvectors $U$: the eigenvectors of $P$ are stationary under polynomial dynamics, provided the spectrum of $P(0)$ is simple (all eigenvalues distinct).
 
 The trajectory $P(t)$ lies on a $d$-dimensional submanifold of $\mathcal{B}$ parameterized by the eigenvalues $(\lambda_1(t), \ldots, \lambda_d(t))$ alone, with each eigenvalue evolving independently:
 \begin{equation}
-\dot{\lambda}_\iota = 2 \sum_{k=0}^{K} \alpha_k \lambda_\iota^{k+1}
+\dot{\lambda}_\iota = 2 \sum_{k=0}^K \alpha_k \lambda_\iota^{k+1}
 \end{equation}
 
 Two consequences follow immediately.
@@ -1088,10 +1180,7 @@ Polynomial dynamics $\dot{X} = N(P) X$ with $N(P) = \sum \alpha_k P^k$ and simpl
 \end{proposition}
 
 \begin{proof}
-For (1): since the eigenvectors of $P$ are stationary, $N(P(t)) = U (\sum \alpha_k \Lambda(t)^k) U^\top$ for all $t$, with the same $U$. Any two diagonal matrices commute, so
-\[
-[N(P(t_1)), N(P(t_2))] = U \bigl[\textstyle\sum \alpha_k \Lambda(t_1)^k,\, \sum \alpha_k \Lambda(t_2)^k\bigr] U^\top = 0.
-\]
+For (1): since the eigenvectors of $P$ are stationary, $N(P(t)) = U (\sum \alpha_k \Lambda(t)^k) U^\top$ for all $t$, with the same $U$. Any two diagonal matrices commute, so $[N(P(t_1)), N(P(t_2))] = U [\sum \alpha_k \Lambda(t_1)^k, \sum \alpha_k \Lambda(t_2)^k] U^\top = 0$.
 
 For (2): each $\lambda_\iota(t)$ satisfies the autonomous ODE $\dot{\lambda}_\iota = f(\lambda_\iota)$ with $f(x) = 2 \sum \alpha_k x^{k+1}$.
 By uniqueness of ODE solutions, if $\lambda_\iota(t_0) = \lambda_\iota(t_1)$ for $t_0 \neq t_1$, then $\lambda_\iota$ must be constant.
@@ -1103,7 +1192,7 @@ The statement that eigenvectors of $P$ are stationary deserves both rigorous jus
 
 \emph{Why eigenvectors are fixed.}
 Write $P(t) = U(t) \Lambda(t) U(t)^\top$ and let $\Omega = U^\top \dot{U} \in \so(d)$ be the eigenvector rotation rate.
-Differentiating $P = U\Lambda U^\top$ and projecting into the eigenbasis gives $(U^\top \dot{P} U)_{\iota\gamma} = \Omega_{\iota\gamma}(\lambda_\gamma - \lambda_\iota)$ for $\iota \neq \gamma$.
+Differentiating $P = U \Lambda U^\top$ and projecting into the eigenbasis gives $(U^\top \dot{P} U)_{\iota\gamma} = \Omega_{\iota\gamma}(\lambda_\gamma - \lambda_\iota)$ for $\iota \neq \gamma$.
 Since $\dot{P} = 2 \sum \alpha_k P^{k+1}$ is diagonal in the eigenbasis, the left side vanishes, so $\Omega_{\iota\gamma} (\lambda_\gamma - \lambda_\iota) = 0$ for all $\iota \neq \gamma$.
 It remains to show that eigenvalues remain distinct.
 All $d$ eigenvalues satisfy the same autonomous ODE $\dot{\lambda} = f(\lambda)$ with $f(x) = 2 \sum \alpha_k x^{k+1}$, differing only in initial conditions.
@@ -1116,14 +1205,14 @@ For block models with equal block sizes, for instance, repeated eigenvalues aris
 This is a measure-zero condition in the space of initial conditions.
 
 \emph{What this means for nodes.}
-In the canonical gauge $X = U\Lambda^{1/2}$, node $i$ has latent position $x_i(t) = (U_{i1} \sqrt{\lambda_1(t)}, \ldots, U_{id} \sqrt{\lambda_d(t)})$.
+In the canonical gauge $X = U \Lambda^{1/2}$, node $i$ has latent position $x_i(t) = (U_{i1} \sqrt{\lambda_1(t)}, \ldots, U_{id} \sqrt{\lambda_d(t)})$.
 The loading $U_{i\iota}$ (which can be read as the ``membership weight'' of node $i$ in eigenvector direction $\iota$) is constant; what evolves is the scale $\sqrt{\lambda_\iota(t)}$ of each direction.
 
 Since the eigenvalue ODE $\dot{\lambda} = f(\lambda)$ is nonlinear for $K \ge 1$, eigenvalues with different magnitudes evolve at different rates, and the ratios $\lambda_\iota(t) / \lambda_\gamma(t)$ change over time.
 The effect on the node positions is an \emph{anisotropic rescaling} of the latent space along fixed axes: in $d = 2$, the point cloud deforms as if inscribed in an ellipse whose axes do not rotate but whose eccentricity changes.
 Node directions in $\RR^d$ do change (they are not merely rescaled in magnitude), but the change is tightly constrained: all deformation is captured by the $d$ scalar functions $\lambda_\iota(t)$.
 
-The exception is linear dynamics ($K = 0$, $f(\lambda) = 2\alpha_0 \lambda$), where $\lambda_\iota(t) = \lambda_\iota(0) e^{2\alpha_0 t}$ and all eigenvalues grow or decay at the same exponential rate.
+The exception is linear dynamics ($K = 0$, $f(\lambda) = 2 \alpha_0 \lambda$), where $\lambda_\iota(t) = \lambda_\iota(0) e^{2 \alpha_0 t}$ and all eigenvalues grow or decay at the same exponential rate.
 In this case the ratios are constant, the point cloud is rescaled isotropically, and node angular positions in $\RR^d$ are truly fixed.
 For quadratic or higher dynamics ($K \ge 1$), the nonlinearity of $f$ causes larger eigenvalues to evolve differently from smaller ones, producing genuine reshaping of the point cloud's geometry while preserving the eigenvector axes that define community alignment.
 Note, however, that preserving the axes does not guarantee preserving community \emph{separability}: if eigenvalue ratios diverge (e.g., $\lambda_d(t) \to 0$ while $\lambda_1$ grows), the point cloud collapses onto a lower-dimensional subspace, and communities that were distinguishable along the $\lambda_d$ direction may become indistinguishable.
@@ -1134,19 +1223,17 @@ The generator $-L = P - D$ is symmetric, so the dynamics are horizontal.
 But $L$ is \emph{not} a polynomial in $P$: the degree matrix $D$ depends on the row sums of $P$, which mix eigenvector information that a polynomial in $P$ cannot access.
 
 There is a notable exception: if $D$ is a scalar multiple of the identity ($D = cI$, i.e., the graph is \emph{regular} with all node degrees equal), then $L = cI - P$ is affine in $P$, and the Laplacian dynamics reduce to the polynomial family.
-Regular graphs (and more generally, vertex-transitive latent configurations where all rows of $X$ have the same norm) thus have trivial holonomy under Laplacian dynamics.
+Regular graphs (and more generally, configurations with constant row sums of $P$, i.e.\ $P\mathbf{1} = c\mathbf{1}$) thus have trivial holonomy under Laplacian dynamics.
 The nontrivial holonomy results below require that $D$ is \emph{not} scalar: structural heterogeneity in the graph is the source of holonomy.
 
 The $P$-dynamics under Laplacian flow are:
 \begin{equation}
 \dot{P} = -LP - PL = -(D - P)P - P(D - P) = 2P^2 - DP - PD
 \end{equation}
-The term $2P^2$ preserves eigenvectors of $P$ (it is a polynomial in $P$), but $DP + PD$ does not.
-In the eigenbasis $P = U\Lambda U^\top$, the degree matrix
-$D = \diag(U\Lambda U^\top \mathbf{1})$ is diagonal in the \emph{node} basis, not the eigenbasis.
+The term $2P^2$ preserves eigenvectors of $P$ (it is a polynomial in $P$), but $DP + PD$ does not: in the eigenbasis $P = U \Lambda U^\top$, the degree matrix $D = \diag(U \Lambda U^\top \mathbf{1})$ is diagonal in the \emph{node} basis, not the eigenbasis.
 Thus $U^\top D U$ is generally a full matrix, and $\dot{P}$ has eigenvector components transverse to those of $P$.
 
-\emph{Consequence:} the eigenvectors of $P$ rotate under Laplacian dynamics, the trajectory sweeps out area in $\mathcal{B}$ transverse to the eigenvalue-parameterized submanifold, and \cref{prop:curvature-criterion} guarantees positive curvature along any portion of the trajectory where $[L(P(t_1)),\allowbreak{} L(P(t_2))] \neq 0$.
+\emph{Consequence:} the eigenvectors of $P$ rotate under Laplacian dynamics, the trajectory sweeps out area in $\mathcal{B}$ transverse to the eigenvalue-parameterized submanifold, and \cref{prop:curvature-criterion} guarantees positive curvature along any portion of the trajectory where $[L(P(t_1)), L(P(t_2))] \neq 0$.
 
 \textbf{What Laplacian dynamics look like for nodes.}
 The contrast with polynomial dynamics is sharp at the node level.
@@ -1156,81 +1243,163 @@ Because the coupling depends on the \emph{row sums} of $P$, mixing contributions
 In the ellipse analogy for $d = 2$: not only does the eccentricity change, but the axes themselves rotate.
 The community structure is no longer static; nodes' membership weights across latent dimensions genuinely evolve, creating the richer dynamics that produce nontrivial holonomy.
 
-\begin{proposition}[Laplacian Dynamics: Nontrivial Holonomy]\label{prop:laplacian-holonomy}
-For $d \ge 2$ and initial conditions such that $D(P(0))$ is not a scalar multiple of the identity (i.e., the graph is not regular), Laplacian dynamics $\dot{X} = -L(P) X$ generically produce trajectories in $\mathcal{B}$ with strictly positive sectional curvature.
-
-Moreover, if the trajectory visits two states $P(t_1), P(t_2)$ for which the projected commutator is nonzero,
+\begin{proposition}[Laplacian Dynamics: Local Commutator Criterion for Nontrivial Holonomy]\label{prop:laplacian-holonomy}
+Let $X(t)$ solve Laplacian dynamics $\dot{X} = -L(P) X$, with $P = XX^\top$ and $L = D - P$.
+Suppose there exists $t_* \in [0,T)$ such that
 \begin{equation}
-X^\top [L(P(t_1)), L(P(t_2))] X \neq 0,
+C_* := X(t_*)^\top [L(t_*), \dot{L}(t_*)] X(t_*) \neq 0.
 \end{equation}
-then the connection has nonzero curvature along the trajectory segment spanning those states. In particular, any closed loop in $\mathcal{B}$ that encloses a region of nonzero curvature yields nontrivial holonomy (a non-identity gauge rotation after horizontal transport).
+Then there exists $\epsilon_0 > 0$ such that for all $0 < |h| < \epsilon_0$,
+\begin{equation}
+X(t_*)^\top [L(t_*), L(t_* + h)] X(t_*) \neq 0.
+\end{equation}
+Consequently, by \cref{prop:curvature-criterion}, the sectional curvature along the trajectory is strictly positive on that local two-time span.
+In particular, there exist contractible loops in a neighborhood of that region whose restricted holonomy is nontrivial.
 \end{proposition}
 
 \begin{proof}
-It suffices to show that $X^\top [L(P(t_1)), L(P(t_2))] X \neq 0$ generically.
-Write $L_i = D_i - P_i$ for $i = 1, 2$.
+Since $L$ is differentiable in $t$, Taylor expansion gives
+$L(t_* + h) = L(t_*) + h \dot{L}(t_*) + O(h^2)$.
+Therefore
+$[L(t_*), L(t_* + h)] = h [L(t_*), \dot{L}(t_*)] + O(h^2)$.
+Left and right multiplication by the fixed matrix $X(t_*)^\top$ and $X(t_*)$ yields
+\begin{equation}
+X(t_*)^\top [L(t_*), L(t_* + h)] X(t_*) = h C_* + O(h^2).
+\end{equation}
+Because $C_* \neq 0$, continuity implies there exists $\epsilon_0 > 0$ such that this expression is nonzero for all $0 < |h| < \epsilon_0$.
+
+Apply \cref{prop:curvature-criterion} with $M_1 = -L(t_*)$ and $M_2 = -L(t_* + h)$ (both symmetric): nonzero projected commutator implies strictly positive sectional curvature for the corresponding two-time span.
+The final holonomy claim follows from Ambrose--Singer: nonzero curvature implies nontrivial restricted holonomy, hence existence of contractible loops with non-identity holonomy.
+\end{proof}
+
+The criterion above is checkable pointwise along a trajectory. It is also generic at initialization.
+
+\begin{proposition}[Genericity of the Local Commutator Condition at Initialization]\label{prop:laplacian-generic-init}
+Fix $n \ge 3$ and $2 \le d \le n$, and define
+\begin{equation}
+\Psi(X) := X^\top [L(X), \dot{L}(X)] X
+\end{equation}
+with $P = XX^\top$, $D = \diag(P\mathbf{1})$, $L = D - P$, $\dot{P} = 2P^2 - DP - PD$, and $\dot{L} = \diag(\dot{P}\mathbf{1}) - \dot{P}$.
 Then
 \begin{equation}
-[L_1, L_2] = [D_1 - P_1, D_2 - P_2] = [D_1, D_2] - [D_1, P_2] + [D_2, P_1] + [P_1, P_2].
+\mathcal{Z} := \{X \in \RR_*^{n \times d} : \Psi(X) = 0\}
 \end{equation}
-Since $D_1, D_2$ are both diagonal, $[D_1, D_2] = 0$. Also $[P_1, P_2] = 0$ whenever $P_1$ and $P_2$ share eigenvectors. Along a Laplacian trajectory, for distinct times $t_1 \neq t_2$ the eigenvectors generically rotate, so $P_1 = P(t_1)$ and $P_2 = P(t_2)$ generically fail to commute and $[P_1, P_2] \neq 0$.
-Moreover, $[D_1, P_2]$ is generically nonzero since the row sums encoded in $D_1$ depend on the full matrix $P_1$, not just its eigenvalues.
-For $n \gg d$, a nonzero $n \times n$ commutator $[L_1, L_2]$ generically projects to a nonzero $d \times d$ matrix $X^\top [L_1, L_2] X$. If $X^\top [L_1, L_2] X = 0$, then $[L_1, L_2]$ maps $\col(X)$ into $\col(X)^\perp$. This is a non-generic algebraic constraint on the entries of $[L_1, L_2]$ relative to $X$ (it requires a whole family of bilinear forms to vanish), so we do not expect it to hold except on a measure-zero set of trajectories or initial conditions.
-By \cref{prop:curvature-criterion}, the curvature along the trajectory is positive, and by the Ambrose--Singer theorem, the holonomy group is generated by the curvature 2-form evaluated at such pairs.
+is a proper real-algebraic subset of $\RR_*^{n \times d}$.
+Consequently, $\mathcal{Z}$ has empty interior and Lebesgue measure zero; equivalently, for generic initial conditions, the hypothesis of \cref{prop:laplacian-holonomy} holds at $t_* = 0$.
+Restricting to valid RDPG states, the same conclusion holds after intersecting with $\mathcal{E}$: this remains a proper exceptional set in the interior model domain.
+\end{proposition}
+
+\begin{proof}
+Each entry of $\Psi(X)$ is a polynomial in the entries of $X$ (all operations are sums and products), so $\mathcal{Z}$ is algebraic.
+To show it is proper, it suffices to exhibit one full-rank $X$ with $\Psi(X) \neq 0$.
+
+For $n = 3$, $d = 2$, take
+\begin{equation}
+X_0 = \frac{1}{3}\begin{pmatrix} 1 & 1 \\ 2 & 1 \\ 2 & 2 \end{pmatrix}.
+\end{equation}
+A direct substitution into the formulas above gives
+$(\Psi(X_0))_{12} = 2/3^7 \neq 0$,
+hence $\Psi(X_0) \neq 0$.
+
+For general $n \ge 3$ and $2 \le d \le n$, embed this $2$-dimensional witness into the first two columns and first three rows, set remaining entries to zero, and then add an arbitrarily small perturbation in columns $3, \ldots, d$ making the matrix full rank.
+Since $\Psi$ is continuous and nonzero at the embedded witness, for sufficiently small perturbation the value remains nonzero.
+Therefore a full-rank witness exists for every $n \ge 3$ and $2 \le d \le n$, so $\mathcal{Z}$ is a proper algebraic subset.
+
+A proper real-algebraic subset of Euclidean space has empty interior and Lebesgue measure zero.
 \end{proof}
 
 For $d = 2$, the result is particularly sharp.
 
-\begin{corollary}[Full Holonomy for Laplacian Dynamics in Dimension 2]\label{cor:full-holonomy-d2}
-For $d = 2$ and generic initial conditions, the restricted holonomy group of Laplacian dynamics is $\mathrm{SO}(2)$, the largest possible connected subgroup of $O(2)$.
-Concretely: for any target rotation angle $\phi \in [0, 2\pi)$, there exists a loop in $\mathcal{B}$ traversable by Laplacian dynamics whose holonomy is rotation by $\phi$.
+\begin{corollary}[Dimension 2: Full Restricted Holonomy from One Nonzero Curvature Value]\label{cor:d2-holonomy}
+Let $d = 2$ and assume the hypothesis of \cref{prop:laplacian-holonomy} holds at some time $t_*$.
+Then the restricted holonomy group of the bundle is $\mathrm{SO}(2)$.
+Equivalently, for each angle $\phi \in [0, 2\pi)$ there exists a contractible loop in $\mathcal{B}$ whose horizontal transport has holonomy rotation by $\phi$.
 \end{corollary}
 
 \begin{proof}
-The Lie algebra $\so(2)$ is one-dimensional, spanned by the single generator $J = \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix}$.
-By \cref{prop:laplacian-holonomy}, the curvature along a generic Laplacian trajectory is strictly positive, so the curvature 2-form produces a nonzero element of $\so(2)$.
+The Lie algebra $\so(2)$ is one-dimensional, spanned by the single generator $J = \bigl(\begin{smallmatrix} 0 & -1 \\ 1 & 0 \end{smallmatrix}\bigr)$.
+By \cref{prop:laplacian-holonomy}, the curvature 2-form produces a nonzero element of $\so(2)$.
 A single nonzero element spans the one-dimensional Lie algebra, so by the Ambrose--Singer theorem, the holonomy algebra is all of $\so(2)$, and the restricted holonomy group (holonomy of contractible loops) is $\mathrm{SO}(2)$.
 \end{proof}
 
 This means that for rank-2 latent spaces under Laplacian dynamics, the obstruction is not merely a discrete sign flip (as in the simplest cases) but a continuous rotation by an arbitrary angle: you can get \emph{any} amount of gauge drift, depending on the loop. From an alignment point of view, this is about as bad as it gets.
 
-\textbf{Quantitative estimate.} For $d = 2$, the holonomy around a loop $\gamma$ in $\mathcal{B}$ is a rotation by an angle that, heuristically, scales like an integral of sectional curvature over an enclosed surface:
-\begin{equation}
-\phi(\gamma) \approx \iint_\Sigma K \, dA
-\end{equation}
+\begin{remark}
+\textbf{Heuristic quantitative estimate (dimension 2).}
+For $d = 2$, the holonomy around a loop $\gamma$ in $\mathcal{B}$ is often approximated by an area integral of sectional curvature:
+$\phi(\gamma) \approx \iint_\Sigma K \, dA$
 where $\Sigma$ is a surface bounded by $\gamma$, $K$ is the sectional curvature, and $dA$ is the area element.
-By the curvature formula of \citet{massart2019curvature}, regions where the smallest eigenvalues of $P$ are small contribute large curvature, so even short Laplacian trajectories that pass near rank-deficient states can accumulate substantial holonomy.
+This is an intuition aid, not a theorem used elsewhere in the manuscript.
+Combined with~\citet{massart2019curvature}, it suggests that trajectories passing near rank-deficient states (small trailing eigenvalues) may accumulate larger holonomy.
+\end{remark}
 
 \textbf{Higher dimensions ($d \ge 2$).}
 For general $d$, the Lie algebra $\so(d)$ has dimension $d(d-1)/2$.
 The curvature 2-form produces holonomy-algebra elements $\Omega^* \in \so(d)$ with
-\begin{equation}
-\Omega^*_{\iota\gamma} = \frac{2(X^\top [M_1, M_2] X)_{\iota\gamma}}{\lambda_\iota + \lambda_\gamma}.
-\end{equation}
+$\Omega^*_{\iota\gamma} = 2(X^\top [M_1, M_2] X)_{\iota\gamma} / (\lambda_\iota + \lambda_\gamma)$.
 As the trajectory visits different states, the \emph{direction} of these elements in $\so(d)$ can change, and the span can grow.
 
-For generic Laplacian dynamics with $n \gg d$, the degree matrices at different times are sufficiently varied that we expect these curvature-generated directions to span all of $\so(d)$, giving holonomy group $\mathrm{SO}(d)$.
-We state this as a conjecture.
+\begin{theorem}[Full Restricted Holonomy from a Curvature-Span Condition]\label{thm:full-holonomy-conditional}
+Let $d \ge 2$ and fix a base point $p \in \mathcal{B}$.
+Suppose the Lie algebra generated by curvature values reachable from $p$ spans all of $\so(d)$, i.e.
+\begin{equation}
+\spn\{ \Ad_{\tau_{q \to p}} (\Omega_q(u, v)) : q \text{ horizontally reachable from } p,~u,v \in \mathcal{H}_q \} = \so(d).
+\end{equation}
+Then the restricted holonomy group at $p$ is:
+$\Hol_p^0 = \mathrm{SO}(d)$.
+\end{theorem}
+
+\begin{proof}
+By the Ambrose--Singer theorem, the Lie algebra of $\Hol_p^0$ is exactly the span above.
+Under the hypothesis, $\Lie(\Hol_p^0) = \so(d)$.
+The group $\Hol_p^0$ is connected and lies in $O(d)$; hence it lies in the identity component $\mathrm{SO}(d)$.
+A connected Lie subgroup of $\mathrm{SO}(d)$ with Lie algebra $\so(d)$ must be $\mathrm{SO}(d)$ itself.
+\end{proof}
+
+The theorem isolates the exact missing ingredient for $d \ge 3$: a rank condition on curvature-generated directions.
+
+\begin{proposition}[Finite-Time Rank Criterion at a Fixed Base Point]\label{prop:finite-time-rank}
+Let $X(t)$ solve $\dot{X} = -L(P) X$ and fix $t_0$ such that $P(t_0)$ has rank $d$.
+Suppose there exist times $s_1, \ldots, s_m$ with $m = d(d-1)/2$ such that the skew matrices
+\begin{equation}
+B_a := X(t_0)^\top [L(t_0), L(s_a)] X(t_0) \in \so(d), \quad a = 1, \ldots, m,
+\end{equation}
+are linearly independent.
+Then, at the base point $p = [X(t_0)]$, the restricted holonomy group is $\mathrm{SO}(d)$.
+\end{proposition}
+
+\begin{proof}
+By \cref{prop:curvature-criterion} and \cref{app:vertical-projection}, each $B_a$ determines a curvature value at the same base point $p$ through the Lyapunov map
+$B_a \mapsto \Omega_a^*$,
+with componentwise scaling by positive factors $1/(\lambda_\iota + \lambda_\gamma)$ (evaluated at $t_0$).
+This linear map on $\so(d)$ is invertible, so linear independence of $(B_a)$ implies linear independence of $(\Omega_a^*)$.
+Since $m = \dim(\so(d))$, these curvature values span $\so(d)$ at $p$.
+Therefore the curvature-span hypothesis of \cref{thm:full-holonomy-conditional} holds (with $q = p$, so no transport issue), and $\Hol_p^0 = \mathrm{SO}(d)$.
+\end{proof}
+
+\begin{remark}
+\textbf{Heuristic genericity note.}
+For Laplacian dynamics with $n \gg d$, one expects the degree matrices at different times to make the finite-time rank criterion hold on most trajectories.
+Turning this into a theorem for all $d \ge 3$ requires a transversality argument controlling symmetry strata.
+We therefore keep the fully generic statement as a conjecture.
+\end{remark}
 
 \begin{conjecture}[Full Holonomy in Higher Dimensions]\label{conj:full-holonomy}
 For $d \ge 3$, $n > d$, and initial conditions with $D(P(0))$ not scalar (non-regular graph), the restricted holonomy group of Laplacian dynamics $\dot{X} = -L(P) X$ is $\mathrm{SO}(d)$.
 \end{conjecture}
 
-A proof would require showing that the holonomy algebra elements
-\[
-\Omega^*_{\iota\gamma} = \frac{2(X^\top [L(P(t_1)), L(P(t_2))] X)_{\iota\gamma}}{\lambda_\iota + \lambda_\gamma},
-\]
-as $t_1, t_2$ vary along the trajectory, span $\so(d)$.
-Since the Lyapunov weights $1/(\lambda_\iota + \lambda_\gamma)$ are positive scalars that do not change rank, this is equivalent to requiring that the projected commutators $X^\top [L(P(t_1)), L(P(t_2))] X$ span $\so(d)$.
-For $d = 2$ this is automatic (one nonzero element spans a one-dimensional Lie algebra); for $d \ge 3$ it requires a transversality argument exploiting the fact that the degree matrix $D = \diag(P\mathbf{1})$ mixes all $d$ eigenvector components.
-The potential obstruction to full holonomy would be an \emph{invariant subspace} of the degree operator: if the map $P \mapsto D(P) = \diag(P\mathbf{1})$ always preserved some subspace of $\so(d)$ aligned with the eigenvector structure, the holonomy group would be confined to a proper subgroup.
-Generically, the degree operator mixes all eigenvector components, precluding such invariant subspaces; the non-generic exceptions are configurations with symmetries that force $D$ to commute with $P$ (regular graphs being the extreme case identified above).
+A proof of \cref{conj:full-holonomy} would amount to proving the rank criterion above generically.
+Equivalently, one must show that the projected commutators
+$X^\top [L(P(t_1)), L(P(t_2))] X$
+span $\so(d)$ for generic trajectories.
+The main obstruction is structural symmetry: if the degree operator $P \mapsto D(P)$ preserves a proper invariant subspace in $\so(d)$, the generated holonomy algebra can collapse to a proper subalgebra.
+Regular/equitable families are canonical examples of such degeneracy.
 
 The same argument applies to message-passing dynamics $\dot{x}_i = \sum_j P_{ij} g(x_i, x_j)$ with symmetric generators that are not polynomials in $P$.
 
-\textbf{Summary:} the holonomy obstruction creates a sharp dichotomy among horizontal dynamics families.
+\textbf{Summary:} the holonomy obstruction creates a clear contrast among horizontal dynamics families.
 Polynomial dynamics, which operate on the spectral structure of $P$ through commuting generators, preserve eigenvectors and have trivial holonomy: global gauge consistency is achievable without topological obstruction.
-Laplacian and message-passing dynamics, which mix spectral and spatial structure through non-commuting generators, rotate eigenvectors and produce nontrivial holonomy: gauge drift accumulates even along horizontal trajectories, and no local alignment procedure can achieve global consistency over cycles.
+Laplacian and message-passing dynamics, which mix spectral and spatial structure through non-commuting generators, can produce nontrivial holonomy whenever the projected-commutator criterion of \cref{prop:curvature-criterion} is triggered: gauge drift then accumulates even along horizontal trajectories, and no local alignment procedure can achieve global consistency over cycles.
 
 This distinction has practical implications: for polynomial dynamics, the constructive alignment problem (\cref{sec:constructive}) is purely a statistical challenge (overcoming Bernoulli noise); for Laplacian dynamics, it is simultaneously a statistical \emph{and} topological challenge.
 
@@ -1238,7 +1407,7 @@ This distinction has practical implications: for polynomial dynamics, the constr
 \textbf{Ambrose--Singer perspective (a quick intuition pump).}
 The relationship between local curvature and global holonomy is formalized by the Ambrose--Singer theorem~\citep{kobayashi1963foundations}: the Lie algebra $\hol_p$ of the restricted holonomy group at $p$ is generated by curvature endomorphisms $\Omega_q(u, v)$ evaluated at points $q$ reachable from $p$ by horizontal curves, after parallel-transporting them back to $p$.
 
-For $d = 2$, $\so(2)$ has no proper nonzero subalgebras, so a single nonzero curvature element forces the full restricted holonomy $\mathrm{Hol}_p^0 = \mathrm{SO}(2)$ (as used above).
+For $d = 2$, $\so(2)$ has no proper nonzero subalgebras, so a single nonzero curvature element forces the full restricted holonomy $\Hol_p^0 = \mathrm{SO}(2)$ (as used above).
 
 For $d \ge 3$, one curvature value gives only one direction inside a much larger algebra.
 Full holonomy requires a bracket-generating phenomenon: curvature directions encountered along the trajectory must not all live inside a commuting subalgebra.
@@ -1249,6 +1418,11 @@ So a small spectral gap not only amplifies statistical noise (via ASE error boun
 \end{remark}
 
 
+%% paper_part4.tex — Sections 6–8 and Appendices
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% SECTION 6: INFORMATION-THEORETIC LIMITS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Information-theoretic limits}\label{sec:info-theoretic}
 
@@ -1263,7 +1437,7 @@ Consider a parametric dynamics family with parameter $\theta \in \RR^k$ generati
 We observe adjacency matrices $\{A^{(t)}\}_{t=0}^T$ with $A^{(t)} \sim \text{Bernoulli}(P(t; \theta))$, and all entries conditionally independent given $P(t; \theta)$.
 The log-likelihood factorizes:
 \begin{equation}
-\ell(\theta) = \sum_{t=0}^T \sum_{i < j} [A_{ij}^{(t)} \log P_{ij}(t; \theta) + (1 - A_{ij}^{(t)}) \log(1 - P_{ij}(t; \theta))]
+\ell(\theta) = \sum_{t=0}^T \sum_{i < j} \bigl[A_{ij}^{(t)} \log P_{ij}(t; \theta) + (1 - A_{ij}^{(t)}) \log(1 - P_{ij}(t; \theta))\bigr]
 \end{equation}
 
 The Fisher information matrix $\mathcal{I}(\theta) \in \RR^{k \times k}$ has entries:
@@ -1274,20 +1448,18 @@ where $P_{ij} = P_{ij}(t; \theta)$ and the derivatives $\partial P_{ij} / \parti
 
 \subsection{Sensitivity propagation through the Lyapunov equation}
 
-The key quantity in \eqref{eq:fisher} is the sensitivity $\partial P_{ij} / \partial \theta_a$.
-For polynomial dynamics $N(\theta) = \sum_{k=0}^{K} \theta_k P^k$, the $P$-dynamics are:
-\begin{equation}
-\dot{P} = 2 \sum_{k=0}^{K} \theta_k P^{k+1}
-\end{equation}
+The key quantity in \cref{eq:fisher} is the sensitivity $\partial P_{ij} / \partial \theta_a$.
+For polynomial dynamics $N(\theta) = \sum_{k=0}^K \theta_k P^k$, the $P$-dynamics are:
+$\dot{P} = 2 \sum_{k=0}^K \theta_k P^{k+1}$.
 A crucial simplification comes from \cref{prop:poly-trivial-holonomy}: the eigenvectors of $P$ are stationary under polynomial dynamics.
-Writing $P = U\Lambda U^\top$ with $\Lambda = \diag(\lambda_1, \ldots, \lambda_d)$ and $U \in \RR^{n \times d}$ fixed, the sensitivity $\partial P / \partial \theta_a = U (\partial \Lambda / \partial \theta_a) U^\top$ is diagonal in the eigenbasis.
+Writing $P = U \Lambda U^\top$ with $\Lambda = \diag(\lambda_1, \ldots, \lambda_d)$ and $U \in \RR^{n \times d}$ fixed, the sensitivity $\partial P / \partial \theta_a = U (\partial \Lambda / \partial \theta_a) U^\top$ is diagonal in the eigenbasis.
 
-Each eigenvalue satisfies $\dot{\lambda}_\iota = 2 \sum_{k=0}^{K} \theta_k \lambda_\iota^{k+1}$, so:
+Each eigenvalue satisfies $\dot{\lambda}_\iota = 2 \sum_{k=0}^K \theta_k \lambda_\iota^{k+1}$, so:
 \begin{equation}
 \frac{\partial}{\partial t} \frac{\partial \lambda_\iota}{\partial \theta_a} = 2 \lambda_\iota^{a+1} + \frac{\partial \dot{\lambda}_\iota}{\partial \lambda_\iota} \cdot \frac{\partial \lambda_\iota}{\partial \theta_a}
 \end{equation}
-where $\partial \dot{\lambda}_\iota / \partial \lambda_\iota = 2 \sum_{k=0}^{K} \theta_k (k+1) \lambda_\iota^k$ is the linearized eigenvalue dynamics.
-This is a scalar linear ODE for each pair $(\iota, a)$, with forcing $2\lambda_\iota^{a+1}$ and feedback through the linearized dynamics.
+where $\partial \dot{\lambda}_\iota / \partial \lambda_\iota = 2 \sum_{k=0}^K \theta_k (k+1) \lambda_\iota^k$ is the linearized eigenvalue dynamics.
+This is a scalar linear ODE for each pair $(\iota, a)$, with forcing $2 \lambda_\iota^{a+1}$ and feedback through the linearized dynamics.
 
 The resulting sensitivity of the observed probabilities is:
 \begin{equation}\label{eq:poly-sensitivity}
@@ -1296,19 +1468,19 @@ The resulting sensitivity of the observed probabilities is:
 Each node pair $(i,j)$ receives signal from all $d$ eigenvalue sensitivities, weighted by the eigenvector loadings $U_{i\iota} U_{j\iota}$.
 
 \textbf{Example: linear dynamics ($K = 0$).}
-For $\dot{X} = \alpha_0 X$ (single parameter), the eigenvalue dynamics are $\dot{\lambda}_\iota = 2\alpha_0 \lambda_\iota$, giving $\lambda_\iota(t) = \lambda_\iota(0) e^{2\alpha_0 t}$.
-The sensitivity is $\partial \lambda_\iota / \partial \alpha_0 = 2t \lambda_\iota(t)$, and therefore:
+For $\dot{X} = \alpha_0 X$ (single parameter), the eigenvalue dynamics are $\dot{\lambda}_\iota = 2 \alpha_0 \lambda_\iota$, giving $\lambda_\iota(t) = \lambda_\iota(0) e^{2 \alpha_0 t}$.
+The sensitivity is $\partial \lambda_\iota / \partial \alpha_0 = 2 t \lambda_\iota(t)$, and therefore:
 \begin{equation}
-\frac{\partial P_{ij}}{\partial \alpha_0} = 2t \sum_\iota U_{i\iota} \lambda_\iota(t) U_{j\iota} = 2t P_{ij}(t)
+\frac{\partial P_{ij}}{\partial \alpha_0} = 2 t \sum_\iota U_{i\iota} \lambda_\iota(t) U_{j\iota} = 2 t P_{ij}(t)
 \end{equation}
 The Fisher information at a single snapshot $t$ is:
 \begin{equation}
-\mathcal{I}_t(\alpha_0) = 4t^2 \sum_{i < j} \frac{P_{ij}(t)^2}{P_{ij}(t)(1 - P_{ij}(t))} = 4t^2 \sum_{i < j} \frac{P_{ij}(t)}{1 - P_{ij}(t)}
+\mathcal{I}_t(\alpha_0) = 4 t^2 \sum_{i < j} \frac{P_{ij}(t)^2}{P_{ij}(t)(1 - P_{ij}(t))} = 4 t^2 \sum_{i < j} \frac{P_{ij}(t)}{1 - P_{ij}(t)}
 \end{equation}
 Summing over $T$ equally-spaced snapshots gives $\mathcal{I}(\alpha_0) = 4 \sum_{t=0}^T t^2 \sum_{i<j} P_{ij}(t) / (1 - P_{ij}(t))$, which scales as $O(T^3 \cdot n^2)$ when the edge probabilities are bounded away from 0 and 1.
 
 \textbf{Higher-degree terms and the spectral gap.}
-For $a \ge 1$, the forcing $2\lambda_\iota^{a+1}$ is small for eigenvalues near the spectral gap: $2\delta^{a+1}$ versus $2\lambda_1^{a+1}$.
+For $a \ge 1$, the forcing $2 \lambda_\iota^{a+1}$ is small for eigenvalues near the spectral gap: $2 \delta^{a+1}$ versus $2 \lambda_1^{a+1}$.
 This means the sensitivity $\partial \lambda_d / \partial \theta_a$ is small relative to $\partial \lambda_1 / \partial \theta_a$, so the Fisher information for higher-degree parameters $\theta_a$ receives proportionally less signal from the small-eigenvalue directions.
 Concretely, the contribution of the $\lambda_d$ direction to $\mathcal{I}(\theta)_{ab}$ scales as $\delta^{a+b+2}$, while the $\lambda_1$ direction contributes $\lambda_1^{a+b+2}$.
 
@@ -1323,7 +1495,7 @@ The factor $1 / (\lambda_\iota + \lambda_\gamma)$ amplifies noise in the off-dia
 This yields a direct correspondence: directions in parameter space that are hard geometrically (small $\lambda_\iota + \lambda_\gamma$ produces large curvature and large connection coefficients) are also hard statistically (small $\lambda_\iota + \lambda_\gamma$ amplifies estimation noise).
 
 For Laplacian dynamics, the situation is compounded by holonomy.
-The eigenvector rotation contributes additional degrees of freedom to the sensitivity, but this information is entangled with gauge degrees of freedom that the holonomy obstruction (\cref{prop:laplacian-holonomy}) prevents from being resolved locally.
+The eigenvector rotation contributes additional degrees of freedom to the sensitivity, but this information is entangled with gauge degrees of freedom that may fail to be locally resolvable when the nonzero-curvature criterion of \cref{prop:laplacian-holonomy} is met.
 
 \subsection{The statistical-geometric duality}
 
@@ -1331,7 +1503,15 @@ Combining the geometric and statistical pictures yields a unified obstruction.
 We first state the result for polynomial dynamics, then explain the broader duality.
 
 \begin{proposition}[Cram\'er--Rao Bound for Polynomial Dynamics]\label{prop:cramer-rao}
-For polynomial dynamics of degree $K$ with parameter $\theta = (\theta_0, \ldots, \theta_K) \in \RR^{k}$ ($k = K + 1$) on an RDPG with $n$ nodes, $d$ latent dimensions, and spectral gap $\delta = \lambda_d$, any unbiased estimator $\hat{\theta}$ satisfies:
+For polynomial dynamics of degree $K$ with parameter $\theta = (\theta_0, \ldots, \theta_K) \in \RR^{k}$ ($k = K + 1$), assume:
+\begin{enumerate}
+\item $\theta$ belongs to an open parameter set $\Theta \subset \RR^k$, and the true parameter is an interior point.
+\item For each $t, i, j$, the map $\theta \mapsto P_{ij}(t; \theta)$ is $C^1$, with $0 < P_{ij}(t; \theta) < 1$ on a neighborhood of the true parameter.
+\item The score is integrable and differentiation can be interchanged with expectation (standard Fisher regularity), so the information identity is valid.
+\item $\mathcal{I}(\theta)$ is positive definite on the identifiable parameter subspace.
+\end{enumerate}
+
+Then any unbiased estimator $\hat{\theta}$ satisfies:
 \begin{equation}
 \EE[\|\hat{\theta} - \theta\|^2] \ge \tr(\mathcal{I}(\theta)^{-1})
 \end{equation}
@@ -1343,34 +1523,36 @@ where $C_{\iota\gamma}(t) = \sum_{i < j} U_{i\iota} U_{j\iota} U_{i\gamma} U_{j\
 The diagonal entries $C_{\iota\iota}(t) = \mathcal{W}_\iota(t)$ measure the information content of eigenvalue direction $\iota$ at time $t$; the off-diagonal entries $C_{\iota\gamma}(t)$ for $\iota \neq \gamma$ capture cross-eigenvalue correlations.
 A baseline lower bound on each parameter's variance follows from the matrix inequality $(\mathcal{I}^{-1})_{aa} \ge 1 / \mathcal{I}_{aa}$:
 \begin{equation}
-\mathrm{Var}(\hat{\theta}_a) \ge \frac{1}{\mathcal{I}_{aa}} = \frac{1}{\sum_t \sum_\iota \left(\frac{\partial \lambda_\iota}{\partial \theta_a}\right)^2 \mathcal{W}_\iota(t) + \text{cross terms}}
+\mathrm{Var}(\hat{\theta}_a) \ge \frac{1}{\mathcal{I}_{aa}} = \frac{1}{\sum_t \sum_\iota \bigl(\frac{\partial \lambda_\iota}{\partial \theta_a}\bigr)^2 \mathcal{W}_\iota(t) + \text{cross terms}}
 \end{equation}
 Non-zero cross-eigenvalue terms arising from structured graphs (where Fisher weights correlate with eigenvector components) can only \emph{increase} the true Cram\'er--Rao bound above this baseline.
 \end{proposition}
 
 \begin{proof}
-By \eqref{eq:poly-sensitivity}, the sensitivity of $P_{ij}$ decomposes as $\partial P_{ij} / \partial \theta_a = \sum_\iota U_{i\iota} U_{j\iota} (\partial \lambda_\iota / \partial \theta_a)$.
-Substituting into \eqref{eq:fisher}:
+By \cref{eq:poly-sensitivity}, the sensitivity of $P_{ij}$ decomposes as $\partial P_{ij} / \partial \theta_a = \sum_\iota U_{i\iota} U_{j\iota} (\partial \lambda_\iota / \partial \theta_a)$.
+Substituting into \cref{eq:fisher}:
 \begin{equation}
-\mathcal{I}(\theta)_{ab} = \sum_t \sum_{i < j} \left[\sum_\iota U_{i\iota} U_{j\iota} \frac{\partial \lambda_\iota}{\partial \theta_a}\right] \left[\sum_\gamma U_{i\gamma} U_{j\gamma} \frac{\partial \lambda_\gamma}{\partial \theta_b}\right] \cdot \frac{1}{P_{ij}(1 - P_{ij})}
+\mathcal{I}(\theta)_{ab} = \sum_t \sum_{i < j} \biggl[\sum_\iota U_{i\iota} U_{j\iota} \frac{\partial \lambda_\iota}{\partial \theta_a}\biggr] \biggl[\sum_\gamma U_{i\gamma} U_{j\gamma} \frac{\partial \lambda_\gamma}{\partial \theta_b}\biggr] \cdot \frac{1}{P_{ij}(1 - P_{ij})}
 \end{equation}
 Expanding the product over $\iota, \gamma$ yields:
 \begin{equation}
 \mathcal{I}(\theta)_{ab} = \sum_t \sum_{\iota, \gamma} \frac{\partial \lambda_\iota}{\partial \theta_a} \frac{\partial \lambda_\gamma}{\partial \theta_b} \underbrace{\sum_{i<j} \frac{U_{i\iota} U_{j\iota} U_{i\gamma} U_{j\gamma}}{P_{ij}(1 - P_{ij})}}_{C_{\iota\gamma}(t)}
 \end{equation}
 
-\emph{On the cross-eigenvalue terms.}
+\textbf{On the cross-eigenvalue terms.}
 Column orthogonality of $U$ gives $\sum_i U_{i\iota} U_{i\gamma} = \delta_{\iota\gamma}$, but the Fisher weights $1/[P_{ij}(1-P_{ij})]$ are not uniform.
-In structured RDPGs (e.g., stochastic block models with equal-sized blocks), these weights are constant within blocks and the blocks are defined by the eigenvectors themselves, so the weights correlate with eigenvector components and the cross terms $C_{\iota\gamma}$ for $\iota \neq \gamma$ are generically nonzero.
+In structured RDPGs (e.g., stochastic block models with equal-sized blocks), these weights are constant within blocks and the blocks are defined by the eigenvectors themselves, so the weights correlate with eigenvector components and cross terms $C_{\iota\gamma}$ for $\iota \neq \gamma$ can be nonzero (and are nonzero in explicit blockmodel configurations).
 The Fisher information matrix is therefore \emph{not} diagonal in the eigenvalue basis for structured graphs.
 
 However, the spectral gap scaling is unaffected: the eigenvalue sensitivity $\partial \lambda_\iota / \partial \theta_a$ is determined by the scalar ODE $\dot{\lambda}_\iota = 2 \sum_k \theta_k \lambda_\iota^{k+1}$.
-The forcing term $2\lambda_\iota^{a+1}$ scales as $\delta^{a+1}$ for $\iota = d$, so the $\lambda_d$ direction contributes $O(\delta^{a+b+2})$ to $\mathcal{I}_{ab}$ regardless of whether this contribution arises from diagonal or cross terms.
+The forcing term $2 \lambda_\iota^{a+1}$ scales as $\delta^{a+1}$ for $\iota = d$, so the $\lambda_d$ direction contributes $O(\delta^{a+b+2})$ to $\mathcal{I}_{ab}$ regardless of whether this contribution arises from diagonal or cross terms.
 When $\delta \to 0$, the Fisher information matrix becomes ill-conditioned: the rows and columns involving high powers of $\delta$ shrink, making $\tr(\mathcal{I}^{-1})$ diverge.
 
-The baseline bound $(\mathcal{I}^{-1})_{aa} \ge 1/\mathcal{I}_{aa}$ follows from the Schur complement: for any positive definite matrix, the diagonal of the inverse is at least the reciprocal of the diagonal.
+The baseline bound $(\mathcal{I}^{-1})_{aa} \ge 1/\mathcal{I}_{aa}$ is immediate from Cauchy--Schwarz: $1 = (e_a^\top e_a)^2 \le (e_a^\top \mathcal{I} e_a)(e_a^\top \mathcal{I}^{-1} e_a) = \mathcal{I}_{aa} (\mathcal{I}^{-1})_{aa}$.
 This bound is tight when $\mathcal{I}$ is diagonal and loose when off-diagonal terms are large (i.e., when parameter correlations from structured graphs make estimation strictly harder than the diagonal analysis suggests).
 \end{proof}
+
+If $\mathcal{I}(\theta)$ is singular, the same derivation applies on the identifiable subspace using the Moore--Penrose pseudoinverse $\mathcal{I}^+$.
 
 The bound reveals three scaling regimes.
 Each snapshot provides $O(n^2)$ conditionally independent Bernoulli observations, so the Fisher information grows as $n^2$.
@@ -1393,18 +1575,18 @@ This scales as $\Theta(T^3 \cdot n^2)$ when edge probabilities remain bounded aw
 See \cref{app:deferred-proofs}.
 \end{proof}
 
-The cubic dependence on $T$ (rather than linear) reflects the fact that the sensitivity $\partial P_{ij} / \partial \alpha_0 = 2t P_{ij}$ grows with time: later snapshots are more informative because the perturbation has had longer to propagate.
+The cubic dependence on $T$ (rather than linear) reflects the fact that the sensitivity $\partial P_{ij} / \partial \alpha_0 = 2 t P_{ij}$ grows with time: later snapshots are more informative because the perturbation has had longer to propagate.
 This is a general feature of dynamics estimation, in contrast to i.i.d.\ settings where information accumulates linearly.
 
 The scaling $\Theta(T^3 \cdot n^2)$ holds only while the trajectory remains in the interior of the probability space.
-Linear dynamics produce exponential growth or decay of eigenvalues: $\lambda_\iota(t) = \lambda_\iota(0) e^{2\alpha_0 t}$.
+Linear dynamics produce exponential growth or decay of eigenvalues: $\lambda_\iota(t) = \lambda_\iota(0) e^{2 \alpha_0 t}$.
 For $\alpha_0 > 0$, the probabilities $P_{ij}$ grow toward 1, and the Fisher weights $P_{ij}/(1 - P_{ij})$ diverge; but the model becomes invalid as probabilities saturate, so the growth of $\mathcal{I}$ eventually halts.
-For $\alpha_0 < 0$, probabilities decay toward 0, the sensitivities $\partial P_{ij} / \partial \alpha_0 = 2t P_{ij}(t)$ shrink exponentially, and the Fisher information per snapshot saturates.
-In both cases, the $T^3$ scaling describes a \emph{short-time regime} before boundary effects dominate; the effective time horizon is $T_{\text{eff}} \sim 1/|\alpha_0|$.
+For $\alpha_0 < 0$, probabilities decay toward 0, the sensitivities $\partial P_{ij} / \partial \alpha_0 = 2 t P_{ij}(t)$ shrink exponentially, and the Fisher information per snapshot saturates.
+In both cases, the $T^3$ scaling describes a \emph{short-time regime} before boundary effects dominate; the effective time horizon is $T_{\mathrm{eff}} \sim 1/|\alpha_0|$.
 
 \textbf{The duality.}
 The statistical-geometric correspondence is sharpest for general (non-polynomial) symmetric dynamics, where the full Lyapunov structure appears.
-The connection 1-form involves factors $1 / (\lambda_\iota + \lambda_\gamma)$ controlling gauge sensitivity (\cref{sec:fiber-bundle}); the vertical bracket norm in the sectional curvature involves the same factors, with $\|[\overline{\xi}_1, \overline{\xi}_2]^{\mathcal{V}}\|^2 \sim \sum_{\iota < \gamma} \lambda_\iota \lambda_\gamma / (\lambda_\iota + \lambda_\gamma) \cdot [(U^\top [M_1, M_2] U)_{\iota\gamma}]^2$ (\cref{prop:curvature-criterion}), which diverges as $\lambda_d \to 0$ for fixed commutator; and the Fisher information for estimating $M_{\iota\gamma}$ from the Lyapunov equation $\dot{P}_{\iota\gamma} = (\lambda_\iota + \lambda_\gamma) M_{\iota\gamma}$ involves the same factor $(\lambda_\iota + \lambda_\gamma)^2$ that appears in the curvature denominator.
+The connection 1-form involves factors $1 / (\lambda_\iota + \lambda_\gamma)$ controlling gauge sensitivity (\cref{sec:fiber-bundle}); the vertical bracket norm in sectional curvature contains the same denominators (weighted as in \cref{prop:curvature-criterion}), so weak eigendirections become geometrically delicate when commutator energy lies in those directions and $\lambda_{d-1}, \lambda_d$ are small; and the Fisher information for estimating $M_{\iota\gamma}$ from the Lyapunov equation $\dot{P}_{\iota\gamma} = (\lambda_\iota + \lambda_\gamma) M_{\iota\gamma}$ involves the same factor $(\lambda_\iota + \lambda_\gamma)^2$.
 
 An important qualification: this duality applies to \emph{full operator recovery} (estimating the action of $M$ on all eigenvector directions, including the weak subspace near $\lambda_d$).
 For \emph{parsimonious parameterizations} (e.g., a single scalar parameter $\alpha_0$ shared across all eigenvalue directions), estimation can proceed primarily from the dominant modes: the contribution of $\lambda_1$ alone may suffice to identify $\alpha_0$, bypassing the ill-conditioned $\lambda_d$ direction entirely.
@@ -1414,7 +1596,7 @@ With this qualification, the correspondence remains tight: for any component of 
 Networks near rank-deficiency ($\delta \to 0$, with $\lambda_{d-1}$ also small) are simultaneously harder to align (curvature $\sim 1/(\lambda_{d-1} + \delta)$), harder to interpolate (injectivity radius $\sim \sqrt{\delta}$), and harder to estimate statistically (Fisher information for the weakest direction $\sim \delta^2$).
 
 For non-polynomial dynamics (e.g., Laplacian), sensitivity propagation is more complex because the eigenvectors of $P$ also evolve.
-The additional eigenvector sensitivity contributes positively to the Fisher information (there are more directions in which observations carry signal), but it also introduces the holonomy obstruction: the extra information is entangled with gauge degrees of freedom that \cref{prop:laplacian-holonomy} shows cannot be resolved locally.
+The additional eigenvector sensitivity contributes positively to the Fisher information (there are more directions in which observations carry signal), but it also introduces holonomy: the extra information can be entangled with gauge degrees of freedom in regions where \cref{prop:laplacian-holonomy} applies.
 A complete minimax theory for dynamics estimation in the presence of holonomy remains an important open problem.
 
 \begin{remark}
@@ -1441,6 +1623,10 @@ For finite-sample inference, the biased Cram\'er--Rao variant $\mathrm{Var}(\hat
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% SECTION 7: THE CONSTRUCTIVE PROBLEM
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{The Constructive Problem: Identifiability and Its Limits}\label{sec:constructive}
 
 The obstructions in the previous sections characterize what is and isn't observable in principle.
@@ -1462,18 +1648,14 @@ The dynamics family acts as regularization on the gauge choice.
 
 We formulate this as a joint optimization problem:
 
-\begin{definition}[Joint Alignment and Learning Problem]\sloppy
-Given ASE embeddings $\{\hat{X}^{(t)}\}_{t=0}^T$ and a dynamics family
-$\mathcal{F}$, find gauge corrections
-$\{Q_t \in O(d)\}$ and $f \in \mathcal{F}$ minimizing:
-\begin{multline}
-\mathcal{L}(\{Q_t\}, f) = \sum_{t=0}^{T-1} \bigl\|\hat{X}^{(t+1)} Q_{t+1} \\
- - \hat{X}^{(t)} Q_t - \delta t\, f(\hat{X}^{(t)} Q_t)\bigr\|_F^2
-\end{multline}
+\begin{definition}[Joint Alignment and Learning Problem]
+Given ASE embeddings $\{\hat{X}^{(t)}\}_{t=0}^T$ and a dynamics family $\mathcal{F}$, find gauge corrections $\{Q_t \in O(d)\}$ and $f \in \mathcal{F}$ minimizing:
+\begin{equation}
+\mathcal{L}(\{Q_t\}, f) = \sum_{t=0}^{T-1} \|\hat{X}^{(t+1)} Q_{t+1} - \hat{X}^{(t)} Q_t - \delta t \, f(\hat{X}^{(t)} Q_t)\|_F^2
+\end{equation}
 \end{definition}
 
 The objective measures how well the aligned discrete trajectory $\{\hat{X}^{(t)} Q_t\}$ is explained by the dynamics $f$: if the gauges are correct and $f$ captures the true dynamics, each step's displacement should match the predicted velocity.
-
 
 
 \subsection{The identifiability principle}
@@ -1485,7 +1667,7 @@ Let $X(t)$ follow true dynamics $\dot{X} = NX$ with $N = N^\top$.
 Let $S(t) \in O(d)$ be a time-varying (mis)gauge and define the gauged trajectory $\tilde{X}(t) = X(t) S(t)$.
 Then
 \begin{equation}
-\dot{\tilde{X}} = N\tilde{X} + \tilde{X} \Omega
+\dot{\tilde{X}} = N \tilde{X} + \tilde{X} \Omega
 \end{equation}
 where $\Omega(t) = S(t)^\top \dot{S}(t) \in \so(d)$ is skew-symmetric.
 
@@ -1498,30 +1680,22 @@ Moreover, if $\tilde{X}(t)$ has full column rank for all $t$ in an interval, the
 
 \begin{proof}
 By the product rule,
-\begin{equation}
-\dot{\tilde{X}} = \dot{X} S + X \dot{S} = NXS + X\dot{S}.
-\end{equation}
+$\dot{\tilde{X}} = \dot{X} S + X \dot{S} = NXS + X\dot{S}$.
 Using $X = \tilde{X} S^\top$ (since $S \in O(d)$), this becomes
-\begin{equation}
-\dot{\tilde{X}} = N\tilde{X} + \tilde{X} (S^\top \dot{S}) = N\tilde{X} + \tilde{X} \Omega,
-\end{equation}
+$\dot{\tilde{X}} = N \tilde{X} + \tilde{X} (S^\top \dot{S}) = N \tilde{X} + \tilde{X} \Omega$,
 where $\Omega = S^\top \dot{S} \in \so(d)$ because differentiating $S^\top S = I$ gives $\dot{S}^\top S + S^\top \dot{S} = 0$.
 
 Now suppose $\dot{\tilde{X}} = \tilde{N} \tilde{X}$ for some symmetric (possibly time-varying) $\tilde{N}$ and that $\tilde{X}$ has full column rank, so $G = \tilde{X}^\top \tilde{X}$ is positive definite.
 Left-multiplying by $\tilde{X}^\top$ gives
-\begin{equation}
-\tilde{X}^\top \dot{\tilde{X}} = \tilde{X}^\top \tilde{N} \tilde{X},
-\end{equation}
+$\tilde{X}^\top \dot{\tilde{X}} = \tilde{X}^\top \tilde{N} \tilde{X}$,
 and the right-hand side is symmetric because $\tilde{N}$ is symmetric.
 
 On the other hand, from the decomposition above,
-\begin{equation}
-\tilde{X}^\top \dot{\tilde{X}} = \tilde{X}^\top N \tilde{X} + G\Omega.
-\end{equation}
-The term $\tilde{X}^\top N \tilde{X}$ is symmetric, hence $G\Omega$ must be symmetric as well.
-But if $G$ is symmetric positive definite and $\Omega$ is skew-symmetric, then $G\Omega$ is symmetric iff $\Omega = 0$ (equivalently, $G\Omega + \Omega G = 0$ implies $\Omega = 0$).
+$\tilde{X}^\top \dot{\tilde{X}} = \tilde{X}^\top N \tilde{X} + G \Omega$.
+The term $\tilde{X}^\top N \tilde{X}$ is symmetric, hence $G \Omega$ must be symmetric as well.
+But if $G$ is symmetric positive definite and $\Omega$ is skew-symmetric, then $G \Omega$ is symmetric iff $\Omega = 0$ (equivalently, $G \Omega + \Omega G = 0$ implies $\Omega = 0$).
 Therefore $\Omega = 0$, which means $S$ is constant in time.
-The converse direction is immediate: if $\Omega = 0$ then $\dot{\tilde{X}} = N\tilde{X}$ is already of the required form with symmetric generator $N$.
+The converse direction is immediate: if $\Omega = 0$ then $\dot{\tilde{X}} = N \tilde{X}$ is already of the required form with symmetric generator $N$.
 \end{proof}
 
 The mechanism is elegant: random ASE gauge errors $R^{(t)}$ introduce skew-symmetric contamination that \emph{cannot be absorbed} by symmetric dynamics.
@@ -1542,7 +1716,15 @@ Both have closed-form updates per step.
 \subsection{The downstream pipeline: from trajectories to equations}
 
 Suppose, optimistically, that the trajectory recovery problem were solved, that is, some method (structure-constrained alignment, a future $P$-level estimator, or domain-specific prior information) produced gauge-consistent estimates $\tilde{X}^{(t)}$ of the latent positions, up to noise.
-When multiple independent network samples $A_1^{(t)}, \ldots, A_m^{(t)}$ are available at each time $t$, averaging $\bar{A}^{(t)} = \frac{1}{m} \sum_i A_i^{(t)}$ before embedding reduces per-entry variance by a factor of $m$ and (heuristically, in standard dense regimes) reduces per-vertex embedding error by about $\sqrt{m}$, potentially making trajectory recovery feasible even when individual snapshots are noisy.
+
+\begin{remark}
+\textbf{Sampling-averaging heuristic.}
+When multiple independent network samples $A_1^{(t)}, \ldots, A_m^{(t)}$ are available at each time $t$, averaging
+$\bar{A}^{(t)} = \frac{1}{m} \sum_i A_i^{(t)}$
+reduces per-entry variance by a factor of $m$.
+In standard dense perturbative regimes, one therefore expects roughly a $\sqrt{m}$ improvement in per-vertex embedding error.
+We use this as a practical scaling heuristic, not as a proved rate in this manuscript.
+\end{remark}
 
 Given such a recovered trajectory, the remaining steps are well-established.
 \emph{Universal Differential Equations} (UDEs)~\citep{rackauckas2020universal} provide a framework for learning dynamics that combine known mechanistic structure with neural network flexibility:
@@ -1613,9 +1795,7 @@ However, there is a natural special case in which the gauge problem admits a cle
 Suppose a subset $S \subset \{1, \ldots, n\}$ of nodes has $\dot{x}_i = 0$ for $i \in S$. These are ``anchor'' points whose latent positions do not move.
 At each time $t$, ASE produces $\hat{X}^{(t)} = X^{(t)} R^{(t)} + E^{(t)}$ with a gauge factor $R^{(t)} \in O(d)$ (coming from the eigendecomposition choice) and estimation noise $E^{(t)}$.
 For anchor nodes $i \in S$, we have $x_i^{(t)} = x_i^{(0)}$ for all $t$, so the anchor rows satisfy
-\begin{equation}
-\hat{X}_S^{(t)} = X_S R^{(t)} + E_S^{(t)}
-\end{equation}
+$\hat{X}_S^{(t)} = X_S R^{(t)} + E_S^{(t)}$
 where $X_S \in \RR^{|S| \times d}$ is constant.
 
 Align the anchor rows to a reference frame (say $t = 0$) via Procrustes:
@@ -1634,9 +1814,9 @@ Holonomy is irrelevant because we never attempt to propagate a gauge along the t
 \textbf{Conditions and limitations.}
 The anchor principle requires:
 \begin{enumerate}
-\item \textbf{Well-conditioned anchors:} the anchor position matrix $X_S \in \RR^{|S| \times d}$ must have full column rank for the Procrustes problem to be determined, and should be well-conditioned ($\sigma_d(X_S)$ not too small) for robustness to noise. Counting anchors alone is insufficient: $|S| \gg d$ anchors that are nearly collinear or clustered around a single point leave the rotation poorly constrained in orthogonal directions. This is the same stability story as in the classical orthogonal Procrustes problem: the rotation estimate becomes sensitive when the reference configuration is nearly rank-deficient. (We do not reproduce a full perturbation bound here; the key point for our purposes is the conditioning dependence. See, e.g., standard treatments of Procrustes perturbation theory, or interpret it directly through the SVD formula for Procrustes and Weyl/Wedin-type eigen/singular vector perturbation bounds.)
-\item \textbf{Known anchor identity:} we must know which nodes are stationary. In practice this could come from domain knowledge (e.g., established species in an ecological network, institutional nodes in a social network) or from a preliminary analysis identifying nodes with low temporal variance.
-\item \textbf{Approximately stationary anchors:} if anchor nodes drift slowly (with velocity $\|\dot{x}_i\| = \epsilon$ for $i \in S$), the alignment incurs a systematic bias that grows with the time horizon. A crude but useful rule of thumb is that anchor drift should remain small compared to the embedding noise accumulated over the window of interest; otherwise, the ``reference frame'' itself becomes moving.
+\item \emph{Well-conditioned anchors:} the anchor position matrix $X_S \in \RR^{|S| \times d}$ must have full column rank for the Procrustes problem to be determined, and should be well-conditioned ($\sigma_d(X_S)$ not too small) for robustness to noise. Counting anchors alone is insufficient: $|S| \gg d$ anchors that are nearly collinear or clustered around a single point leave the rotation poorly constrained in orthogonal directions. This is the same stability story as in the classical orthogonal Procrustes problem: the rotation estimate becomes sensitive when the reference configuration is nearly rank-deficient. (We do not reproduce a full perturbation bound here; the key point for our purposes is the conditioning dependence. See, e.g., standard treatments of Procrustes perturbation theory, or interpret it directly through the SVD formula for Procrustes and Weyl/Wedin-type eigen/singular vector perturbation bounds.)
+\item \emph{Known anchor identity:} we must know which nodes are stationary. In practice this could come from domain knowledge (e.g., established species in an ecological network, institutional nodes in a social network) or from a preliminary analysis identifying nodes with low temporal variance.
+\item \emph{Approximately stationary anchors:} if anchor nodes drift slowly (with velocity $\|\dot{x}_i\| = \epsilon$ for $i \in S$), the alignment incurs a systematic bias that grows with the time horizon. A crude but useful rule of thumb is that anchor drift should remain small compared to the embedding noise accumulated over the window of interest; otherwise, the ``reference frame'' itself becomes moving.
 \end{enumerate}
 
 \begin{remark}
@@ -1680,26 +1860,28 @@ We measure alignment quality by the mean Procrustes error:
 where $Q^*$ is the best global alignment to the true trajectory (accounting for the residual gauge at $t = 0$).
 We sweep over four experimental conditions: anchor count $n_a$, trajectory length $T$, anchor drift rate $\epsilon$, and initial embedding norm scale (controlling signal-to-noise ratio).
 
-\begin{figure}[!htbp]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=0.95\textwidth]{plots/anchor-main-results.png}
-\caption{%
+\caption{
 Anchor-based alignment experiment ($n = 200$, $d = 2$, polynomial dynamics $\dot{X} = (\alpha_0 I + \alpha_1 P) X$ with $m = 3$ Bernoulli samples per time step).
 \textbf{(a)} Alignment error vs.\ number of anchor nodes: below $n_a = d = 2$ (dashed vertical line) Procrustes is underdetermined and alignment fails; with sufficient anchors, error stabilizes at the ASE noise floor.
 \textbf{(b)} Error accumulation over trajectory length: anchor-based alignment (blue) remains bounded while sequential Procrustes (coral, dashed) grows with $T$, consistent with $O(\sqrt{T})$ drift accumulation.
 \textbf{(c)} Effect of anchor drift rate $\epsilon$: with larger $\epsilon$, systematic bias from drifting anchors becomes visible.
 \textbf{(d)} Per-timestep alignment error for the $T = 200$ trajectory: the anchor-based error (blue) remains approximately flat, while sequential Procrustes (coral) accumulates drift, with the gap widening toward later time steps.
 Shaded bands show $\pm 1$ standard deviation across 20 Monte Carlo repetitions.
-}\label{fig:anchor-main}
+}
+\label{fig:anchor-main}
 \end{figure}
 
-\begin{figure}[!htbp]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=0.95\textwidth]{plots/anchor-spectral-portrait.png}
-\caption{%
+\caption{
 \textbf{(a)} Alignment error as a function of the initial embedding norm scale (proxy for signal strength): smaller norms yield weaker signals and less informative Bernoulli observations, increasing ASE noise and degrading alignment for both methods. Note that uniform scaling preserves the condition number $\sigma_1 / \sigma_2$ (constant at $\approx 2.2$); this experiment varies signal \emph{magnitude} rather than the spectral gap ratio.
 \textbf{(b)} Phase portrait with $n_a = 15$ anchor nodes (red diamonds, stationary) and non-anchor nodes (gray trajectories evolving under polynomial dynamics) in $B_+^2$.
-}\label{fig:anchor-spectral}
+}
+\label{fig:anchor-spectral}
 \end{figure}
 
 \textbf{Results.}
@@ -1734,7 +1916,7 @@ The 100 non-anchor nodes evolve under damped spiral dynamics around their commun
 \begin{equation}
 \dot{x}_i = (-\gamma + \beta \|x_i - \mu_k\|^2)(x_i - \mu_k) + \omega J(x_i - \mu_k)
 \end{equation}
-where $J = \frac{1}{\sqrt{3}} \begin{pmatrix} 0 & -1 & 1 \\ 1 & 0 & -1 \\ -1 & 1 & 0 \end{pmatrix}$ is the rotation generator around the $(1,1,1)/\sqrt{3}$ axis, and $(\gamma, \beta, \omega) = (0.3, -0.5, 1.0)$.
+where $J = \frac{1}{\sqrt{3}} \bigl(\begin{smallmatrix} 0 & -1 & 1 \\ 1 & 0 & -1 \\ -1 & 1 & 0 \end{smallmatrix}\bigr)$ is the rotation generator around the $(1,1,1)/\sqrt{3}$ axis, and $(\gamma, \beta, \omega) = (0.3, -0.5, 1.0)$.
 These dynamics are \emph{not} gauge-equivariant: the centroids $\mu_k$ and rotation axis live in $X$-space coordinates, so a misaligned trajectory $\tilde{X}(t)$ produces different offsets $\tilde{x}_i - \mu_k \neq x_i - \mu_k$, corrupting the dynamics structure.
 
 We observe $m = 10$ independent adjacency matrices per time step over $T = 50$ steps at $\delta t = 0.1$, compute ASE embeddings, and apply three alignment conditions: anchor-based Procrustes, sequential Procrustes, and no alignment (raw ASE with random per-frame rotations).
@@ -1751,28 +1933,25 @@ The UDE is trained by solving the neural ODE forward from the initial condition 
 
 \textbf{Primary metric: total dynamics MSE (the main story).}
 Because the NN can absorb part of the linear damping term, the additive decomposition
-\begin{equation}
-f_{\text{learned}}(\delta) = -\hat{\gamma} \delta + f_\theta(\delta)
-\end{equation}
+$f_{\text{learned}}(\delta) = -\hat{\gamma} \delta + f_\theta(\delta)$
 has an inherent identifiability caveat: different $(\hat{\gamma}, f_\theta)$ pairs can yield essentially the same total vector field.
 So we evaluate what we actually care about, namely the \emph{total learned dynamics}, against the true dynamics
-\begin{equation}
-f_{\text{true}}(\delta) = (-\gamma + \beta \|\delta\|^2) \delta + \omega J \delta
-\end{equation}
+$f_{\text{true}}(\delta) = (-\gamma + \beta \|\delta\|^2) \delta + \omega J \delta$
 on a held-out cloud of random test inputs $\delta \in [-0.3, 0.3]^3$ (2000 samples in our implementation).
 This metric is intentionally invariant to how the model splits responsibility between $\hat{\gamma}$ and the NN.
 
-\begin{figure}[!htbp]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=0.95\textwidth]{plots/ude-pipeline-results.png}
-\caption{%
+\caption{
 UDE pipeline experiment ($n = 200$, $d = 3$, damped spiral dynamics with rotation around $(1,1,1)/\sqrt{3}$, $m = 10$ Bernoulli samples per frame).
 \textbf{(a)} True trajectories (gray) and anchor-aligned ASE (blue) in $B_+^3$; anchor nodes shown as red diamonds.
 \textbf{(b)} Learned NN residual $f_\theta(\delta)$ vs.\ true residual $f_u(\delta)$: anchor-aligned data (left) produces tight agreement along the diagonal; sequential Procrustes (center) and unaligned data (right) degrade progressively.
 \textbf{(c)} Symbolic regression Pareto fronts (loss vs.\ expression complexity): anchor-aligned data achieves $1$--$2$ orders of magnitude lower loss at each complexity level.
 \textbf{(d)} Total dynamics MSE (log scale) by alignment condition: anchor alignment achieves MSE $\approx 6 \times 10^{-4}$, sequential Procrustes $\approx 8 \times 10^{-3}$ ($13\times$ worse), and unaligned $\approx 0.44$ ($\approx 700\times$ worse).
 Error bars show $\pm 1$ standard deviation across 5 repetitions.
-}\label{fig:ude-pipeline}
+}
+\label{fig:ude-pipeline}
 \end{figure}
 
 \textbf{Results.}
@@ -1803,6 +1982,10 @@ When dynamics depend on $X$-space coordinates, alignment quality directly contro
 Anchor-based alignment provides the gauge-consistent trajectories that the downstream UDE pipeline requires.
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% SECTION 8: DISCUSSION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Discussion and conclusion}\label{sec:discussion}
 
 We hope to have convinced the reader that treating a Random Dot Product Graph as a dynamical system is appealing, even if there are geometric and statistical reasons that make it genuinely difficult.
@@ -1815,7 +1998,7 @@ Third, the trajectory-recovery problem shows that in the standard RDPG pipeline-
 
 The differential geometric setting we adopted and developed (\cref{sec:fiber-bundle}) formalizes gauge freedom as a principal bundle and makes the connection/curvature/holonomy machinery explicit in the RDPG setting.
 The connection 1-form formalizes ``gauge velocity,'' and curvature/holonomy explain why local alignment may fail to globalize.
-The analysis of concrete dynamics allowed us to identify a sharp holonomy dichotomy (\cref{sec:holonomy-dynamics}): polynomial dynamics act through commuting generators (trivial holonomy along trajectories), whereas Laplacian dynamics generically introduce non-commuting generators and hence nontrivial holonomy (full $\mathrm{SO}(2)$ for $d=2$), introducing a genuine global obstruction.
+The analysis of concrete dynamics allowed us to identify a robust holonomy contrast (\cref{sec:holonomy-dynamics}): polynomial dynamics act through commuting generators (trivial holonomy along trajectories), whereas Laplacian dynamics satisfy a proved local nontrivial-holonomy criterion and, in $d=2$, a full restricted holonomy $\mathrm{SO}(2)$ consequence; for $d \ge 3$, we give a conditional full-holonomy criterion and keep the generic full-holonomy statement conjectural.
 The information-theoretic analysis (\cref{sec:info-theoretic}) highlights a deep statistics-geometry duality: the same spectral quantities that control curvature and injectivity also control Fisher information and ill-conditioning.
 
 The difficulties we exposed do not leave us without hopes.
@@ -1828,53 +2011,70 @@ Bridging this gap is an open problem. In particular, it would be valuable to cha
 
 Several avenues seem promising for narrowing the constructive gap, both by bypassing gauge when possible and by quantifying the geometric effects when it cannot be avoided.
 \begin{enumerate}
-\item \textbf{Work in $P$-space when possible.} The $P$-dynamics viewpoint (\cref{sec:p-dynamics}) bypasses gauge in principle. The Euclidean mirror framework of~\citep{athreya2024euclidean} demonstrates that a gauge-invariant scalar summary of the $P$-trajectory (the spectral-norm Procrustes distance between network states) can be consistently estimated and is practically useful for change-point detection. However, learning dynamics requires the full matrix $\dot{P}$, not only the scalar inter-time distance. At present, we lack an estimation theory for recovering $\dot{P}$ and inverting the Lyapunov structure from Bernoulli samples. The $1/(\lambda_\iota + \lambda_\gamma)$ amplification suggests that minimax rates will depend sharply on the spectral gap; pinning this down would clarify when $P$-level dynamics inference is practically viable and whether the mirror's estimation guarantees can be extended to the richer differential structure required here.
-\item \textbf{Quantify holonomy, not only its existence.} Beyond generic nontriviality, one would like trajectory-dependent ``holonomy budgets'': how much gauge drift should be expected over a cycle as a function of curvature and of proximity to rank deficiency?
-\item \textbf{Achievability of the CRB.} For polynomial dynamics (trivial holonomy, explicit eigenvalue ODEs), a matching upper bound via likelihood-based estimators on the $P$-trajectory appears plausible. For Laplacian dynamics, holonomy suggests that achieving the CRB may require estimators that explicitly account for gauge transport.
-\item \textbf{Sparsity changes everything.} In the sparse regime $P = \rho_n XX^\top$ with $\rho_n \to 0$, injectivity shrinks, and both curvature and ASE error deteriorate. The combined effect on dynamics recovery remains largely unexplored.
+\item \emph{Work in $P$-space when possible.} The $P$-dynamics viewpoint (\cref{sec:p-dynamics}) bypasses gauge in principle. The Euclidean mirror framework of \citet{athreya2024euclidean} demonstrates that a gauge-invariant scalar summary of the $P$-trajectory (the spectral-norm Procrustes distance between network states) can be consistently estimated and is practically useful for change-point detection. However, learning dynamics requires the full matrix $\dot{P}$, not only the scalar inter-time distance. At present, we lack an estimation theory for recovering $\dot{P}$ and inverting the Lyapunov structure from Bernoulli samples. The $1/(\lambda_\iota + \lambda_\gamma)$ amplification suggests that minimax rates will depend sharply on the spectral gap; pinning this down would clarify when $P$-level dynamics inference is practically viable and whether the mirror's estimation guarantees can be extended to the richer differential structure required here.
+\item \emph{Quantify holonomy, not only its existence.} Beyond generic nontriviality, one would like trajectory-dependent ``holonomy budgets'': how much gauge drift should be expected over a cycle as a function of curvature and of proximity to rank deficiency?
+\item \emph{Achievability of the CRB.} For polynomial dynamics (trivial holonomy, explicit eigenvalue ODEs), a matching upper bound via likelihood-based estimators on the $P$-trajectory appears plausible. For Laplacian dynamics, holonomy suggests that achieving the CRB may require estimators that explicitly account for gauge transport.
+\item \emph{Sparsity changes everything.} In the sparse regime $P = \rho_n XX^\top$ with $\rho_n \to 0$, injectivity shrinks, and both curvature and ASE error deteriorate. The combined effect on dynamics recovery remains largely unexplored.
 \end{enumerate}
 
 Our results have direct interest in applications. Learning interpretable dynamics from network data has the potential to be useful across neuroscience, ecology, and social systems. Characterizing which dynamics are possible \emph{within} the framework helps inform modelling decisions.
 As for any model, the RDPG assumptions are structurally strong, and learned dynamics should be treated as hypotheses to be stress-tested against domain knowledge and model misspecification.
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% ACKNOWLEDGMENTS AND CODE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section*{Acknowledgments}
+
 We are extremely grateful to our student Connor Stirling James Smith, who pioneered this research in his Thesis work and had to deal with the challenges of working with non-gauge-equivariant dynamics before the mathematical settings was developed.
 
 \section*{Code Availability}
+
 Julia code for reproducing the results and data are available at \url{https://github.com/gvdr/RDPG_in_differential_geometry}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% BIBLIOGRAPHY
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \bibliographystyle{plainnat}
 \bibliography{bibliography}
 
-\appendix
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% APPENDICES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\clearpage
 \appendix
 
 \section{Deferred Proofs}\label{app:deferred-proofs}
 
 \textbf{Proof of \cref{prop:measure-zero} (Measure Zero).}
-Assume $\mathcal{F}$ is a finite-dimensional family with $p$ parameters (e.g., polynomial dynamics with $p = K+1$ coefficients), and restrict attention to a parameter domain on which solutions exist on $[0,T]$ and depend smoothly on parameters and initial conditions (standard under local Lipschitz conditions in $X$ and smoothness in parameters).
-For each $(f, X_0) \in \mathcal{F} \times \RR^{n \times d}$, the Picard--Lindel\"of theorem yields a unique solution $X(\cdot; f, X_0) \in C^k([0,T], \RR^{n \times d})$.
-The solution map $\Phi: (f, X_0) \mapsto X(\cdot; f, X_0)$ is smooth, so $\mathcal{M}_{\mathcal{F}} = \im(\Phi)$ is the image of a smooth map from an $m$-dimensional manifold (with $m = p + nd$) into the path space $\mathcal{X} = C^k([0,T], \RR^{n \times d})$.
+Assume $\mathcal{F}$ is a finite-dimensional family with $p$ parameters (e.g., polynomial dynamics with $p = K+1$ coefficients), and restrict attention to a parameter domain on which solutions exist on $[0,T]$ and depend smoothly on parameters and initial conditions (standard under local Lipschitz conditions in $X$ and smoothness in parameters; see Lee, \emph{Introduction to Smooth Manifolds}, 2nd ed., 2013, book-level reference).
+For each $(f, X_0) \in \mathcal{F} \times \RR^{n \times d}$, the Picard--Lindel\"of theorem yields a unique solution $X(\cdot; f, X_0) \in C^k([0,T], \RR^{n \times d})$ (same reference).
+The solution map $\Phi: (f, X_0) \mapsto X(\cdot; f, X_0)$ is smooth, so $\mathcal{M}_\mathcal{F} = \im(\Phi)$ is the image of a smooth map from an $m$-dimensional manifold (with $m = p + nd$) into the path space $\mathcal{X} = C^k([0,T], \RR^{n \times d})$.
 
 Choose $m + 1$ continuous linear functionals $\ell_1, \ldots, \ell_{m+1}$ on $\mathcal{X}$ (for example, evaluations of specific coordinates at distinct times) and define $L = (\ell_1, \ldots, \ell_{m+1}): \mathcal{X} \to \RR^{m+1}$.
 Choose these functionals so that the pushforward $L_* \mu$ is non-degenerate (equivalently, has full-rank covariance), hence absolutely continuous with respect to Lebesgue measure on $\RR^{m+1}$.
 Then $L \circ \Phi: \RR^m \to \RR^{m+1}$ is a smooth map between finite-dimensional spaces with $m < m+1$.
-A standard consequence of Sard's theorem (equivalently, the area formula) is that the image of such a map has Lebesgue measure zero in $\RR^{m+1}$.
-Thus $L(\mathcal{M}_{\mathcal{F}}) \subseteq \im(L \circ \Phi)$ also has Lebesgue measure zero, and therefore
-$\mu(\mathcal{M}_{\mathcal{F}}) \le (L_* \mu)(L(\mathcal{M}_{\mathcal{F}})) = 0$. $\square$
+A standard consequence of Sard's theorem (equivalently, the area formula) is that the image of such a map has Lebesgue measure zero in $\RR^{m+1}$ (book-level reference: Milnor, \emph{Topology from the Differentiable Viewpoint}, 1997 ed., Sard theorem section).
+Thus $L(\mathcal{M}_\mathcal{F}) \subseteq \im(L \circ \Phi)$ also has Lebesgue measure zero, and therefore
+$\mu(\mathcal{M}_\mathcal{F}) \le (L_* \mu)(L(\mathcal{M}_\mathcal{F})) = 0$. \qed
+
+\medskip
 
 \textbf{Proof of \cref{cor:linear-fisher} (Linear Dynamics: Explicit Fisher Information).}
-For linear dynamics $\dot{X} = \alpha_0 X$, the solution is $X(t) = e^{\alpha_0 t} X(0)$, giving $P(t) = e^{2\alpha_0 t} P(0)$.
-The sensitivity is $\partial P_{ij}(t) / \partial \alpha_0 = 2t e^{2\alpha_0 t} P_{ij}(0) = 2t P_{ij}(t)$.
+For linear dynamics $\dot{X} = \alpha_0 X$, the solution is $X(t) = e^{\alpha_0 t} X(0)$, giving $P(t) = e^{2 \alpha_0 t} P(0)$.
+The sensitivity is $\partial P_{ij}(t) / \partial \alpha_0 = 2t e^{2 \alpha_0 t} P_{ij}(0) = 2t P_{ij}(t)$.
 Since there is a single scalar parameter, the Fisher information is:
 \begin{equation}
-\mathcal{I}(\alpha_0) = \sum_{t=0}^T \sum_{i < j} \left(\frac{\partial P_{ij}(t)}{\partial \alpha_0}\right)^2 \cdot \frac{1}{P_{ij}(t)(1 - P_{ij}(t))} = 4 \sum_{t=0}^T t^2 \sum_{i < j} \frac{P_{ij}(t)}{1 - P_{ij}(t)}
+\mathcal{I}(\alpha_0) = \sum_{t=0}^T \sum_{i < j} \biggl(\frac{\partial P_{ij}(t)}{\partial \alpha_0}\biggr)^2 \cdot \frac{1}{P_{ij}(t)(1 - P_{ij}(t))} = 4 \sum_{t=0}^T t^2 \sum_{i < j} \frac{P_{ij}(t)}{1 - P_{ij}(t)}
 \end{equation}
 For the scaling claim: when $P_{ij}(t) \in [\epsilon, 1 - \epsilon]$ for some $\epsilon > 0$, the inner sum $\sum_{i < j} P_{ij} / (1 - P_{ij})$ is $\Theta(n^2)$ (there are $\binom{n}{2}$ terms, each bounded away from zero and infinity).
 The outer sum $\sum_{t=0}^T t^2 = T(T+1)(2T+1)/6 = \Theta(T^3)$.
-Therefore $\mathcal{I}(\alpha_0) = \Theta(T^3 \cdot n^2)$, giving a Cram\'er--Rao lower bound $\mathrm{Var}(\hat{\alpha}_0) \ge \mathcal{I}^{-1} = \Omega(1/(T^3 n^2))$. $\square$
+Therefore $\mathcal{I}(\alpha_0) = \Theta(T^3 \cdot n^2)$, giving a Cram\'er--Rao lower bound $\mathrm{Var}(\hat{\alpha}_0) \ge \mathcal{I}^{-1} = \Omega(1/(T^3 n^2))$. \qed
 
 
 \section{Vertical Projection onto the Fiber}\label{app:vertical-projection}
@@ -1889,13 +2089,11 @@ X^\top (Z - X\Omega^*) = X^\top Z - G\Omega^* \quad \text{must be symmetric}
 \end{equation}
 where $G = X^\top X$ is positive definite.
 Decomposing $X^\top Z$ into symmetric and skew-symmetric parts, $X^\top Z = \sym(X^\top Z) + \skewop(X^\top Z)$, the condition becomes:
-\begin{equation}
-\skewop(G\Omega^*) = \skewop(X^\top Z)
-\end{equation}
+$\skewop(G\Omega^*) = \skewop(X^\top Z)$.
 
 Since $\Omega^*$ is skew-symmetric and $G$ is symmetric, the skew-symmetric part of $G\Omega^*$ is:
 \begin{equation}
-\skewop(G\Omega^*) = \frac{1}{2}(G\Omega^* - (G\Omega^*)^\top) = \frac{1}{2}(G\Omega^* + \Omega^* G)
+\skewop(G\Omega^*) = \frac{1}{2} (G\Omega^* - (G\Omega^*)^\top) = \frac{1}{2} (G\Omega^* + \Omega^* G)
 \end{equation}
 where the last step uses $\Omega^{*\top} = -\Omega^*$ and $G^\top = G$.
 Equating:
@@ -1911,14 +2109,14 @@ In the eigenbasis of $G = \diag(\lambda_1, \ldots, \lambda_d)$, the solution is 
 \end{equation}
 
 For the application in \cref{prop:curvature-criterion}, $Z = SX$ with $S$ skew-symmetric.
-Then $X^\top Z = X^\top SX$, which is already skew-symmetric (since $(X^\top SX)^\top = X^\top S^\top X = -X^\top SX$), so $\skewop(X^\top SX) = X^\top SX$ and the Lyapunov equation becomes $G\Omega^* + \Omega^* G = 2X^\top SX$.
+Then $X^\top Z = X^\top S X$, which is already skew-symmetric (since $(X^\top S X)^\top = X^\top S^\top X = -X^\top S X$), so $\skewop(X^\top S X) = X^\top S X$ and the Lyapunov equation becomes $G\Omega^* + \Omega^* G = 2 X^\top S X$.
 
 
 \section{Norm of the Vertical Bracket Component}\label{app:vertical-norm}
 
-We derive the explicit formula for $\|[\overline{\xi}_1, \overline{\xi}_2]^{\mathcal{V}}\|^2$ stated in \cref{prop:curvature-criterion}.
+We derive the explicit formula for $\|[\bar{\xi}_1, \bar{\xi}_2]^{\mathcal{V}}\|^2$ stated in \cref{prop:curvature-criterion}.
 
-The vertical component is $X\Omega^*$ with $\Omega^*_{\iota\gamma} = 2(X^\top SX)_{\iota\gamma} / (\lambda_\iota + \lambda_\gamma)$ where $S = -[M_1, M_2]$ (\cref{app:vertical-projection}).
+The vertical component is $X\Omega^*$ with $\Omega^*_{\iota\gamma} = 2(X^\top S X)_{\iota\gamma} / (\lambda_\iota + \lambda_\gamma)$ where $S = -[M_1, M_2]$ (\cref{app:vertical-projection}).
 Its squared norm in the ambient Euclidean metric is:
 \begin{equation}
 \|X\Omega^*\|^2 = \tr((X\Omega^*)^\top X\Omega^*) = \tr(\Omega^{*\top} G \Omega^*)
@@ -1928,27 +2126,23 @@ Working in the eigenbasis of $G = \diag(\lambda_1, \ldots, \lambda_d)$:
 \begin{equation}
 \tr(\Omega^{*\top} G \Omega^*) = \sum_{\iota, \gamma} \lambda_\iota (\Omega^*_{\iota\gamma})^2
 \end{equation}
-(using $\tr(A^\top BA) = \sum_a b_a \sum_b A_{ab}^2$ when $B = \diag(b_1, \ldots, b_d)$; diagonal terms vanish since $\Omega^*_{\iota\iota} = 0$).
+(using $\tr(A^\top B A) = \sum_a b_a \sum_b A_{ab}^2$ when $B = \diag(b_1, \ldots, b_d)$; diagonal terms vanish since $\Omega^*_{\iota\iota} = 0$).
 Collecting the pair $(\iota, \gamma)$ and $(\gamma, \iota)$ for $\iota < \gamma$ and using skew-symmetry $(\Omega^*_{\gamma\iota})^2 = (\Omega^*_{\iota\gamma})^2$:
 \begin{equation}
 = \sum_{\iota < \gamma} (\lambda_\iota + \lambda_\gamma)(\Omega^*_{\iota\gamma})^2
 \end{equation}
 
-Substituting $\Omega^*_{\iota\gamma} = 2(X^\top SX)_{\iota\gamma} / (\lambda_\iota + \lambda_\gamma)$:
+Substituting $\Omega^*_{\iota\gamma} = 2(X^\top S X)_{\iota\gamma} / (\lambda_\iota + \lambda_\gamma)$:
 \begin{equation}
-= \sum_{\iota < \gamma} (\lambda_\iota + \lambda_\gamma) \cdot \frac{4(X^\top SX)_{\iota\gamma}^2}{(\lambda_\iota + \lambda_\gamma)^2} = 4 \sum_{\iota < \gamma} \frac{(X^\top SX)_{\iota\gamma}^2}{\lambda_\iota + \lambda_\gamma}
+= \sum_{\iota < \gamma} (\lambda_\iota + \lambda_\gamma) \cdot \frac{4(X^\top S X)_{\iota\gamma}^2}{(\lambda_\iota + \lambda_\gamma)^2} = 4 \sum_{\iota < \gamma} \frac{(X^\top S X)_{\iota\gamma}^2}{\lambda_\iota + \lambda_\gamma}
 \end{equation}
 
-It remains to express $(X^\top SX)_{\iota\gamma}$ in terms of $(U^\top [M_1, M_2] U)_{\iota\gamma}$.
-Writing $X = U\Lambda^{1/2}$ in the canonical gauge (where $U$ has orthonormal columns spanning $\col(X)$ and $\Lambda = \diag(\lambda_1, \ldots, \lambda_d)$):
-\begin{equation}
-X^\top SX = \Lambda^{1/2} U^\top SU \Lambda^{1/2}
-\end{equation}
-so $(X^\top SX)_{\iota\gamma} = \sqrt{\lambda_\iota} (U^\top SU)_{\iota\gamma} \sqrt{\lambda_\gamma}$.
+It remains to express $(X^\top S X)_{\iota\gamma}$ in terms of $(U^\top [M_1, M_2] U)_{\iota\gamma}$.
+Writing $X = U \Lambda^{1/2}$ in the canonical gauge (where $U$ has orthonormal columns spanning $\col(X)$ and $\Lambda = \diag(\lambda_1, \ldots, \lambda_d)$):
+$X^\top S X = \Lambda^{1/2} U^\top S U \Lambda^{1/2}$
+so $(X^\top S X)_{\iota\gamma} = \sqrt{\lambda_\iota} (U^\top S U)_{\iota\gamma} \sqrt{\lambda_\gamma}$.
 Since $S = -[M_1, M_2]$:
-\begin{equation}
-(X^\top SX)_{\iota\gamma}^2 = \lambda_\iota \lambda_\gamma (U^\top [M_1, M_2] U)_{\iota\gamma}^2
-\end{equation}
+$(X^\top S X)_{\iota\gamma}^2 = \lambda_\iota \lambda_\gamma (U^\top [M_1, M_2] U)_{\iota\gamma}^2$.
 
 Substituting:
 \begin{equation}

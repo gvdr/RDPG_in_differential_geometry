@@ -9,3 +9,16 @@ Manifest.toml
 deps/build.log
 docs/build/
 
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.blg
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.synctex(busy)
+
+# PDFs (generated, not tracked)
+paper_arxiv/*.pdf
+paper_latex/*.pdf
