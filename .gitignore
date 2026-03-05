@@ -7,7 +7,7 @@ Manifest.toml
 *.jl.*.cov
 *.jl.mem
 deps/build.log
-docs/build/
+docs/
 
 # LaTeX build artifacts
 *.aux
